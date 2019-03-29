@@ -1,7 +1,7 @@
 <template>
   <div class="hello">
     <img src='@/assets/logo-django.png' style="width: 250px" />
-    <p>The data below is added/removed from the SQLite Database using Django's ORM and Rest Framework.</p>
+    <p>The data below is added/removed from the PostgreSQL Database using Django's ORM and Rest Framework.</p>
     <br/>
     <p>Subject</p>
     <input type="text" placeholder="Hello" v-model="subject">

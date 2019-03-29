@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from .api.views import index_view, MessageViewSet
+from .cuida24.views import index_view, MessageViewSet
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
@@ -18,11 +18,11 @@ urlpatterns = [
     # http://localhost:8000/
     path('', index_view, name='index'),
 
-    # http://localhost:8000/api/<router-viewsets>
-    path('api/', include(router.urls)),
+    # http://localhost:8000/cuida24/<router-viewsets>
+    path('cuida24/', include(router.urls)),
 
-    # http://localhost:8000/api/admin/
-    path('api/admin/', admin.site.urls),
+    # http://localhost:8000/cuida24/admin/
+    path('cuida24/admin/', admin.site.urls),
 ]
 
 
