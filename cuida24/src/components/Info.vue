@@ -1,10 +1,15 @@
 <template>
-	<h3>Página das páginas informativas</h3>
+  <h3>Página de páginas informativas</h3>
 </template>
 
 <script>
+import { Slide } from 'vue-burger-menu'
+
 export default {
   name: 'Info',
+  components: {
+    Slide
+  },
   props: {
 
   }

@@ -7372,6 +7372,13 @@ vm-browserify@0.0.4:
   dependencies:
     indexof "0.0.1"
 
+vue-burger-menu@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/vue-burger-menu/-/vue-burger-menu-2.0.1.tgz#1060e4b00cdbdc806622607b956afd4ae2f8bf4e"
+  integrity sha512-uFFhneAU+BFCR79Dy+dUBV64Nr9YtVTtIvSdQeR8EEk35SonHJdFQj3HN++A1B0P2mzsQyXuHlV79QA6iiszTw==
+  dependencies:
+    vue "^2.5.17"
+
 vue-eslint-parser@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-2.0.3.tgz#c268c96c6d94cfe3d938a5f7593959b0ca3360d1"
