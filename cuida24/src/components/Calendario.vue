@@ -1,13 +1,21 @@
 <template>
-	<h3>Página do calendário</h3>
+	<v-app id="dayspan" v-cloak>
+		<ds-calendar-app :calendar="calendar"></ds-calendar-app>
+	</v-app>
 </template>
 
 <script>
-export default {
-  name: 'Calendario',
-  props: {
+import DaySpanVuetify from 'dayspan-vuetify'
+import { Calendar } from 'dayspan';
 
-  }
+export default {
+	components: {
+		DaySpanVuetify
+	},
+	name: 'Calendario',
+	data: () => ({
+		calendar: Calendar.months()
+	}),
 }
 </script>
 
@@ -32,4 +40,9 @@ img {
   width: 250px;
 }
 
+body, html, #app, #dayspan {
+  font-family: Roboto, sans-serif;
+  width: 100%;
+  height: 100%;
+}
 </style>
