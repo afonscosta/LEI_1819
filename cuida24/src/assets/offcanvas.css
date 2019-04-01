@@ -20,8 +20,8 @@ body {
     transition: -webkit-transform .3s ease-in-out;
     transition: transform .3s ease-in-out;
     transition: transform .3s ease-in-out, -webkit-transform .3s ease-in-out;
-    -webkit-transform: translateX(100%);
-    transform: translateX(100%);
+    -webkit-transform: translateX(-105%);
+    transform: translateX(-105%);
   }
   .offcanvas-collapse.open {
     -webkit-transform: translateX(-1rem);
