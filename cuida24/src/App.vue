@@ -2,6 +2,7 @@
 
   <div id="app">
     <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
+      <img src="@/assets/logo-IADem.png" width="30" height="30" alt="">
       <router-link class="navbar-brand" :to="{ name: 'home' }" @click.native="offoffcanvas() + currentUpdate('')">Cuida24</router-link>
       <button class="navbar-toggler p-0 border-0" type="button" @click="toggleoffcanvas">
         <span class="navbar-toggler-icon"></span>
