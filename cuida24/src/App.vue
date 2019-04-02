@@ -1,7 +1,7 @@
 <template>
 
   <div id="app">
-	<NavbarToOffcanvas></NavbarToOffcanvas>
+	<NavbarToOffcanvas v-if="['calendario'].indexOf($route.name) < 0" ></NavbarToOffcanvas>
 
     <!--<h1>Cuida24</h1>-->
 

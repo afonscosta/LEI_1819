@@ -1,10 +1,10 @@
 <template>
   <nav class="navbar navbar-expand-md fixed-top navbar-dark bg-dark">
-    <img src="@/assets/logo-IADem.png" width="30" height="30" alt="">
     <button class="navbar-toggler p-0 border-0" type="button" @click="toggleoffcanvas">
       <span class="navbar-toggler-icon"></span>
     </button>
     <router-link class="navbar-brand" :to="{ name: 'home' }" @click.native="offoffcanvas() + currentUpdate('')">Cuida24</router-link>
+    <img src="@/assets/logo-IADem.png" width="30" height="30" alt="">
   
     <div class="navbar-collapse offcanvas-collapse" v-bind:class="{ open: collapse }" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
@@ -46,6 +46,8 @@
       </ul>
     </div>
   </nav>
+
+
 </template>
 
 <script>
