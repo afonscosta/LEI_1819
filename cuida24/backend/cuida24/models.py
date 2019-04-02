@@ -115,7 +115,7 @@ class Evento(models.Model):
     dataFim = models.DateField()
     # repeticao
     local = models.TextField()
-    # cor
+    # cor = models.
     descricao = models.TextField()
 
 
@@ -173,7 +173,6 @@ class Tomas(models.Model):
 
 
 # Sessões
-# FALTA OS PARTICIPANTES DA SESSÃO, FK NULA???
 
 class Sessao(models.Model):
     TIPO = (('I', 'Individual'), ('G', 'Grupo'))
@@ -185,6 +184,8 @@ class Sessao(models.Model):
     material = models.TextField()
     detalhes = models.ForeignKey(Evento, on_delete=models.CASCADE)
     estado = models.CharField(max_length=1, choices=ESTADO)
+    # Relação many-to-many só tem que estar num model
+    participantes = models.ManyToManyField(Cuidador)
 
 
 class Avaliacao(models.Model):
