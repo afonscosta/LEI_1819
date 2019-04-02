@@ -109,14 +109,18 @@ class Constituicao(models.Model):
 
 # Evento
 
+class Calendario(models.Model):
+    descricao = models.TextField()
+    cor = models.CharField(max_length=8)
+
 class Evento(models.Model):
     titulo = models.TextField()
     dataInicio = models.DateField()
     dataFim = models.DateField()
     # repeticao
     local = models.TextField()
-    # cor = models.
     descricao = models.TextField()
+    calendario = models.ForeignKey(Calendario, on_delete=models.CASCADE)
 
 
 class Notificacao(models.Model):
@@ -124,6 +128,7 @@ class Notificacao(models.Model):
     hora = models.TimeField()
     # repeticao
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+
 
 
 # Consulta
