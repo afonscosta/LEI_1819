@@ -4,26 +4,45 @@
     <ds-calendar-app ref="cal"
       :calendar="calendar"
       :read-only="readOnly"
-      @change="saveState">
+      @event-create="addEvent"
+      @event-update="updateEvent"
+      @event-remove="deleteEvent"
+    >
 
       <template slot="title">
-        DaySpan
+        Cuida24
       </template>
 
       <template slot="menuRight">
-        <v-btn icon large href="https://github.com/ClickerMonkey/dayspan-vuetify" target="_blank">
+        <v-btn icon large href="/">
           <v-avatar size="32px" tile>
-            <img src="https://simpleicons.org/icons/github.svg" alt="Github">
+            <img src="@/assets/logo-IADem.png" alt="Cuida24">
           </v-avatar>
         </v-btn>
       </template>
 
       <template slot="eventPopover" slot-scope="slotData">
-         <ds-calendar-event-popover
-          v-bind="slotData"
-          :read-only="readOnly"
-          @finish="saveState"
-        ></ds-calendar-event-popover>
+        <ds-calendar-event-popover
+         v-bind="slotData"
+         :read-only="readOnly"
+        >
+          <template slot="eventPopoverToolbarActions" slot-scope="{calendarEvent, calendar, slotData, labels, styleButton}">
+            <ds-schedule-actions
+             slot="activator"
+             v-bind="slotData"
+             :schedule="calendarEvent.schedule"
+             :calendar-event="calendarEvent"
+             :calendar="calendar"
+             :labels="labels"
+             @event-update="updateEvent"
+             @event-remove="deleteEvent"
+            >
+              <v-btn icon dark :style="styleButton">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+            </ds-schedule-actions>
+          </template>
+        </ds-calendar-event-popover>
       </template>
 
       <template slot="eventCreatePopover" slot-scope="{placeholder, calendar, close}">
@@ -32,7 +51,7 @@
           :calendar="calendar"
           :close="$refs.cal.$refs.calendar.clearPlaceholder"
           @create-edit="$refs.cal.editPlaceholder"
-          @create-popover-closed="saveState"
+          @event-create="addEvent"
         ></ds-calendar-event-create-popover>
       </template>
 
@@ -87,12 +106,12 @@ export default {
   name: 'cal',
 
   computed: mapState({
-    events: state => state.events.events
+    calendar: state => state.calendar.calendar
   }),
 
   created() 
   {
-	this.$store.dispatch('events/getEvents');
+    this.$store.dispatch('calendar/getEvents');
   },
 
   mounted()
@@ -104,7 +123,7 @@ export default {
 
   methods:
   {
-	...mapActions('events', ['addEvent', 'deleteEvent']),
+    ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
     getCalendarTime(calendarEvent)
     {
       let sa = calendarEvent.start.format('a');
@@ -125,7 +144,7 @@ export default {
       return (sa === ea) ? (sh + ' - ' + eh + ea) : (sh + sa + ' - ' + eh + ea);
     },
 
-	setLocale(code)
+    setLocale(code)
     {
       moment.lang(code);
 
@@ -149,7 +168,7 @@ export default {
 
       try
       {
-		let savedState = this.events.slice(-1)[0];
+        let savedState = this.calendar;
 
         if (savedState)
         {
@@ -181,7 +200,11 @@ export default {
 
   data: vm => ({
     storeKey: 'dayspanState',
-    calendar: Calendar.months(),
+    //calendar: Calendar.months(),
+    //calendar: Calendar.months(undefined,undefined,undefined,{
+    //  fill: true,
+    //  updateRows: true
+    //}),
     readOnly: false,
     currentLocale: vm.$dayspan.setLocale('pt'),
     locales: [
