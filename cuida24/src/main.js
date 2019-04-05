@@ -35,7 +35,14 @@ Vue.use(Vuetify);
 Vue.use(DaySpanVuetify, {
   data:
   {
-    locales: { en, fr, nl, ca, pt }
+    locales: { en, fr, nl, ca, pt },
+	supports: {
+      busy:           false,
+      icon:           false
+    },
+	features: {
+      drag:           false,
+    },
   },
   methods: {
     getDefaultEventColor: () => '#1976d2'
