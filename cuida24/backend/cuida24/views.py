@@ -3,6 +3,7 @@ from django.views.decorators.cache import never_cache
 from rest_framework import viewsets
 
 from .models import Message, MessageSerializer
+from .models import DefAtividade, DefAtividadeSerializer
 
 
 # Serve Vue Application
@@ -16,4 +17,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
-
+class DefAtividadeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows messages to be viewed or edited.
+    """
+    queryset = DefAtividade.objects.all()
+    serializer_class = DefAtividadeSerializer
