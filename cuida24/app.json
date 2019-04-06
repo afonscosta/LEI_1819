@@ -1,7 +1,7 @@
 {
     "name": "Django VueJs Template",
     "description": "",
-    "repository": "https://github.com/afonscosta/LEI_1819/tree/dev/cuida24",
+    "repository": "https://github.com/afonscosta/LEI_1819",
     "keywords": ["django", "vue", "vuejs", "template", "django rest framework"],
     "env": {
       "DJANGO_SETTINGS_MODULE": {
