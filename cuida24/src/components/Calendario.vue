@@ -4,26 +4,45 @@
     <ds-calendar-app ref="cal"
       :calendar="calendar"
       :read-only="readOnly"
-      @change="saveState">
+      @event-create="addEvent"
+      @event-update="updateEvent"
+      @event-remove="deleteEvent"
+    >
 
       <template slot="title">
-        DaySpan
+        Cuida24
       </template>
 
       <template slot="menuRight">
-        <v-btn icon large href="https://github.com/ClickerMonkey/dayspan-vuetify" target="_blank">
+        <v-btn icon large href="/">
           <v-avatar size="32px" tile>
-            <img src="https://simpleicons.org/icons/github.svg" alt="Github">
+            <img src="@/assets/logo-IADem.png" alt="Cuida24">
           </v-avatar>
         </v-btn>
       </template>
 
       <template slot="eventPopover" slot-scope="slotData">
-         <ds-calendar-event-popover
-          v-bind="slotData"
-          :read-only="readOnly"
-          @finish="saveState"
-        ></ds-calendar-event-popover>
+        <ds-calendar-event-popover
+         v-bind="slotData"
+         :read-only="readOnly"
+        >
+          <template slot="eventPopoverToolbarActions" slot-scope="{calendarEvent, calendar, slotData, labels, styleButton}">
+            <ds-schedule-actions
+             slot="activator"
+             v-bind="slotData"
+             :schedule="calendarEvent.schedule"
+             :calendar-event="calendarEvent"
+             :calendar="calendar"
+             :labels="labels"
+             @event-update="updateEvent"
+             @event-remove="deleteEvent"
+            >
+              <v-btn icon dark :style="styleButton">
+                <v-icon>more_vert</v-icon>
+              </v-btn>
+            </ds-schedule-actions>
+          </template>
+        </ds-calendar-event-popover>
       </template>
 
       <template slot="eventCreatePopover" slot-scope="{placeholder, calendar, close}">
@@ -32,7 +51,7 @@
           :calendar="calendar"
           :close="$refs.cal.$refs.calendar.clearPlaceholder"
           @create-edit="$refs.cal.editPlaceholder"
-          @create-popover-closed="saveState"
+          @event-create="addEvent"
         ></ds-calendar-event-create-popover>
       </template>
 
@@ -76,8 +95,9 @@
 </template>
 
 <script>
-import { Calendar, Weekday, Month } from 'dayspan';
 import Vue from 'vue';
+import { mapState, mapActions } from 'vuex'
+import { Calendar, Weekday, Month } from 'dayspan';
 import * as moment from 'moment';
 
 
@@ -85,9 +105,106 @@ export default {
 
   name: 'cal',
 
+  computed: mapState({
+    calendar: state => state.calendar.calendar
+  }),
+
+  created() 
+  {
+    this.$store.dispatch('calendar/getEvents');
+  },
+
+  mounted()
+  {
+    window.cal = this.$refs.cal;
+
+    this.loadState();
+  },
+
+  methods:
+  {
+    ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
+    getCalendarTime(calendarEvent)
+    {
+      let sa = calendarEvent.start.format('a');
+      let ea = calendarEvent.end.format('a');
+      let sh = calendarEvent.start.format('h');
+      let eh = calendarEvent.end.format('h');
+
+      if (calendarEvent.start.minute !== 0)
+      {
+        sh += calendarEvent.start.format(':mm');
+      }
+
+      if (calendarEvent.end.minute !== 0)
+      {
+        eh += calendarEvent.end.format(':mm');
+      }
+
+      return (sa === ea) ? (sh + ' - ' + eh + ea) : (sh + sa + ' - ' + eh + ea);
+    },
+
+    setLocale(code)
+    {
+      moment.lang(code);
+
+      this.$dayspan.setLocale(code);
+      this.$dayspan.refreshTimes();
+
+      this.$refs.cal.$forceUpdate();
+    },
+
+    saveState()
+    {
+      let state = this.calendar.toInput(true);
+      let json = JSON.stringify(state);
+      this.addEvent(state);
+      localStorage.setItem(this.storeKey, json);
+    },
+
+    loadState()
+    {
+      let state = {};
+
+      try
+      {
+        let savedState = this.calendar;
+
+        if (savedState)
+        {
+          state = savedState;
+          state.preferToday = false;
+        }
+      }
+      catch (e)
+      {
+        // eslint-disable-next-line
+        console.log( e );
+      }
+
+      if (!state.events || !state.events.length)
+      {
+        state.events = this.defaultEvents;
+      }
+
+      state.events.forEach(ev =>
+      {
+        let defaults = this.$dayspan.getDefaultEventDetails();
+
+        ev.data = Vue.util.extend( defaults, ev.data );
+      });
+
+      this.$refs.cal.setState( state );
+    }
+  },
+
   data: vm => ({
     storeKey: 'dayspanState',
-    calendar: Calendar.months(),
+    //calendar: Calendar.months(),
+    //calendar: Calendar.months(undefined,undefined,undefined,{
+    //  fill: true,
+    //  updateRows: true
+    //}),
     readOnly: false,
     currentLocale: vm.$dayspan.setLocale('pt'),
     locales: [
@@ -273,90 +390,7 @@ export default {
         }
       }
     ]
-  }),
-
-  mounted()
-  {
-    window.cal = this.$refs.cal;
-
-    this.loadState();
-  },
-
-  methods:
-  {
-    getCalendarTime(calendarEvent)
-    {
-      let sa = calendarEvent.start.format('a');
-      let ea = calendarEvent.end.format('a');
-      let sh = calendarEvent.start.format('h');
-      let eh = calendarEvent.end.format('h');
-
-      if (calendarEvent.start.minute !== 0)
-      {
-        sh += calendarEvent.start.format(':mm');
-      }
-
-      if (calendarEvent.end.minute !== 0)
-      {
-        eh += calendarEvent.end.format(':mm');
-      }
-
-      return (sa === ea) ? (sh + ' - ' + eh + ea) : (sh + sa + ' - ' + eh + ea);
-    },
-
-	setLocale(code)
-    {
-      moment.lang(code);
-
-      this.$dayspan.setLocale(code);
-      this.$dayspan.refreshTimes();
-
-      this.$refs.cal.$forceUpdate();
-    },
-
-    saveState()
-    {
-      let state = this.calendar.toInput(true);
-      let json = JSON.stringify(state);
-
-      localStorage.setItem(this.storeKey, json);
-    },
-
-    loadState()
-    {
-      let state = {};
-
-      try
-      {
-        let savedState = JSON.parse(localStorage.getItem(this.storeKey));
-
-        if (savedState)
-        {
-          state = savedState;
-          state.preferToday = false;
-        }
-      }
-      catch (e)
-      {
-        // eslint-disable-next-line
-        console.log( e );
-      }
-
-      if (!state.events || !state.events.length)
-      {
-        state.events = this.defaultEvents;
-      }
-
-      state.events.forEach(ev =>
-      {
-        let defaults = this.$dayspan.getDefaultEventDetails();
-
-        ev.data = Vue.util.extend( defaults, ev.data );
-      });
-
-      this.$refs.cal.setState( state );
-    }
-  }
+  })
 }
 </script>
 

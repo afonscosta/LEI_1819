@@ -1,3 +1,4 @@
+backend/cuida24/migrations/*
 cuida24/yarn.lock
 .DS_Store
 node_modules
