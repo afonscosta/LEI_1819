@@ -1,5 +1,6 @@
 {
-    "name": "Django VueJs Template",
+    "name": "Cuida24",
+	"repository": "https://github.com/afonscosta/LEI_1819",
     "description": "",
     "keywords": ["django", "vue", "vuejs", "template", "django rest framework"],
     "env": {
