@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import * as firebase from 'firebase'
 import NavbarToOffcanvas from './components/NavbarToOffcanvas.vue'
 
 export default {
@@ -24,6 +25,21 @@ export default {
     NavbarToOffcanvas
   },
   methods: {
+  },
+  created () {
+    this.$messaging
+      .requestPermission()
+      .then(() => this.$messaging.getToken())
+      .then((token) => {
+        console.log(token) // Receiver Token to use in the notification
+      })
+      .catch(function (err) {
+        console.log('Unable to get permission to notify.', err)
+      })
+
+    this.$messaging.onMessage(function (payload) {
+      console.log('Message received. ', payload)
+    })
   }
 }
 </script>
