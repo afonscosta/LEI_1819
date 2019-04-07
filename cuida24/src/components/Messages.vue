@@ -30,12 +30,12 @@
 import { mapState, mapActions } from 'vuex'
 
 export default {
-  name: "Messages",
-  data() {
+  name: 'Messages',
+  data () {
     return {
-      subject: "",
-      msgBody: "",
-    };
+      subject: '',
+      msgBody: ''
+    }
   },
   computed: mapState({
     messages: state => state.messages.messages
@@ -44,10 +44,10 @@ export default {
     'addMessage',
     'deleteMessage'
   ]),
-  created() {
+  created () {
     this.$store.dispatch('messages/getMessages')
   }
-};
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

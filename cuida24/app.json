@@ -10,7 +10,6 @@
       }
      },
      "engines": {
-        "yarn": "1.4.0",
         "npm": "6.2.0"
      },
     "addons": [
@@ -24,4 +23,4 @@
           "url": "heroku/python"
         }
     ]
-  }
+}

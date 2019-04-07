@@ -17,14 +17,14 @@
 import NavbarToOffcanvas from './components/NavbarToOffcanvas.vue'
 
 export default {
-	name: 'App',
-	data: () => ({
-	}),
-	components: {
-		NavbarToOffcanvas
-	},
-	methods: {
-	}
+  name: 'App',
+  data: () => ({
+  }),
+  components: {
+    NavbarToOffcanvas
+  },
+  methods: {
+  }
 }
 </script>
 

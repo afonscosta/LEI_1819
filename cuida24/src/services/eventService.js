@@ -1,16 +1,16 @@
 import cuida24 from '@/services/cuida24'
 
 export default {
-  fetchEvents() {
+  fetchEvents () {
     return cuida24.get(`events/`)
-              .then(response => response.data)
+      .then(response => response.data)
   },
-  postEvent(payload) {
+  postEvent (payload) {
     return cuida24.post(`events/`, payload)
-              .then(response => response.data)
+      .then(response => response.data)
   },
-  deleteEvent(eventId) {
+  deleteEvent (eventId) {
     return cuida24.delete(`events/${eventId}`)
-              .then(response => response.data)
+      .then(response => response.data)
   }
 }

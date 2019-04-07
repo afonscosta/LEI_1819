@@ -52,49 +52,45 @@
 
 <script>
 export default {
-	name: 'NavbarToOffcanvas',
-	data() {
-		return {
-			collapse: false,
-			calendarioCurrent: false,
-			habitosCurrent: false,
-			chatCurrent: false,
-			jogosCurrent: false,
-			infoCurrent: false
-		}
-	},
-	methods: {
-		toggleoffcanvas: function () {
-			this.collapse = !this.collapse
-			return this.collapse
-		},
-		offoffcanvas: function () {
-			this.collapse = false
-			return this.collapse
-		},
-		currentUpdate: function(page) {
-			this.calendarioCurrent = false
-			this.habitosCurrent = false
-			this.chatCurrent = false
-			this.jogosCurrent = false
-			this.infoCurrent = false
-			if (page == "calendario") {
-				this.calendarioCurrent = true
-			}
-			else if (page == "habitos") {
-				this.habitosCurrent = true
-			}
-			else if (page == "chat") {
-				this.chatCurrent = true
-			}
-			else if (page == "jogos") {
-				this.jogosCurrent = true
-			}
-			else if (page == "info") {
-				this.infoCurrent = true
-			}
-		}
-	}
+  name: 'NavbarToOffcanvas',
+  data () {
+    return {
+      collapse: false,
+      calendarioCurrent: false,
+      habitosCurrent: false,
+      chatCurrent: false,
+      jogosCurrent: false,
+      infoCurrent: false
+    }
+  },
+  methods: {
+    toggleoffcanvas: function () {
+      this.collapse = !this.collapse
+      return this.collapse
+    },
+    offoffcanvas: function () {
+      this.collapse = false
+      return this.collapse
+    },
+    currentUpdate: function (page) {
+      this.calendarioCurrent = false
+      this.habitosCurrent = false
+      this.chatCurrent = false
+      this.jogosCurrent = false
+      this.infoCurrent = false
+      if (page === 'calendario') {
+        this.calendarioCurrent = true
+      } else if (page === 'habitos') {
+        this.habitosCurrent = true
+      } else if (page === 'chat') {
+        this.chatCurrent = true
+      } else if (page === 'jogos') {
+        this.jogosCurrent = true
+      } else if (page === 'info') {
+        this.infoCurrent = true
+      }
+    }
+  }
 }
 </script>
 

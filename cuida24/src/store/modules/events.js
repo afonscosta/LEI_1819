@@ -1,11 +1,11 @@
 import eventService from '../../services/eventService'
-import { Calendar } from 'dayspan';
+import { Calendar } from 'dayspan'
 
 const state = {
-  calendar: Calendar.months(undefined,undefined,undefined,{
-      fill: true,
-      updateRows: true
-    })
+  calendar: Calendar.months(undefined, undefined, undefined, {
+    fill: true,
+    updateRows: true
+  })
 }
 
 const getters = {
@@ -16,29 +16,29 @@ const getters = {
 
 const mutations = {
   setEvents (state, events) {
-    let cal = Calendar.months(undefined,undefined,undefined,{
+    let cal = Calendar.months(undefined, undefined, undefined, {
       fill: true,
       updateRows: true
     })
     cal.addEvents(events)
     state.calendar = cal
   },
-  addEvent(state, event) {
+  addEvent (state, event) {
     let cal = Calendar.fromInput(state.calendar)
     cal.addEvent(event)
     state.calendar = cal
   },
-  updateEvent(state, event) {
+  updateEvent (state, event) {
     let cal = Calendar.fromInput(state.calendar)
-    let old_event = cal.findEvent(event.id)
-    cal.removeEvent(old_event)
+    let oldEvent = cal.findEvent(event.id)
+    cal.removeEvent(oldEvent)
     cal.addEvent(event)
     state.calendar = cal
   },
-  deleteEvent(state, eventId) {
+  deleteEvent (state, eventId) {
     let cal = Calendar.fromInput(state.calendar)
-    let old_event = cal.findEvent(eventId)
-    cal.removeEvent(old_event)
+    let oldEvent = cal.findEvent(eventId)
+    cal.removeEvent(oldEvent)
     state.calendar = cal
   }
 }
@@ -46,23 +46,23 @@ const mutations = {
 const actions = {
   getEvents ({ commit }) {
     eventService.fetchEvents()
-    .then(events => {
-      commit('setEvents', events)
-    })
+      .then(events => {
+        commit('setEvents', events)
+      })
   },
-  addEvent({ commit }, event) {
+  addEvent ({ commit }, event) {
     eventService.postEvent(event)
-    .then(new_event => {
-      commit('addEvent', new_event)
-    })
+      .then(newEvent => {
+        commit('addEvent', newEvent)
+      })
   },
-  updateEvent({ commit }, event) {
+  updateEvent ({ commit }, event) {
     eventService.postEvent(event)
-    .then(() => {
-      commit('updateEvent', event)
-    })
+      .then(() => {
+        commit('updateEvent', event)
+      })
   },
-  deleteEvent( { commit }, event) {
+  deleteEvent ({ commit }, event) {
     eventService.deleteEvent(event.id)
     commit('deleteEvent', event.id)
   }
