@@ -44,6 +44,9 @@
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </ul>
+      <router-link class="btn btn-primary" :to="{ name: 'login' }">
+        Login
+      </router-link>
     </div>
   </nav>
 

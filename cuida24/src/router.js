@@ -10,6 +10,7 @@ import InfoIadem from '@/components/InfoIadem'
 import InfoDemencia from '@/components/InfoDemencia'
 import InfoApoio from '@/components/InfoApoio'
 import Messages from '@/components/Messages'
+import Login from '@/components/Login'
 
 Vue.use(Router)
 
@@ -19,6 +20,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component: VueDemo
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '/calendario',
