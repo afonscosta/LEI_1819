@@ -284,7 +284,7 @@ class NotificacaoSerializer(serializers.HyperlinkedModelSerializer):
 # Consulta
 
 class Consulta(models.Model):
-    detalhes = models.OneToOneField(Evento)
+    detalhes = models.OneToOneField(Evento,on_delete=models.CASCADE)
 
 
 class ConsultaSerializer(serializers.HyperlinkedModelSerializer):
