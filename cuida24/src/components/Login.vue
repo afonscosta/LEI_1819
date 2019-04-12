@@ -24,7 +24,7 @@ export default {
     },
     methods: {
         login() {
-            console.log(this.email, this.password)
+            console.log(this.email, this.password);
             this.$store.dispatch('login/getToken', {
                 username: this.email,
                 password: this.password,
