@@ -8,11 +8,13 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-from .cuida24.views import index_view, MessageViewSet, DefAtividadeViewSet
+from .cuida24.views import index_view, MessageViewSet, DefAtividadeViewSet, EventViewSet, CalendarViewSet
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
 router.register('defatividades', DefAtividadeViewSet)
+router.register('events', EventViewSet)
+router.register('calendars', CalendarViewSet)
 
 urlpatterns = [
 
@@ -25,5 +27,4 @@ urlpatterns = [
     # http://localhost:8000/cuida24/admin/
     path('cuida24/admin/', admin.site.urls),
 ]
-
 
