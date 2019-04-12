@@ -6,16 +6,19 @@ const state = {
 }
 
 const getters = {
-    token: state => {
-        return state.token
+    accesstoken: state => {
+        return state.accesstoken
+    },
+    refreshtoken: state => {
+        return state.refreshtoken
     }
 }
 
 const mutations = {
     setToken (state, response) {
-        state.accesstoken = response.access
-        state.refreshtoken = response.refreshtoken
-        //console.log(state.token)
+        state.accesstoken = response.access;
+        state.refreshtoken = response.refresh;
+        //console.log("teste mutations " + state.refreshtoken)
     }
 }
 
