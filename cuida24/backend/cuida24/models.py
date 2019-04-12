@@ -1,21 +1,36 @@
 from django.db import models
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
+import logging
 
 
 class Message(models.Model):
     subject = models.CharField(max_length=200)
     body = models.TextField()
 
+
 class MessageSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Message
         fields = ('url', 'subject', 'body', 'pk')
+
+    def create(self, validated_data):
+        logger = logging.getLogger("mylogger")
+        logger.info(validated_data)
+
+        message = Message(
+            subject="olaFromCode",
+            body=validated_data['body'],
+        )
+        message.save()
+        return message
 
 
 # Atividades definidas no backoffice
 
 class DefAtividade(models.Model):
     objetivo = models.IntegerField()
+
 
 class DefAtividadeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -25,6 +40,7 @@ class DefAtividadeSerializer(serializers.HyperlinkedModelSerializer):
 
 class Jogos(models.Model):
     atividade = models.ForeignKey(DefAtividade, on_delete=models.CASCADE)
+
 
 class JogosSerializer(serializers.HyperlinkedModelSerializer):
     atividade = DefAtividadeSerializer()
@@ -38,17 +54,19 @@ class AtividadeFisica(models.Model):
     descricao = models.TextField()
     atividade = models.ForeignKey(DefAtividade, on_delete=models.CASCADE)
 
+
 class AtividadeFisicaSerializer(serializers.HyperlinkedModelSerializer):
     atividade = DefAtividadeSerializer()
 
     class Meta:
         model = AtividadeFisica
-        fields= ('url', 'descricao', 'pk')
+        fields = ('url', 'descricao', 'pk')
 
 
 class LazerSocial(models.Model):
     descricao = models.TextField()
     atividade = models.ForeignKey(DefAtividade, on_delete=models.CASCADE)
+
 
 class LazerSocialSerializer(serializers.HyperlinkedModelSerializer):
     atividade = DefAtividadeSerializer()
@@ -91,6 +109,7 @@ class CuidadorSerializer(serializers.HyperlinkedModelSerializer):
 class Utente(models.Model):
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
 
+
 class UtenteSerializer(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
 
@@ -100,6 +119,7 @@ class UtilizadorBackoffice(models.Model):
     ('ADM', 'Administrador'), ('COR', 'Coordenador'), ('REM', 'Responsável Medicação'), ('PRF', 'Profissional Saúde'),
     ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
     tipo = models.CharField(max_length=3, choices=TIPO)
+
 
 class UtilizadorBackOfficeSerializer(serializers.HyperlinkedModelSerializer):
 
@@ -114,6 +134,7 @@ class ParamFisiologicos(models.Model):
     data = models.DateField()
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
 
+
 class ParamFisiologicos(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
 
@@ -125,6 +146,7 @@ class ParamFisiologicos(serializers.HyperlinkedModelSerializer):
 class ParamAnaliticos(models.Model):
     data = models.DateField()
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+
 
 class ParamAnaliticosSerializer(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
@@ -139,6 +161,7 @@ class Agua(models.Model):
     quantidade = models.IntegerField()
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
 
+
 class AguaSerializer(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
 
@@ -152,6 +175,7 @@ class Sesta(models.Model):
     quantidade = models.IntegerField()
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
 
+
 class SestaSerializer(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
 
@@ -164,6 +188,7 @@ class Sono(models.Model):
     data = models.DateField()
     qualidade = models.BooleanField()
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+
 
 class SonoSerializer(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
@@ -181,6 +206,7 @@ class Atividade(models.Model):
     duracao = models.TimeField()
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
 
+
 class AtividadeSerializer(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
 
@@ -196,6 +222,7 @@ class Refeicao(models.Model):
     tipo = models.CharField(max_length=2, choices=TIPO)
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
 
+
 class RefeicaoSerializers(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()
 
@@ -210,6 +237,7 @@ class Constituicao(models.Model):
     alimento = models.CharField(max_length=2, choices=TIPO)
     refeicao = models.ForeignKey(Refeicao, on_delete=models.CASCADE)
 
+
 class ConstituicaoSerializer(serializers.HyperlinkedModelSerializer):
     refeicao = RefeicaoSerializers()
 
@@ -218,43 +246,76 @@ class ConstituicaoSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'alimento', 'pk')
 
 
-# Evento
+# Event
 
-class Calendario(models.Model):
-    descricao = models.TextField()
-    cor = models.CharField(max_length=8)
+class Calendar(models.Model):
+    calendar = models.TextField()
+    color = models.CharField(max_length=8)
+    forecolor = models.CharField(max_length=8, null=True, blank=True)
 
-class CalendarioSerializer(serializers.HyperlinkedModelSerializer):
+    def __str__(self):
+        return self.calendar
+
+
+class CalendarSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
-        model = Calendario
-        fields = ('url', 'descricao', 'cor', 'pk')
+        model = Calendar
+        fields = ('url', 'calendar', 'color','forecolor')
 
-class Evento(models.Model):
-    titulo = models.TextField()
-    dataInicio = models.DateField()
-    dataFim = models.DateField()
+
+class Event(models.Model):
+    title = models.TextField()
+    #dataInicio = models.DateField()
+    #dataFim = models.DateField()
     # repeticao
-    local = models.TextField()
-    descricao = models.TextField()
-    calendario = models.ForeignKey(Calendario, on_delete=models.CASCADE)
+    location = models.TextField()
+    description = models.TextField()
+    busy = models.BooleanField(null=True, blank=True)
+    icon = models.TextField(null=True, blank=True)
+    visible = models.BooleanField()
+    calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
 
-class EventoSerializer(serializers.HyperlinkedModelSerializer):
-    calendario = CalendarioSerializer()
+    def __str__(self):
+        return self.title
+
+
+class EventSerializer(serializers.HyperlinkedModelSerializer):
+    visible = serializers.BooleanField(required=False)
+    busy = serializers.BooleanField(required=False)
+    visible = serializers.BooleanField(required=False)
 
     class Meta:
-        model = Evento
-        fields = ('url', 'titulo', 'dataInicio', 'dataFim', 'local', 'descricao', 'pk')
+        model = Event
+        fields = ('url', 'title', 'location', 'description', 'busy', 'icon', 'visible', 'calendar', 'pk')
+
+    '''
+    def create(self, validated_data):
+        logger = logging.getLogger("mylogger")
+        logger.info("OLA FROM SERIALIZER CREATE")
+        logger.info(validated_data)
+
+        event = Event(
+            title=validated_data['data']['title'],
+            location=validated_data['data']['location'],
+            description=validated_data['data']['description'],
+            calendario=Calendar.objects.get(color=validated_data['data']['color'])
+        )
+        
+        event.save()
+        return event
+    '''
 
 
 class Notificacao(models.Model):
     dataInicio = models.DateField()
     hora = models.TimeField()
     # repeticao
-    evento = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    evento = models.ForeignKey(Event, on_delete=models.CASCADE)
+
 
 class NotificacaoSerializer(serializers.HyperlinkedModelSerializer):
-    evento = EventoSerializer()
+    evento = EventSerializer()
 
     class Meta:
         model = Notificacao
@@ -265,9 +326,11 @@ class NotificacaoSerializer(serializers.HyperlinkedModelSerializer):
 # Consulta
 
 class Consulta(models.Model):
-    pass
+    detalhes = models.OneToOneField(Event, on_delete=models.CASCADE)
+
 
 class ConsultaSerializer(serializers.HyperlinkedModelSerializer):
+    detalhes = EventSerializer()
 
     class Meta:
         model = Consulta
@@ -280,6 +343,7 @@ class NotaConsulta(models.Model):
     nota = models.TextField()
     autor = models.ForeignKey(UtilizadorBackoffice, on_delete=models.CASCADE)
     categoria = models.CharField(max_length=3, choices=CATEGORIA)
+
 
 class ConsultaSerializer(serializers.HyperlinkedModelSerializer):
     consulta = ConsultaSerializer()
@@ -301,6 +365,7 @@ class Medicamento(models.Model):
     titular = models.TextField()
     generico = models.TextField()
 
+
 class MedicamentoSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
@@ -312,6 +377,7 @@ class Prescricao(models.Model):
     data = models.DateField()
     utente = models.ForeignKey(Utente,on_delete=models.CASCADE)
     autor = models.ForeignKey(UtilizadorBackoffice, on_delete=models.CASCADE)
+
 
 class PrescricaoSerializer(serializers.HyperlinkedModelSerializer):
     utente = UtenteSerializer()
@@ -326,12 +392,13 @@ class Medicacao(models.Model):
     ESTADO = (('E', 'Experimental'), ('A', 'Ativo'), ('I', 'Inativo'))
     quantidade = models.IntegerField()
     estado = models.CharField(max_length=2, choices=ESTADO)
-    detalhes = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    detalhes = models.OneToOneField(Event, on_delete=models.CASCADE)
     medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE)
     prescricao = models.ForeignKey(Prescricao, on_delete=models.CASCADE)
 
+
 class MedicacaoSerializer(serializers.HyperlinkedModelSerializer):
-    detalhes = EventoSerializer()
+    detalhes = EventSerializer()
     medicamento = MedicamentoSerializer()
     prescricao = PrescricaoSerializer()
 
@@ -343,6 +410,7 @@ class MedicacaoSerializer(serializers.HyperlinkedModelSerializer):
 class Toma(models.Model):
     data = models.DateField()
     medicacao = models.ForeignKey(Medicacao, on_delete=models.CASCADE)
+
 
 class TomaSerializer(serializers.HyperlinkedModelSerializer):
     medicacao = MedicacaoSerializer()
@@ -362,25 +430,26 @@ class Sessao(models.Model):
     descricao = models.TextField()
     objetivo = models.TextField()
     material = models.TextField()
-    detalhes = models.ForeignKey(Evento, on_delete=models.CASCADE)
+    detalhes = models.OneToOneField(Event, on_delete=models.CASCADE)
     estado = models.CharField(max_length=1, choices=ESTADO)
     # Relação many-to-many só tem que estar num model
     participantes = models.ManyToManyField('Cuidador')
 
 class SessaoSerializer(serializers.HyperlinkedModelSerializer):
-    # VER COMO SE FAZ O SERIALIZER DE UMA RELAÇÃO "MANYTOMANY"
-    detalhes = EventoSerializer()
+    # Relação many-to-many
+    participantes = CuidadorSerializer(many=True)
+    detalhes = EventSerializer()
 
     class Meta:
         model = Sessao
         fields = ('url', 'tema', 'tipo', 'descricao', 'objetivo', 'material', 'estado', 'pk')
 
 
-
 class Avaliacao(models.Model):
     comentario = models.TextField()
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
     sessao = models.ForeignKey(Sessao, on_delete=models.CASCADE)
+
 
 class AvaliacaoSerializer(serializers.HyperlinkedModelSerializer):
     cuidador = CuidadorSerializer()

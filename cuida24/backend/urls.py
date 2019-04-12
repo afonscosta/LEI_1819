@@ -9,11 +9,13 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .cuida24.views import index_view, MessageViewSet, DefAtividadeViewSet
+from .cuida24.views import index_view, MessageViewSet, DefAtividadeViewSet, EventViewSet, CalendarViewSet
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
 router.register('defatividades', DefAtividadeViewSet)
+router.register('events', EventViewSet)
+router.register('calendars', CalendarViewSet)
 
 urlpatterns = [
 
@@ -35,5 +37,4 @@ urlpatterns = [
     # to refresh the JWT token
     path('cuida24/token/refresh/', TokenRefreshView.as_view())
 ]
-
 

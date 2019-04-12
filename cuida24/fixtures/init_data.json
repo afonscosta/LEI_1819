@@ -1,0 +1,20 @@
+[
+  {
+    "model": "cuida24.Calendar",
+    "pk": 1,
+    "fields": {
+       "calendar": "Consultas",
+       "color": "#1976d2",
+       "forecolor": "#ffffff"
+    }
+  },
+  {
+    "model": "cuida24.Calendar",
+    "pk": 2,
+    "fields": {
+      "calendar": "Medicação",
+      "color": "#E91E63",
+      "forecolor": "#ffffff"
+    }
+  }
+]

@@ -128,7 +128,7 @@ The [`Procfile`](/Procfile) will run Django migrations and then launch Django'S 
 
 ##### Heroku One Click Deploy
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/gtalarico/django-vue-template)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/afonscosta/LEI_1819/tree/dev/cuida24)
 
 ## Static Assets
 
