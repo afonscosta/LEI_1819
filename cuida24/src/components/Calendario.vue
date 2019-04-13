@@ -42,6 +42,11 @@
               </v-btn>
             </ds-schedule-actions>
           </template>
+
+          <template slot="eventPopoverNotifications" slot-scope="{slotData, details}">
+            <v-list-tile-title>{{ details.notify }}</v-list-tile-title>
+          </template>
+
         </ds-calendar-event-popover>
       </template>
 
@@ -52,7 +57,20 @@
           :close="$refs.cal.$refs.calendar.clearPlaceholder"
           @create-edit="$refs.cal.editPlaceholder"
           @event-create="addEvent"
-        ></ds-calendar-event-create-popover>
+        >
+        </ds-calendar-event-create-popover>
+      </template>
+
+      <template slot="schedule" slot-scope="{calendarEvent, details, isReadOnly, labels, day, readOnly, schedule}">
+        <ds-schedule
+          :schedule="schedule"
+          :day="day"
+          :read-only="readOnly"
+        ></ds-schedule>
+        <notification
+          :notify="details.notify"
+          @removeNotification="removeNotification"
+        ></notification>
       </template>
 
       <template slot="eventTimeTitle" slot-scope="{calendarEvent, details}">
@@ -95,123 +113,109 @@
 </template>
 
 <script>
-import Vue from 'vue';
+import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
-import { Calendar, Weekday, Month } from 'dayspan';
-import * as moment from 'moment';
-
+import { Weekday, Month } from 'dayspan'
+import * as moment from 'moment'
+import notification from './Notification.vue'
 
 export default {
 
   name: 'cal',
 
+  components: {
+    notification
+  },
+
   computed: mapState({
     calendar: state => state.calendar.calendar
   }),
 
-  created() 
-  {
-    this.$store.dispatch('calendar/getEvents');
+  created () {
+    this.$store.dispatch('calendar/getEvents')
   },
 
-  mounted()
-  {
-    window.cal = this.$refs.cal;
+  mounted () {
+    window.cal = this.$refs.cal
 
-    this.loadState();
+    this.loadState()
   },
 
   methods:
   {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    getCalendarTime(calendarEvent)
-    {
-      let sa = calendarEvent.start.format('a');
-      let ea = calendarEvent.end.format('a');
-      let sh = calendarEvent.start.format('h');
-      let eh = calendarEvent.end.format('h');
+    getCalendarTime (calendarEvent) {
+      let sa = calendarEvent.start.format('a')
+      let ea = calendarEvent.end.format('a')
+      let sh = calendarEvent.start.format('h')
+      let eh = calendarEvent.end.format('h')
 
-      if (calendarEvent.start.minute !== 0)
-      {
-        sh += calendarEvent.start.format(':mm');
+      if (calendarEvent.start.minute !== 0) {
+        sh += calendarEvent.start.format(':mm')
       }
 
-      if (calendarEvent.end.minute !== 0)
-      {
-        eh += calendarEvent.end.format(':mm');
+      if (calendarEvent.end.minute !== 0) {
+        eh += calendarEvent.end.format(':mm')
       }
 
-      return (sa === ea) ? (sh + ' - ' + eh + ea) : (sh + sa + ' - ' + eh + ea);
+      return (sa === ea) ? (sh + ' - ' + eh + ea) : (sh + sa + ' - ' + eh + ea)
     },
 
-    setLocale(code)
-    {
-      moment.lang(code);
+    setLocale (code) {
+      moment.lang(code)
 
-      this.$dayspan.setLocale(code);
-      this.$dayspan.refreshTimes();
+      this.$dayspan.setLocale(code)
+      this.$dayspan.refreshTimes()
 
-      this.$refs.cal.$forceUpdate();
+      this.$refs.cal.$forceUpdate()
     },
 
-    saveState()
-    {
-      let state = this.calendar.toInput(true);
-      let json = JSON.stringify(state);
-      this.addEvent(state);
-      localStorage.setItem(this.storeKey, json);
+    saveState () {
+      let state = this.calendar.toInput(true)
+      let json = JSON.stringify(state)
+      this.addEvent(state)
+      localStorage.setItem(this.storeKey, json)
     },
 
-    loadState()
-    {
-      let state = {};
+    loadState () {
+      let state = {}
 
-      try
-      {
-        let savedState = this.calendar;
+      try {
+        let savedState = this.calendar
 
-        if (savedState)
-        {
-          state = savedState;
-          state.preferToday = false;
+        if (savedState) {
+          state = savedState
+          state.preferToday = false
         }
-      }
-      catch (e)
-      {
+      } catch (e) {
         // eslint-disable-next-line
-        console.log( e );
+        console.log( e )
       }
 
-      if (!state.events || !state.events.length)
-      {
-        state.events = this.defaultEvents;
+      if (!state.events || !state.events.length) {
+        state.events = this.defaultEvents
       }
 
-      state.events.forEach(ev =>
-      {
-        let defaults = this.$dayspan.getDefaultEventDetails();
+      state.events.forEach(ev => {
+        let defaults = this.$dayspan.getDefaultEventDetails()
 
-        ev.data = Vue.util.extend( defaults, ev.data );
-      });
+        ev.data = Vue.util.extend(defaults, ev.data)
+      })
 
-      this.$refs.cal.setState( state );
+      this.$refs.cal.setState(state)
     }
   },
 
   data: vm => ({
     storeKey: 'dayspanState',
-    //calendar: Calendar.months(),
-    //calendar: Calendar.months(undefined,undefined,undefined,{
-    //  fill: true,
-    //  updateRows: true
-    //}),
+    // calendar: Calendar.months(),
+    // calendar: Calendar.months(undefined,undefined,undefined,{
+    //   fill: true,
+    //   updateRows: true
+    // }),
     readOnly: false,
     currentLocale: vm.$dayspan.setLocale('pt'),
     locales: [
-      { value: 'en', text: 'English' },
-      { value: 'fr', text: 'French' },
-      { value: 'nl', text: 'Dutch' },
-      { value: 'ca', text: 'Catalan' },
       { value: 'pt', text: 'Português' }
     ],
     defaultEvents: [

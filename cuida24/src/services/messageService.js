@@ -1,16 +1,16 @@
 import cuida24 from '@/services/cuida24'
 
 export default {
-  fetchMessages() {
+  fetchMessages () {
     return cuida24.get(`messages/`)
-              .then(response => response.data)
+      .then(response => response.data)
   },
-  postMessage(payload) {
+  postMessage (payload) {
     return cuida24.post(`messages/`, payload)
-              .then(response => response.data)
+      .then(response => response.data)
   },
-  deleteMessage(msgId) {
+  deleteMessage (msgId) {
     return cuida24.delete(`messages/${msgId}`)
-              .then(response => response.data)
+      .then(response => response.data)
   }
 }

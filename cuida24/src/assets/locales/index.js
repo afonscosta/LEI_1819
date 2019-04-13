@@ -1,10 +1,9 @@
 
-import en from './en'
-import nl from './nl'
+import pt from './pt_br'
 
 export default {
-  'en': en,
-  'en-US': en
+  'pt': pt,
+  'pt-PT': pt
 }
 
-export const defaultLocale = 'en'
+export const defaultLocale = 'pt'

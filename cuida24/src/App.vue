@@ -1,7 +1,7 @@
 <template>
 
   <div id="app">
-	<NavbarToOffcanvas v-if="['calendario'].indexOf($route.name) < 0" ></NavbarToOffcanvas>
+    <NavbarToOffcanvas v-if="['calendario'].indexOf($route.name) < 0" ></NavbarToOffcanvas>
 
     <!--<h1>Cuida24</h1>-->
 
@@ -14,17 +14,33 @@
 </template>
 
 <script>
+// import * as firebase from 'firebase'
 import NavbarToOffcanvas from './components/NavbarToOffcanvas.vue'
 
 export default {
-	name: 'App',
-	data: () => ({
-	}),
-	components: {
-		NavbarToOffcanvas
-	},
-	methods: {
-	}
+  name: 'App',
+  data: () => ({
+  }),
+  components: {
+    NavbarToOffcanvas
+  },
+  methods: {
+  },
+  created () {
+    this.$messaging
+      .requestPermission()
+      .then(() => this.$messaging.getToken())
+      .then((token) => {
+        console.log(token) // Receiver Token to use in the notification
+      })
+      .catch(function (err) {
+        console.log('Unable to get permission to notify.', err)
+      })
+
+    this.$messaging.onMessage(function (payload) {
+      console.log('Message received. ', payload)
+    })
+  }
 }
 </script>
 

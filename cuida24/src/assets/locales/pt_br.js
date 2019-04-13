@@ -1,25 +1,25 @@
 
 export default {
   promptLabels: {
-    actionRemove:       'Tem certeza de que deseja remover este evento ?',
-    actionExclude:      'Tem certeza de que deseja remover esta ocorrência de evento ?',
-    actionCancel:       'Você tem certeza que quer cancelar este evento ?',
-    actionUncancel:     'Tem certeza de que deseja cancelar este evento ?',
-    actionSetStart:     'Tem certeza de que deseja definir essa ocorrência como a primeira ?',
-    actionSetEnd:       'Tem certeza de que deseja definir essa ocorrência como a última ?',
-    actionMove:         'Tem certeza de que deseja mover este evento ?',
-    actionInclude:      'Tem certeza de que deseja adicionar uma ocorrência de evento ?',
-    move:               'Tem certeza de que deseja mover este evento ?',
-    toggleAllDay:       'Tem certeza de que deseja alterar se esse evento ocorre o dia todo ?',
+    actionRemove: 'Tem certeza de que deseja remover este evento ?',
+    actionExclude: 'Tem certeza de que deseja remover esta ocorrência de evento ?',
+    actionCancel: 'Você tem certeza que quer cancelar este evento ?',
+    actionUncancel: 'Tem certeza de que deseja cancelar este evento ?',
+    actionSetStart: 'Tem certeza de que deseja definir essa ocorrência como a primeira ?',
+    actionSetEnd: 'Tem certeza de que deseja definir essa ocorrência como a última ?',
+    actionMove: 'Tem certeza de que deseja mover este evento ?',
+    actionInclude: 'Tem certeza de que deseja adicionar uma ocorrência de evento ?',
+    move: 'Tem certeza de que deseja mover este evento ?',
+    toggleAllDay: 'Tem certeza de que deseja alterar se esse evento ocorre o dia todo ?',
     removeExistingTime: 'Tem certeza de que deseja remover todas as ocorrências do evento neste momento ?'
   },
   placeholder: {
     noTitle: '(Sem título)'
   },
   patterns: {
-    lastDay:        (day) => 'Último dia do mês',
+    lastDay: (day) => 'Último dia do mês',
     lastDayOfMonth: (day) => 'Último dia de' + day.format('MMMM'),
-    lastWeekday:    (day) => 'Último ' + day.format('dddd') + ' em ' + day.format('MMMM')
+    lastWeekday: (day) => 'Último ' + day.format('dddd') + ' em ' + day.format('MMMM')
   },
   colors: [
     { text: 'Vermelho' },
@@ -64,7 +64,7 @@ export default {
   defaults: {
     dsDay: {
       formats: {
-        month:  'MMM'
+        month: 'MMM'
       }
     },
     dsCalendarApp: {
@@ -73,7 +73,7 @@ export default {
         { label: 'Semana' },
         { label: 'Mês' },
         { label: 'Ano' },
-        { label: 'Agenda' },
+        { label: 'Agenda' },
         { label: '4 Dias' }
       ],
       formats: {
@@ -95,83 +95,83 @@ export default {
     },
     dsAgendaEvent: {
       formats: {
-        firstLine:  'ddd',
+        firstLine: 'ddd',
         secondLine: 'MMM Do',
-        start:      'dddd, MMMM D',
-        time:       'h:mm a'
+        start: 'dddd, MMMM D',
+        time: 'h:mm a'
       },
       labels: {
-        allDay:   'Dia inteiro',
-        options:  'Opções',
-        close:    'Fechar',
-        day:      ['dia', 'dias'],
-        days:     ['dia', 'dias'],
-        minute:   ['minuto', 'minutos'],
-        minutes:  ['minuto', 'minutos'],
-        hour:     ['hora', 'horas'],
-        hours:    ['hora', 'horas'],
-        week:     ['semana', 'semanas'],
-        weeks:    ['semana', 'semanas'],
-        second:   ['segundo', 'segundos'],
-        seconds:  ['segundo', 'segundos'],
-        busy:     'Ocupado',
-        free:     'Livre'
+        allDay: 'Dia inteiro',
+        options: 'Opções',
+        close: 'Fechar',
+        day: ['dia', 'dias'],
+        days: ['dia', 'dias'],
+        minute: ['minuto', 'minutos'],
+        minutes: ['minuto', 'minutos'],
+        hour: ['hora', 'horas'],
+        hours: ['hora', 'horas'],
+        week: ['semana', 'semanas'],
+        weeks: ['semana', 'semanas'],
+        second: ['segundo', 'segundos'],
+        seconds: ['segundo', 'segundos'],
+        busy: 'Ocupado',
+        free: 'Livre'
       }
     },
     dsCalendarEventChip: {
       formats: {
-        fullDay:          'ddd MMM Do YYYY',
-        timed:            'ddd MMM Do YYYY'
+        fullDay: 'ddd MMM Do YYYY',
+        timed: 'ddd MMM Do YYYY'
       }
     },
     dsCalendarEventPopover: {
       formats: {
-        start:    'dddd, MMMM D',
-        time:     'h:mm a'
+        start: 'dddd, MMMM D',
+        time: 'h:mm a'
       },
       labels: {
-        allDay:   'Dia inteiro',
-        options:  'Opções',
-        close:    'Fechar',
-        day:      ['dia', 'dias'],
-        days:     ['dia', 'dias'],
-        minute:   ['minuto', 'minutos'],
-        minutes:  ['minuto', 'minutos'],
-        hour:     ['hora', 'horas'],
-        hours:    ['hora', 'horas'],
-        week:     ['semana', 'semanas'],
-        weeks:    ['semana', 'semanas'],
-        second:   ['segundo', 'segundos'],
-        seconds:  ['segundo', 'segundos'],
-        busy:     'Ocupado',
-        free:     'Livre'
+        allDay: 'Dia inteiro',
+        options: 'Opções',
+        close: 'Fechar',
+        day: ['dia', 'dias'],
+        days: ['dia', 'dias'],
+        minute: ['minuto', 'minutos'],
+        minutes: ['minuto', 'minutos'],
+        hour: ['hora', 'horas'],
+        hours: ['hora', 'horas'],
+        week: ['semana', 'semanas'],
+        weeks: ['semana', 'semanas'],
+        second: ['segundo', 'segundos'],
+        seconds: ['segundo', 'segundos'],
+        busy: 'Ocupado',
+        free: 'Livre'
       }
     },
     dsCalendarEventCreatePopover: {
       formats: {
-        start:    'dddd, MMMM D',
-        time:     'h:mm a'
+        start: 'dddd, MMMM D',
+        time: 'h:mm a'
       },
       labels: {
-        title:    'Adicionar título',
-        allDay:   'Dia inteiro',
-        close:    'Fechar',
-        save:     'Salvar',
-        day:      ['dia', 'dias'],
-        days:     ['dia', 'dias'],
-        minute:   ['minuto', 'minutos'],
-        minutes:  ['minuto', 'minutos'],
-        hour:     ['hora', 'horas'],
-        hours:    ['hora', 'horas'],
-        week:     ['semana', 'semanas'],
-        weeks:    ['semana', 'semanas'],
-        second:   ['segundo', 'segundos'],
-        seconds:  ['segundo', 'segundos'],
-        busy:     'Ocupado',
-        free:     'Livre',
+        title: 'Adicionar título',
+        allDay: 'Dia inteiro',
+        close: 'Fechar',
+        save: 'Salvar',
+        day: ['dia', 'dias'],
+        days: ['dia', 'dias'],
+        minute: ['minuto', 'minutos'],
+        minutes: ['minuto', 'minutos'],
+        hour: ['hora', 'horas'],
+        hours: ['hora', 'horas'],
+        week: ['semana', 'semanas'],
+        weeks: ['semana', 'semanas'],
+        second: ['segundo', 'segundos'],
+        seconds: ['segundo', 'segundos'],
+        busy: 'Ocupado',
+        free: 'Livre',
         location: 'Adicionar localização',
         description: 'Adicionar descrição',
-        calendar: 'Calendário',
+        calendar: 'Calendário'
       },
       busyOptions: [
         {text: 'Ocupado'},
@@ -180,29 +180,29 @@ export default {
     },
     dsSchedule: {
       labels: {
-        editCustom:   'Editar'
+        editCustom: 'Editar'
       }
     },
     dsEvent: {
       labels: {
-        moreActions:  'Mais ações...',
-        cancel:       'Cancelar alterações de evento',
-        save:         'Salvar',
-        title:        'Título',
-        exclusions:   'Estes são eventos ou períodos de tempo em que um evento que ocorre normalmente foi excluído do planejamento. Os eventos são excluídos aqui se uma ocorrência de evento for movida.',
-        inclusions:   'Estes são eventos ou intervalos de tempo em que os eventos foram adicionados fora do cronograma que ocorre normalmente. Eventos são adicionados aqui se uma ocorrência de evento for movida.',
-        cancelled:    'Estes são eventos ou períodos de tempo em que os eventos foram cancelados.',
-        edit:         'Edit event',
-        add:          'Adicionar evento',
-        location:     'Adicionar localização',
-        description:  'Adicionar descrição',
-        calendar:     'Calendar',
+        moreActions: 'Mais ações...',
+        cancel: 'Cancelar alterações de evento',
+        save: 'Salvar',
+        title: 'Título',
+        exclusions: 'Estes são eventos ou períodos de tempo em que um evento que ocorre normalmente foi excluído do planejamento. Os eventos são excluídos aqui se uma ocorrência de evento for movida.',
+        inclusions: 'Estes são eventos ou intervalos de tempo em que os eventos foram adicionados fora do cronograma que ocorre normalmente. Eventos são adicionados aqui se uma ocorrência de evento for movida.',
+        cancelled: 'Estes são eventos ou períodos de tempo em que os eventos foram cancelados.',
+        edit: 'Edit event',
+        add: 'Adicionar evento',
+        location: 'Adicionar localização',
+        description: 'Adicionar descrição',
+        calendar: 'Calendar',
         tabs: {
-          details:    'Detalhes do evento',
-          forecast:   'Previsão',
-          removed:    'Removido',
-          added:      'Adicionado',
-          cancelled:  'Cancelado'
+          details: 'Detalhes do evento',
+          forecast: 'Previsão',
+          removed: 'Removido',
+          added: 'Adicionado',
+          cancelled: 'Cancelado'
         }
       },
       busyOptions: [
@@ -212,22 +212,22 @@ export default {
     },
     dsScheduleActions: {
       labels: {
-        remove:     'Remover este evento',
-        exclude:    'Remover esta ocorrência',
-        cancel:     'Cancelar esta ocorrência',
-        uncancel:   'Anular o cancelamento',
-        move:       'Mova esta ocorrência',
-        include:    'Adicionar nova ocorrência',
-        setStart:   'Definir como primeira ocorrência',
-        setEnd:     'Definir como última ocorrência',
-        pickerOk:   'OK',
-        pickerCancel:'Cancelar'
+        remove: 'Remover este evento',
+        exclude: 'Remover esta ocorrência',
+        cancel: 'Cancelar esta ocorrência',
+        uncancel: 'Anular o cancelamento',
+        move: 'Mova esta ocorrência',
+        include: 'Adicionar nova ocorrência',
+        setStart: 'Definir como primeira ocorrência',
+        setEnd: 'Definir como última ocorrência',
+        pickerOk: 'OK',
+        pickerCancel: 'Cancelar'
       }
     },
     dsScheduleForecast: {
       labels: {
-        prefix:     'A previsão mostra anterior e próxima',
-        suffix:     'ocorrências de eventos dentro de um período de anos.'
+        prefix: 'A previsão mostra anterior e próxima',
+        suffix: 'ocorrências de eventos dentro de um período de anos.'
       }
     },
     dsScheduleFrequencyDay: {
@@ -246,7 +246,7 @@ export default {
       ]
     },
     dsScheduleFrequencyDayOfWeek: {
-      weekdays: ['Domingo','Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
+      weekdays: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'],
       labels: {
         type: 'Dias da semana'
       },
@@ -260,7 +260,7 @@ export default {
     },
     dsScheduleFrequencyMonth: {
       labels: {
-        type: 'Mêses'
+        type: 'Meses'
       },
       months: [
         'Janeiro',
@@ -319,56 +319,56 @@ export default {
 
     dsScheduleSpan: {
       labels: {
-        startless:  'Início do tempo',
-        endless:    'Fim do tempo'
+        startless: 'Início do tempo',
+        endless: 'Fim do tempo'
       },
       formats: {
-        start:      'MMMM Do, YYYY',
-        end:        'MMMM Do, YYYY'
+        start: 'MMMM Do, YYYY',
+        end: 'MMMM Do, YYYY'
       }
     },
 
     dsScheduleTime: {
       labels: {
-        remove:     'Remover tempo',
-        add:        'Adicionar tempo'
+        remove: 'Remover tempo',
+        add: 'Adicionar tempo'
       }
     },
 
     dsScheduleTimes: {
       labels: {
-        all:        'Dia inteiro',
-        minute:     'minuto',
-        minutes:    'minutos',
-        hour:       'hora',
-        hours:      'horas',
-        day:        'dia',
-        days:       'dias',
-        week:       'semana',
-        weeks:      'semanas',
-        month:      'mês',
-        months:     'mêses',
-        second:     'segundo',
-        seconds:    'segundos'
+        all: 'Dia inteiro',
+        minute: 'minuto',
+        minutes: 'minutos',
+        hour: 'hora',
+        hours: 'horas',
+        day: 'dia',
+        days: 'dias',
+        week: 'semana',
+        weeks: 'semanas',
+        month: 'mês',
+        months: 'meses',
+        second: 'segundo',
+        seconds: 'segundos'
       }
     },
 
     dsScheduleType: {
       formats: {
-        date:       'LL'
+        date: 'LL'
       }
     },
 
     dsScheduleTypeCustomDialog: {
       labels: {
-        save:     'Salvar',
-        cancel:   'Cancelar'
+        save: 'Guardar',
+        cancel: 'Cancelar'
       }
     },
 
     dsWeekDayHeader: {
       formats: {
-        weekday:    'ddd'
+        weekday: 'ddd'
       }
     },
 
