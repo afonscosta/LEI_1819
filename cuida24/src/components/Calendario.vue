@@ -42,6 +42,11 @@
               </v-btn>
             </ds-schedule-actions>
           </template>
+
+          <template slot="eventPopoverNotifications" slot-scope="{slotData, details}">
+            <v-list-tile-title>{{ details.notify }}</v-list-tile-title>
+          </template>
+
         </ds-calendar-event-popover>
       </template>
 
@@ -52,7 +57,20 @@
           :close="$refs.cal.$refs.calendar.clearPlaceholder"
           @create-edit="$refs.cal.editPlaceholder"
           @event-create="addEvent"
-        ></ds-calendar-event-create-popover>
+        >
+        </ds-calendar-event-create-popover>
+      </template>
+
+      <template slot="schedule" slot-scope="{calendarEvent, details, isReadOnly, labels, day, readOnly, schedule}">
+        <ds-schedule
+          :schedule="schedule"
+          :day="day"
+          :read-only="readOnly"
+        ></ds-schedule>
+        <notification
+          :notify="details.notify"
+          @removeNotification="removeNotification"
+        ></notification>
       </template>
 
       <template slot="eventTimeTitle" slot-scope="{calendarEvent, details}">
@@ -99,10 +117,15 @@ import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
 import { Weekday, Month } from 'dayspan'
 import * as moment from 'moment'
+import notification from './Notification.vue'
 
 export default {
 
   name: 'cal',
+
+  components: {
+    notification
+  },
 
   computed: mapState({
     calendar: state => state.calendar.calendar
@@ -193,10 +216,6 @@ export default {
     readOnly: false,
     currentLocale: vm.$dayspan.setLocale('pt'),
     locales: [
-      { value: 'en', text: 'English' },
-      { value: 'fr', text: 'French' },
-      { value: 'nl', text: 'Dutch' },
-      { value: 'ca', text: 'Catalan' },
       { value: 'pt', text: 'Português' }
     ],
     defaultEvents: [

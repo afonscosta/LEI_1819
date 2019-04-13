@@ -51,16 +51,18 @@ const actions = {
       })
   },
   addEvent ({ commit }, event) {
-    eventService.postEvent(event)
-      .then(newEvent => {
-        commit('addEvent', newEvent)
-      })
+    // eventService.postEvent(event)
+    // .then(newEvent => {
+    // event['data']['notify'] = []
+    event['id'] = 8000
+    commit('addEvent', event)
+    // })
   },
   updateEvent ({ commit }, event) {
-    eventService.postEvent(event)
-      .then(() => {
-        commit('updateEvent', event)
-      })
+    // eventService.postEvent(event)
+    //   .then(() => {
+    commit('updateEvent', event)
+    //   })
   },
   deleteEvent ({ commit }, event) {
     eventService.deleteEvent(event.id)

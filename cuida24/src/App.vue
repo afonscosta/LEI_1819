@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import * as firebase from 'firebase'
+// import * as firebase from 'firebase'
 import NavbarToOffcanvas from './components/NavbarToOffcanvas.vue'
 
 export default {
