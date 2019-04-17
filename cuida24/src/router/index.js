@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import VueDemo from '@/components/VueDemo'
 import Calendario from '@/components/Calendario'
+import Medicacao from '@/components/Medicacao'
 import Habitos from '@/components/Habitos'
 import Chat from '@/components/Chat'
 import Jogos from '@/components/Jogos'
@@ -30,6 +31,11 @@ export default new Router({
       path: '/calendario',
       name: 'calendario',
       component: Calendario
+    },
+    {
+      path: '/medicacao',
+      name: 'medicacao',
+      component: Medicacao
     },
     {
       path: '/habitos',

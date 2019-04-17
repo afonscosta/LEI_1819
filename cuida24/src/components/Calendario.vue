@@ -69,7 +69,6 @@
         ></ds-schedule>
         <notification
           :notify="details.notify"
-          @removeNotification="removeNotification"
         ></notification>
       </template>
 

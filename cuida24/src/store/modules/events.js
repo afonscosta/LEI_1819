@@ -1,5 +1,5 @@
 import eventService from '../../services/eventService'
-import { Calendar } from 'dayspan'
+import { Calendar, Event } from 'dayspan'
 
 const state = {
   calendar: Calendar.months(undefined, undefined, undefined, {
@@ -23,9 +23,24 @@ const mutations = {
     cal.addEvents(events)
     state.calendar = cal
   },
-  addEvent (state, event) {
+  addEvent (state, dictEvent) {
+    let event = dictEvent['event']
+    console.log(event)
+    let infoEvent = dictEvent['infoEvent']
     let cal = Calendar.fromInput(state.calendar)
-    cal.addEvent(event)
+    let data = {
+      'calendar': infoEvent['calendar'],
+      'color': '#1976d2',
+      'description': infoEvent['description'],
+      'forecolor': '#ffffff',
+      // 'icon': infoEvent['icon'],
+      'location': infoEvent['location'],
+      'notify': [],
+      'title': infoEvent['title']
+    }
+    let ev = new Event(event['schedule'], data, infoEvent['pk'])
+    cal.removeEvent(event)
+    cal.addEvent(ev)
     state.calendar = cal
   },
   updateEvent (state, event) {
@@ -51,9 +66,10 @@ const actions = {
       })
   },
   addEvent ({ commit }, event) {
+    delete event['data']['icon']
     eventService.postEvent(event)
-      .then(newEvent => {
-        commit('addEvent', event)
+      .then(infoEvent => {
+        commit('addEvent', {'event': event, 'infoEvent': infoEvent})
       })
   },
   updateEvent ({ commit }, event) {
