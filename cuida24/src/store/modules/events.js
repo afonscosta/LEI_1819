@@ -1,5 +1,5 @@
 import eventService from '../../services/eventService'
-import { Calendar, Event } from 'dayspan'
+import { Calendar, Schedule, Event } from 'dayspan'
 
 const state = {
   calendar: Calendar.months(undefined, undefined, undefined, {
@@ -20,12 +20,25 @@ const mutations = {
       fill: true,
       updateRows: true
     })
-    cal.addEvents(events)
+    var newEvents = events.map(function (ev) {
+      let data = {
+        'calendar': ev['calendar'],
+        'color': '#1976d2',
+        'description': ev['description'],
+        'forecolor': '#ffffff',
+        'location': ev['location'],
+        'notify': [],
+        'title': ev['title']
+      }
+      // TODO: acabar o schedule
+      let newEv = new Event(new Schedule(), data, ev['pk'], ev['visible'])
+      return newEv
+    })
+    cal.addEvents(newEvents)
     state.calendar = cal
   },
   addEvent (state, dictEvent) {
     let event = dictEvent['event']
-    console.log(event)
     let infoEvent = dictEvent['infoEvent']
     let cal = Calendar.fromInput(state.calendar)
     let data = {
@@ -33,12 +46,11 @@ const mutations = {
       'color': '#1976d2',
       'description': infoEvent['description'],
       'forecolor': '#ffffff',
-      // 'icon': infoEvent['icon'],
       'location': infoEvent['location'],
       'notify': [],
       'title': infoEvent['title']
     }
-    let ev = new Event(event['schedule'], data, infoEvent['pk'])
+    let ev = new Event(event['schedule'], data, infoEvent['pk'], infoEvent['visible'])
     cal.removeEvent(event)
     cal.addEvent(ev)
     state.calendar = cal
@@ -65,11 +77,14 @@ const actions = {
         commit('setEvents', events)
       })
   },
-  addEvent ({ commit }, event) {
-    delete event['data']['icon']
-    eventService.postEvent(event)
+  addEvent ({ commit }, payload) {
+    delete payload['event']['data']['icon']
+    eventService.postEvent(payload)
       .then(infoEvent => {
-        commit('addEvent', {'event': event, 'infoEvent': infoEvent})
+        commit('addEvent', {
+          'event': payload['event'],
+          'infoEvent': infoEvent
+        })
       })
   },
   updateEvent ({ commit }, event) {

@@ -16,5 +16,20 @@
       "color": "#E91E63",
       "forecolor": "#ffffff"
     }
+  },
+  {
+    "model": "cuida24.Cuidador",
+    "pk": 1,
+    "fields": {
+        "name": "cuidador1"
+    }
+  },
+  {
+    "model": "cuida24.Utente",
+    "pk": 1,
+    "fields": {
+       "name": "utente1",
+       "cuidador": "1"
+    }
   }
 ]

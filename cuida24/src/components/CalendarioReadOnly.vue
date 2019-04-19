@@ -85,25 +85,7 @@
         <div class="ds-ev-description">{{ getCalendarTime( calendarEvent ) }}</div>
       </template>
 
-      <template slot="drawerBottom">
-        <v-container fluid>
-          <v-layout wrap align-center>
-            <v-flex xs12>
-              <v-checkbox box
-                label="Read Only?"
-                v-model="readOnly"
-              ></v-checkbox>
-            </v-flex>
-            <v-flex xs12>
-              <v-select
-                label="Language"
-                :items="locales"
-                v-model="currentLocale"
-                @input="setLocale"
-              ></v-select>
-            </v-flex>
-          </v-layout>
-        </v-container>
+      <template slot="drawerPicker">
       </template>
 
     </ds-calendar-app>
@@ -121,7 +103,7 @@ import listUsers from './ListUsers.vue'
 
 export default {
 
-  name: 'cal',
+  name: 'calReadOnly',
 
   components: {
     notification,
@@ -129,13 +111,11 @@ export default {
   },
 
   computed: mapState({
-    calendar: state => state.calendar.calendar,
-    caregivers: state => state.caregivers.caregivers
+    calendar: state => state.calendar.calendar
   }),
 
   created () {
     this.$store.dispatch('calendar/getEvents')
-    this.$store.dispatch('caregivers/getCaregivers')
   },
 
   mounted () {
@@ -147,7 +127,6 @@ export default {
   methods:
   {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    ...mapActions('caregivers', ['addCaregiver', 'updateCaregiver', 'deleteCaregiver']),
     addEventLocal (event) {
       this.addEvent(event)
     },
@@ -213,14 +192,13 @@ export default {
   },
 
   data: vm => ({
-    caregiversSelected: [],
     storeKey: 'dayspanState',
     // calendar: Calendar.months(),
     // calendar: Calendar.months(undefined,undefined,undefined,{
     //   fill: true,
     //   updateRows: true
     // }),
-    readOnly: false,
+    readOnly: true,
     currentLocale: vm.$dayspan.setLocale('pt'),
     locales: [
       { value: 'pt', text: 'Português' }
@@ -410,15 +388,52 @@ body, html, #cal, #dayspan {
   font-family: Roboto, sans-serif !important;
   width: 100%;
   height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
 }
 </style>
 
 <style>
+.v-toolbar--clipped {
+  position: relative;
+}
+
+.v-toolbar__content, .v-toolbar__extension {
+  top: 0;
+  position: sticky;
+  width:100%;
+  left: 0;
+}
+
+.v-content {
+  position:absolute;
+  top: 0;
+  left: 0;
+}
+
+.v-content__wrap {
+  z-index: 3;
+}
+
+.v-menu__content {
+  position:fixed;
+}
+
+.application--wrap {
+  height: 100%;
+  min-height: 400px;
+}
+
+.v-toolbar {
+  position: relative;
+}
+
+.v-content {
+  position:absolute;
+  top: 0;
+  left: 0;
+}
+
 .v-menu__activator { 
-  position: relative; 
+  position: relative;
 }
 
 .v-btn--flat .v-text-field--solo .v-input__slot {

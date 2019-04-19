@@ -8,6 +8,8 @@ from .models import Message, MessageSerializer
 from .models import DefAtividade, DefAtividadeSerializer
 from .models import Event, EventSerializer
 from .models import Calendar, CalendarSerializer
+from .models import Cuidador, CuidadorSerializer
+from .models import Utente, UtenteSerializer
 import logging
 
 
@@ -43,15 +45,17 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     def create(self, request, *args, **kwargs):
         logger.info(request.data)
-        data = request.data
+        event = request.data['event']
+        users = request.data['users'] # Fazer a ligação entre os users e o event!
+        logger.info(users)
         try:
-            data['data']['calendar'] = 'http://127.0.0.1:8000/cuida24/calendars/' + \
-                                       str(Calendar.objects.get(color=data['data']['color']).id) + '/'
+            event['data']['calendar'] = 'http://127.0.0.1:8000/cuida24/calendars/' + \
+                                       str(Calendar.objects.get(color=event['data']['color']).id) + '/'
         except Calendar.DoesNotExist:
             logger.info('Calendario selecionado não existe!!')
-            return Response(data, status=status.HTTP_400_BAD_REQUEST)
-        data['data']['visible'] = data['visible']
-        serializer = EventSerializer(data=data['data'], context={'request': request})
+            return Response(event, status=status.HTTP_400_BAD_REQUEST)
+        event['data']['visible'] = event['visible']
+        serializer = EventSerializer(data=event['data'], context={'request': request})
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -76,3 +80,17 @@ class CalendarViewSet(viewsets.ModelViewSet):
     """
     queryset = Calendar.objects.all()
     serializer_class = CalendarSerializer
+
+class CaregiverViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows messages to be viewed or edited.
+    """
+    queryset = Cuidador.objects.all()
+    serializer_class = CuidadorSerializer
+
+class PatientViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows messages to be viewed or edited.
+    """
+    queryset = Utente.objects.all()
+    serializer_class = UtenteSerializer

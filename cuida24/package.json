@@ -22,6 +22,7 @@
     "vue": "^2.6.10",
     "vue-burger-menu": "^2.0.1",
     "vue-datetime": "^1.0.0-beta.10",
+    "vue-form-wizard": "^0.8.4",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
     "weekstart": "^1.0.0"

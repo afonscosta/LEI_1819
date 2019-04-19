@@ -96,23 +96,24 @@ class Utilizador(models.Model):
 # VER COMO SE FAZ O SERIALIZER COM HERANÇA
 
 class Cuidador(models.Model):
-    pass
+    name = models.CharField(max_length=200)
 
 class CuidadorSerializer(serializers.HyperlinkedModelSerializer):
-
     class Meta:
         model = Cuidador
-        fields = ('url', 'pk')
+        fields = ('url', 'pk', 'name')
 
 # VER COMO SE FAZ O SERIALIZER COM HERANÇA
 
 class Utente(models.Model):
+    name = models.CharField(max_length=200)
     cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
 
 
 class UtenteSerializer(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
-
+    class Meta:
+        model = Utente
+        fields = ('url', 'pk', 'name', 'cuidador')
 
 class UtilizadorBackoffice(models.Model):
     TIPO = (

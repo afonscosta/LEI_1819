@@ -9,13 +9,15 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from .cuida24.views import index_view, MessageViewSet, DefAtividadeViewSet, EventViewSet, CalendarViewSet
+from .cuida24.views import index_view, MessageViewSet, DefAtividadeViewSet, EventViewSet, CalendarViewSet, CaregiverViewSet, PatientViewSet
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
 router.register('defatividades', DefAtividadeViewSet)
 router.register('events', EventViewSet)
 router.register('calendars', CalendarViewSet)
+router.register('caregivers', CaregiverViewSet)
+router.register('patients', PatientViewSet)
 
 urlpatterns = [
 
