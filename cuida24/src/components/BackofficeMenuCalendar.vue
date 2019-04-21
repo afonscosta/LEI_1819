@@ -1,6 +1,8 @@
 <template>
   <form-wizard
     @on-complete="complete"
+    title="Gestão do calendário"
+    subtitle="Adicionar e editar eventos"
   >
     <tab-content title="Escolha da operação">
       <b-container>
@@ -46,6 +48,7 @@
             <addAppoint 
               v-if="this.selected === 'addAppoint'"
               :form="form"
+              @throwEvent="parseScheduleOption"
             ></addAppoint>
             <editAppoint 
               v-if="this.selected === 'editAppoint'"
@@ -86,13 +89,15 @@ export default {
   },
   data: () => ({
     form: {
-      datetimeValue: '',
+      dateValue: '',
+      timeValue: '',
       allDay: true,
       duration: 0,
       durationUnit: '',
       local: '',
       specialty: '',
-      notify: []
+      notify: [],
+      sched: {}
     },
     caregiversSelected: [],
     patientsSelected: [],
@@ -147,15 +152,12 @@ export default {
       this.patientsSelected = checked
     },
     complete () {
+      let time = LuxonDateTime.fromISO(this.form.timeValue)
+      let t = ''.concat(time.c.hour, ':', time.c.minute)
       const users = {
         'caregivers': this.caregiversSelected,
         'patients': this.patientsSelected
       }
-      let dt = LuxonDateTime.fromISO(this.form.datetimeValue)
-      dt.c.month = dt.c.month - 1
-      let hourStr = String(dt.c.hour)
-      let minuteStr = String(dt.c.minute)
-      let time = ''.concat(hourStr, ':', minuteStr)
       let data = {
         'calendar': this.calendarAppoint.pk,
         'color': this.calendarAppoint.color,
@@ -165,35 +167,83 @@ export default {
         'notify': this.form.notify,
         'title': 'Consulta'
       }
-      if (this.form.allDay) {
-        let sched = new Schedule({
-          'dayOfMonth': [dt.c.day],
-          'month': [dt.c.month],
-          'year': [dt.c.year],
-          'times': [time]
-        })
-        let ev = new Event(sched, data)
-        let payload = {
-          'event': ev,
-          'users': users
-        }
-        this.addEvent(payload)
-      } else {
-        let sched = new Schedule({
-          'dayOfMonth': [dt.c.day],
-          'month': [dt.c.month],
-          'year': [dt.c.year],
-          'times': [time],
-          'duration': this.form.duration,
-          'durationUnit': this.form.durationUnit
-        })
-        let ev = new Event(sched, data)
-        let payload = {
-          'event': ev,
-          'users': users
-        }
-        this.addEvent(payload)
+      if (!this.form.allDay) {
+        this.form.sched.times = [t]
+        this.form.sched.duration = this.form.duration
+        this.form.sched.durationUnit = this.form.durationUnit
       }
+      let sched = new Schedule(this.form.sched)
+      console.log(this.form.sched)
+      console.log(sched.toInput())
+      let ev = new Event(sched, data)
+      let payload = {
+        'event': ev,
+        'users': users
+      }
+      this.addEvent(payload)
+    },
+    parseScheduleOption (option) {
+      let dt = LuxonDateTime.fromISO(this.form.dateValue)
+      let wsom = this.weekSpanOfMonth(dt)
+      let dow = dt.weekday % 7
+      dt.c.month = dt.c.month - 1
+      switch (option) {
+        case 'daily':
+          this.form.sched = {
+            'duration': 1,
+            'durationInDays': 0,
+            'durationUnit': 'days'
+          }
+          break
+        case 'weekly':
+          this.form.sched = {
+            'dayOfWeek': [dow]
+          }
+          break
+        case 'monthly':
+          this.form.sched = {
+            'dayOfWeek': [dow],
+            'weekspanOfMonth': [wsom]
+          }
+          break
+        case 'monthlyByDay':
+          this.form.sched = {
+            'dayOfMonth': [dt.c.day]
+          }
+          break
+        case 'annually':
+          this.form.sched = {
+            'dayOfWeek': [dow],
+            'month': [dt.c.month],
+            'weekspanOfMonth': [wsom]
+          }
+          break
+        case 'annuallyByDay':
+          this.form.sched = {
+            'dayOfMonth': [dt.c.day],
+            'month': [dt.c.month]
+          }
+          break
+        case 'everyWeekday':
+          this.form.sched = {
+            'dayOfWeek': [1, 2, 3, 4, 5]
+          }
+          break
+        case 'custom':
+          this.form.sched = {
+            'custom': 'custom'
+          }
+          break
+        default:
+          this.form.sched = {}
+      }
+    },
+    weekSpanOfMonth (dt) {
+      // month_number is in the range 1..12
+      let date = new Date(''.concat(dt.c.year, '-', dt.c.month, '-', dt.c.day))
+      var firstWeekday = new Date(date.getFullYear(), date.getMonth(), 1).getDay()
+      var offsetDate = date.getDate() + firstWeekday - 1
+      return Math.floor(offsetDate / 7)
     }
   }
 }

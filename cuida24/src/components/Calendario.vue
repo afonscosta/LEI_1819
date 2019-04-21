@@ -129,13 +129,11 @@ export default {
   },
 
   computed: mapState({
-    calendar: state => state.calendar.calendar,
-    caregivers: state => state.caregivers.caregivers
+    calendar: state => state.calendar.calendar
   }),
 
   created () {
     this.$store.dispatch('calendar/getEvents')
-    this.$store.dispatch('caregivers/getCaregivers')
   },
 
   mounted () {
@@ -147,9 +145,8 @@ export default {
   methods:
   {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    ...mapActions('caregivers', ['addCaregiver', 'updateCaregiver', 'deleteCaregiver']),
     addEventLocal (event) {
-      this.addEvent(event)
+      this.addEvent({'event': event})
     },
     toggleAll (checked) {
       this.usersSelected = checked ? this.users.slice() : []
@@ -213,7 +210,6 @@ export default {
   },
 
   data: vm => ({
-    caregiversSelected: [],
     storeKey: 'dayspanState',
     // calendar: Calendar.months(),
     // calendar: Calendar.months(undefined,undefined,undefined,{

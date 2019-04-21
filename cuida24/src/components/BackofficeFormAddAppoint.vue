@@ -16,12 +16,23 @@
         label="Data/Hora:"
         label-for="input-2"
       >
-        <datetime type="datetime" 
-          v-model="form.datetimeValue"
+        <datetime 
+          type="date" 
+          v-model="form.dateValue"
           :phrases="datetime.phrases"
           :week-start="datetime['week-start']"
           :min-datetime="datetime.minDatetime"
         ></datetime>
+      </b-form-group>
+
+      <b-form-group
+        id="input-group-6"
+        label="Repetição:"
+        label-for="input-6"
+      >
+        <schedule
+          @throwEvent="throwEvent"
+        ></schedule>
       </b-form-group>
 
       <b-form-group
@@ -33,6 +44,11 @@
           <b-form-checkbox value="true">Dia inteiro</b-form-checkbox>
         </b-form-checkbox-group>
 
+        <datetime 
+          type="time"
+          v-if="!form.allDay"
+          v-model="form.timeValue"
+        ></datetime>
         <b-form-input
           v-if="!form.allDay"
           id="input-3"
@@ -71,15 +87,21 @@
 <script>
 import { DateTime as LuxonDateTime } from 'luxon'
 import notification from './Notification.vue'
+import schedule from './Schedule'
 
 export default {
   name: 'addAppoint',
   components: {
-    notification
+    notification,
+    schedule
   },
   props: {
     form: {
-      datetimeValue: {
+      dateValue: {
+        required: true,
+        type: String
+      },
+      timeValue: {
         required: true,
         type: String
       },
@@ -141,6 +163,9 @@ export default {
       this.$nextTick(() => {
         this.show = true
       })
+    },
+    throwEvent (option) {
+      this.$emit('throwEvent', option)
     }
   }
 }
