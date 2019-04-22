@@ -97,7 +97,7 @@ export default {
       local: '',
       specialty: '',
       notify: [],
-      sched: {}
+      sched: null
     },
     caregiversSelected: [],
     patientsSelected: [],
@@ -152,14 +152,12 @@ export default {
       this.patientsSelected = checked
     },
     complete () {
-      let time = LuxonDateTime.fromISO(this.form.timeValue)
-      let t = ''.concat(time.c.hour, ':', time.c.minute)
       const users = {
         'caregivers': this.caregiversSelected,
         'patients': this.patientsSelected
       }
       let data = {
-        'calendar': this.calendarAppoint.pk,
+        'calendar': this.calendarAppoint.url,
         'color': this.calendarAppoint.color,
         'description': this.form.specialty,
         'forecolor': this.calendarAppoint.forecolor,
@@ -167,14 +165,23 @@ export default {
         'notify': this.form.notify,
         'title': 'Consulta'
       }
+      if (!this.form.sched) {
+        let dt = LuxonDateTime.fromISO(this.form.dateValue)
+        dt.c.month = dt.c.month - 1
+        this.form.sched = {
+          'dayOfMonth': [dt.c.day],
+          'month': [dt.c.month],
+          'year': [dt.c.year]
+        }
+      }
       if (!this.form.allDay) {
+        let time = LuxonDateTime.fromISO(this.form.timeValue)
+        let t = ''.concat(time.c.hour, ':', time.c.minute)
         this.form.sched.times = [t]
         this.form.sched.duration = this.form.duration
         this.form.sched.durationUnit = this.form.durationUnit
       }
       let sched = new Schedule(this.form.sched)
-      console.log(this.form.sched)
-      console.log(sched.toInput())
       let ev = new Event(sched, data)
       let payload = {
         'event': ev,
@@ -235,7 +242,11 @@ export default {
           }
           break
         default:
-          this.form.sched = {}
+          this.form.sched = {
+            'dayOfMonth': [dt.c.day],
+            'month': [dt.c.month],
+            'year': [dt.c.year]
+          }
       }
     },
     weekSpanOfMonth (dt) {
