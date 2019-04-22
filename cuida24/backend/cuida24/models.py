@@ -263,15 +263,33 @@ class CalendarSerializer(serializers.ModelSerializer):
         fields = ('calendar', 'color', 'forecolor', 'pk')
 
 
+class Schedule(models.Model):
+    duration = models.IntegerField()
+    durationInDays = models.IntegerField()
+    durationUnit = models.TextField()
+    dayOfWeek = models.IntegerField()
+    weekspanOfMonth = models.IntegerField()
+    dayOfMonth = models.IntegerField()
+    month = models.IntegerField()
+    times = models.TimeField()
+
+
+class ScheduleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Schedule
+        fields = ('duration', 'durationInDays', 'durationUnit', 'dayOfWeek', 'weekspanOfMonth', 'dayOfMonth', 'month',
+                  'times', 'pk')
+
+
 class Event(models.Model):
     title = models.TextField()
-    # dataInicio = models.DateField()
-    # dataFim = models.DateField()
     # repeticao
     location = models.TextField()
     description = models.TextField()
     visible = models.BooleanField()
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
+    schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -279,29 +297,39 @@ class Event(models.Model):
 
 class EventSerializer(serializers.ModelSerializer):
     visible = serializers.BooleanField(required=False)
+    calendar = CalendarSerializer()
+    schedule = ScheduleSerializer()
 
     class Meta:
         model = Event
-        fields = ('title', 'location', 'description', 'visible', 'calendar', 'pk')
+        fields = ('title', 'location', 'description', 'visible', 'calendar', 'schedule', 'pk')
 
     def create(self, validated_data):
-        users = self.request.data['users']  # Fazer a ligação entre os users e o event!
         logger.info("OLA FROM SERIALIZER CREATE")
+        users = self.request.data['users']  # Fazer a ligação entre os users e o event!
         logger.info(users)
         logger.info(validated_data)
         calendar = validated_data['data']['calendar']
+        request = self.context['request'].data
+        # falta criar o schedule e assocar ao event
+        event = Event.objects.create(**validated_data)
 
+        # Notification of a event
+        for notification in validated_data['notify']:
+            notification_req_data = {'dateTime':notification, 'event':event}
+            notification_serializer = NotificationSerializer(data=notification_req_data)
+            notification_serializer.save()
+
+        # Specifies type of event
         if calendar.calendar == 'Consultas':
-            appointment_serializer = AppointmentSerializer()
+            appointment_req_data = {'user': request['users'][0], 'details': event}
+            appointment_serializer = AppointmentSerializer(data=appointment_req_data)
             appointment_serializer.save()
-
-        return Event.objects.create(**validated_data)
+        return event
 
 
 class Notification(models.Model):
-    startDate = models.DateField()
-    hour = models.TimeField()
-    # repeticao
+    dateTime = models.TextField()
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 
@@ -310,7 +338,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ('startDate', 'hour', ' event', 'pk')
+        fields = ('dateTime', 'event', 'pk')
 
 
 # Appointment
@@ -321,6 +349,9 @@ class Appointment(models.Model):
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
+    details = EventSerializer()
+    user = UserSerializer()
+
     class Meta:
         model = Appointment
         fields = ('details', 'user', 'pk')
