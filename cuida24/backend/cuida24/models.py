@@ -103,6 +103,7 @@ class Caregiver(models.Model):
 
 
 class CaregiverSerializer(serializers.ModelSerializer):
+    info = UserSerializer()
 
     class Meta:
         model = Caregiver
@@ -115,6 +116,8 @@ class Patient(models.Model):
 
 
 class PatientSerializer(serializers.ModelSerializer):
+    info = UserSerializer()
+
     class Meta:
         model = Patient
         fields = ('info', 'caregiver', 'pk')
@@ -287,6 +290,7 @@ class EventSerializer(serializers.ModelSerializer):
         logger.info(users)
         logger.info(validated_data)
         calendar = validated_data['data']['calendar']
+
         if calendar.calendar == 'Consultas':
             appointment_serializer = AppointmentSerializer()
             appointment_serializer.save()

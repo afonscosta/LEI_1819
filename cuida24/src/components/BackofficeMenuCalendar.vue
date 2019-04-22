@@ -128,12 +128,12 @@ export default {
     ]),
     caregiversParsed: function () {
       return this.caregivers.map(function (i) {
-        return {'text': i.name, 'value': i.pk}
+        return {'text': i.info.name, 'value': i.pk}
       })
     },
     patientsParsed: function () {
       return this.patients.map(function (i) {
-        return {'text': i.name, 'value': i.pk}
+        return {'text': i.info.name, 'value': i.pk}
       })
     }
   },
