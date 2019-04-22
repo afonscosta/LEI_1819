@@ -7,7 +7,7 @@
     <tab-content title="Escolha da operação">
       <b-container>
         <b-row sm="auto">
-          <b-col md="4" sm="12">
+          <b-col md="6" cols="6">
             <listUsers 
               :listName="'Cuidadores'"
               :users="caregiversParsed"
@@ -16,7 +16,7 @@
               @updateSelected="updateSelectedCaregivers"
             ></listUsers>
           </b-col>
-          <b-col md="4" sm="12">
+          <b-col md="6" cols="6">
             <listUsers 
               :listName="'Utentes'"
               :users="patientsParsed"
@@ -25,7 +25,7 @@
               @updateSelected="updateSelectedPatients"
             ></listUsers>
           </b-col>
-          <b-col md="4" sm="12">
+          <b-col md="12" cols="12">
             <b-form-group label="Operações disponíveis">
             <b-form-radio-group
               id="btn-radios-3"
