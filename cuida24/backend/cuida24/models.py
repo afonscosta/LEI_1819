@@ -1,7 +1,8 @@
 from django.db import models
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 import logging
+
+logger = logging.getLogger("mylogger")
 
 
 class Message(models.Model):
@@ -15,239 +16,234 @@ class MessageSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'subject', 'body', 'pk')
 
     def create(self, validated_data):
-        logger = logging.getLogger("mylogger")
         logger.info(validated_data)
 
         message = Message(
-            subject="olaFromCode",
-            body=validated_data['body'],
+          subject="olaFromCode",
+          body=validated_data['body'],
         )
         message.save()
         return message
 
 
-# Atividades definidas no backoffice
+# Activity defines by Backoffice
 
-class DefAtividade(models.Model):
-    objetivo = models.IntegerField()
+class DefActivity(models.Model):
+    goal = models.IntegerField()
 
 
-class DefAtividadeSerializer(serializers.HyperlinkedModelSerializer):
+class DefActivitySerializer(serializers.ModelSerializer):
     class Meta:
-        model = DefAtividade
-        fields = ('url', 'objetivo', 'pk')
+        model = DefActivity
+        fields = ('goal', 'pk')
 
 
-class Jogos(models.Model):
-    atividade = models.ForeignKey(DefAtividade, on_delete=models.CASCADE)
+class Game(models.Model):
+    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
 
 
-class JogosSerializer(serializers.HyperlinkedModelSerializer):
-    atividade = DefAtividadeSerializer()
-
-    class Meta:
-        model = Jogos
-        fields = ('url', 'pk')
-
-
-class AtividadeFisica(models.Model):
-    descricao = models.TextField()
-    atividade = models.ForeignKey(DefAtividade, on_delete=models.CASCADE)
-
-
-class AtividadeFisicaSerializer(serializers.HyperlinkedModelSerializer):
-    atividade = DefAtividadeSerializer()
+class GameSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AtividadeFisica
-        fields = ('url', 'descricao', 'pk')
+        model = Game
+        fields = ('activity', 'pk')
 
 
-class LazerSocial(models.Model):
-    descricao = models.TextField()
-    atividade = models.ForeignKey(DefAtividade, on_delete=models.CASCADE)
+class PhysicalActivity(models.Model):
+    description = models.TextField()
+    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
 
 
-class LazerSocialSerializer(serializers.HyperlinkedModelSerializer):
-    atividade = DefAtividadeSerializer()
-
-    class Meta:
-        model = LazerSocial
-        fields = ('url', 'descricao', 'pk')
-
-
-class LazerIndividual(models.Model):
-    descricao = models.TextField()
-    atividade = models.ForeignKey(DefAtividade, on_delete=models.CASCADE)
-
-class LazerIndividualSerializer(serializers.HyperlinkedModelSerializer):
-    atividade = DefAtividadeSerializer()
+class PhysicalActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = LazerIndividual
-        fields = ('url', 'descricao', 'pk')
+        model = PhysicalActivity
+        fields = ('description', 'activity', 'pk')
 
 
-# Utilizadores
+class SocialLeisure(models.Model):
+    description = models.TextField()
+    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
 
-class Utilizador(models.Model):
-    pass
 
-# VER COMO SE FAZ O SERIALIZER COM HERANÇA
+class SocialLeisureSerializer(serializers.ModelSerializer):
 
-class Cuidador(models.Model):
+    class Meta:
+        model = SocialLeisure
+        fields = ('description', 'activity', 'pk')
+
+
+class IndividualLeisure(models.Model):
+    description = models.TextField()
+    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
+
+
+class IndividualLeisureSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IndividualLeisure
+        fields = ('description', 'activity', 'pk')
+
+
+# Users
+
+class User(models.Model):
     name = models.CharField(max_length=200)
 
-class CuidadorSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Cuidador
-        fields = ('url', 'pk', 'name')
 
-# VER COMO SE FAZ O SERIALIZER COM HERANÇA
-
-class Utente(models.Model):
-    name = models.CharField(max_length=200)
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
-
-
-class UtenteSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Utente
-        fields = ('url', 'pk', 'name', 'cuidador')
-
-class UtilizadorBackoffice(models.Model):
-    TIPO = (
-    ('ADM', 'Administrador'), ('COR', 'Coordenador'), ('REM', 'Responsável Medicação'), ('PRF', 'Profissional Saúde'),
-    ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
-    tipo = models.CharField(max_length=3, choices=TIPO)
-
-
-class UtilizadorBackOfficeSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = UtilizadorBackoffice
-        fields = ('url', 'tipo', 'pk')
+        model = User
+        fields = ('name', 'pk')
 
 
-# Historico
-
-class ParamFisiologicos(models.Model):
-    data = models.DateField()
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+class Caregiver(models.Model):
+    info = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
-class ParamFisiologicos(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
+class CaregiverSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = ParamFisiologicos
-        fields = ('url', 'data', 'pk')
+        model = Caregiver
+        fields = ('info', 'pk')
 
 
-class ParamAnaliticos(models.Model):
-    data = models.DateField()
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+class Patient(models.Model):
+    info = models.OneToOneField(User, on_delete=models.CASCADE)
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
-class ParamAnaliticosSerializer(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
+class PatientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Patient
+        fields = ('info', 'caregiver', 'pk')
+
+
+class BackofficeUser(models.Model):
+    TYPE = (
+      ('ADM', 'Administrador'), ('COR', 'Coordenador'), ('REM', 'Responsável Medicação'), ('PRF', 'Profissional Saúde'),
+      ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
+    type = models.CharField(max_length=3, choices=TYPE)
+
+
+class BackofficeUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BackofficeUser
+        fields = ('type', 'pk')
+
+
+# Historic
+
+class PhysiologicalParam(models.Model):
+    date = models.DateField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+
+
+class PhysiologicalParamSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = ParamAnaliticos
-        fields = ('url', 'data', 'pk')
+        model = PhysiologicalParam
+        fields = ('data', 'caregiver', 'pk')
 
 
-class Agua(models.Model):
-    data = models.DateField()
-    quantidade = models.IntegerField()
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+class AnalyticalParam(models.Model):
+    date = models.DateField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
-class AguaSerializer(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
+class AnalyticalParamSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Agua
-        fields = ('url', 'data', 'quantidade', 'pk')
+        model = AnalyticalParam
+        fields = ('date', 'caregiver', 'pk')
 
 
-class Sesta(models.Model):
-    data = models.DateField()
-    quantidade = models.IntegerField()
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+class Water(models.Model):
+    date = models.DateField()
+    quantity = models.IntegerField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
-class SestaSerializer(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
-
-    class Meta:
-        model = Sesta
-        fields = ('url', 'data', 'quantidade', 'pk')
-
-
-class Sono(models.Model):
-    data = models.DateField()
-    qualidade = models.BooleanField()
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
-
-
-class SonoSerializer(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
+class WaterSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Sono
-        fields = ('url', 'data', 'qualidade', 'pk')
+        model = Water
+        fields = ('date', 'quantity', 'caregiver', 'pk')
 
 
-class Atividade(models.Model):
-    TIPO = (('AF', 'Atividade Fisica'), ('LS', 'Lazer Social'), ('LI', 'Lazer Individual'))
-    data = models.DateField()
-    tipo = models.CharField(max_length=2, choices=TIPO)
-    atividadeEspecifica = models.TextField(null=True, blank=True)
-    duracao = models.TimeField()
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+class Nap(models.Model):
+    date = models.DateField()
+    quantity = models.IntegerField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
-class AtividadeSerializer(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
+class NapSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Atividade
-        fields = ('url', 'data', 'tipo', 'atividadeEspecifica', 'duracao', 'pk')
+        model = Nap
+        fields = ('date', 'quantity', 'caregiver', 'pk')
 
 
-class Refeicao(models.Model):
-    TIPO = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'LancheTarde'), ('JT', 'Jantar'))
-    data = models.DateField()
-    realizado = models.BooleanField()
-    tipo = models.CharField(max_length=2, choices=TIPO)
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
+class Sleep(models.Model):
+    date = models.DateField()
+    quantity = models.BooleanField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
-class RefeicaoSerializers(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
+class SleepSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Refeicao
-        fields = ('url', 'data', 'realizado', 'tipo', 'pk')
+        model = Sleep
+        fields = ('date', 'quantity', 'caregiver', 'pk')
 
 
-class Constituicao(models.Model):
-    TIPO = (('CB', 'Carnes Brancas'), ('FT', 'Fruta'), ('VG', 'Vegetais'), ('FB', 'Fibras'), ('PC', 'Pré-cozinhados'),
+class Activity(models.Model):
+    TYPE = (('AF', 'Atividade Fisica'), ('LS', 'Lazer Social'), ('LI', 'Lazer Individual'))
+    date = models.DateField()
+    type = models.CharField(max_length=2, choices=TYPE)
+    specificActivity = models.TextField(null=True, blank=True)
+    duration = models.TimeField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Activity
+        fields = ('date', 'type', 'specificActivity', 'duration', 'caregiver', 'pk')
+
+
+class Meal(models.Model):
+    TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'LancheTarde'), ('JT', 'Jantar'))
+    date = models.DateField()
+    realize = models.BooleanField()
+    type = models.CharField(max_length=2, choices=TYPE)
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+
+
+class MealSerializers(serializers.ModelSerializer):
+
+    class Meta:
+        model = Meal
+        fields = ('date', 'realize', 'type', 'caregiver', 'pk')
+
+
+class Constitution(models.Model):
+    TYPE = (('CB', 'Carnes Brancas'), ('FT', 'Fruta'), ('VG', 'Vegetais'), ('FB', 'Fibras'), ('PC', 'Pré-cozinhados'),
             ('RF', 'Refrigerantes'), ('AL', 'Alcool'))
-    alimento = models.CharField(max_length=2, choices=TIPO)
-    refeicao = models.ForeignKey(Refeicao, on_delete=models.CASCADE)
+    food = models.CharField(max_length=2, choices=TYPE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
 
 
-class ConstituicaoSerializer(serializers.HyperlinkedModelSerializer):
-    refeicao = RefeicaoSerializers()
+class ConstitutionSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Constituicao
-        fields = ('url', 'alimento', 'pk')
-
+        model = Constitution
+        fields = ('food', 'meal', 'pk')
 
 # Event
+
 
 class Calendar(models.Model):
     calendar = models.TextField()
@@ -258,22 +254,19 @@ class Calendar(models.Model):
         return self.calendar
 
 
-class CalendarSerializer(serializers.HyperlinkedModelSerializer):
-
+class CalendarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Calendar
-        fields = ('url', 'calendar', 'color','forecolor')
+        fields = ('calendar', 'color', 'forecolor', 'pk')
 
 
 class Event(models.Model):
     title = models.TextField()
-    #dataInicio = models.DateField()
-    #dataFim = models.DateField()
+    # dataInicio = models.DateField()
+    # dataFim = models.DateField()
     # repeticao
     location = models.TextField()
     description = models.TextField()
-    busy = models.BooleanField(null=True, blank=True)
-    icon = models.TextField(null=True, blank=True)
     visible = models.BooleanField()
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
 
@@ -281,181 +274,159 @@ class Event(models.Model):
         return self.title
 
 
-class EventSerializer(serializers.HyperlinkedModelSerializer):
-    visible = serializers.BooleanField(required=False)
-    busy = serializers.BooleanField(required=False)
+class EventSerializer(serializers.ModelSerializer):
     visible = serializers.BooleanField(required=False)
 
     class Meta:
         model = Event
-        fields = ('url', 'title', 'location', 'description', 'busy', 'icon', 'visible', 'calendar', 'pk')
+        fields = ('title', 'location', 'description', 'visible', 'calendar', 'pk')
 
-    '''
     def create(self, validated_data):
-        logger = logging.getLogger("mylogger")
+        users = self.request.data['users']  # Fazer a ligação entre os users e o event!
         logger.info("OLA FROM SERIALIZER CREATE")
+        logger.info(users)
         logger.info(validated_data)
+        calendar = validated_data['data']['calendar']
+        if calendar.calendar == 'Consultas':
+            appointment_serializer = AppointmentSerializer()
+            appointment_serializer.save()
 
-        event = Event(
-            title=validated_data['data']['title'],
-            location=validated_data['data']['location'],
-            description=validated_data['data']['description'],
-            calendario=Calendar.objects.get(color=validated_data['data']['color'])
-        )
-        
-        event.save()
-        return event
-    '''
+        return Event.objects.create(**validated_data)
 
 
-class Notificacao(models.Model):
-    dataInicio = models.DateField()
-    hora = models.TimeField()
+class Notification(models.Model):
+    startDate = models.DateField()
+    hour = models.TimeField()
     # repeticao
-    evento = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 
-class NotificacaoSerializer(serializers.HyperlinkedModelSerializer):
-    evento = EventSerializer()
-
-    class Meta:
-        model = Notificacao
-        fields = ('url', 'dataInicio', 'hora', 'pk')
-
-
-
-# Consulta
-
-class Consulta(models.Model):
-    detalhes = models.OneToOneField(Event, on_delete=models.CASCADE)
-
-
-class ConsultaSerializer(serializers.HyperlinkedModelSerializer):
-    detalhes = EventSerializer()
+class NotificationSerializer(serializers.ModelSerializer):
+    event = EventSerializer()
 
     class Meta:
-        model = Consulta
-        fields = ('url', 'pk')
+        model = Notification
+        fields = ('startDate', 'hour', ' event', 'pk')
 
 
-class NotaConsulta(models.Model):
-    CATEGORIA = (('ENF', 'Enfermagem'), ('CLI', 'Clinica'), ('PSI', 'Psicologia'), ('OTR', 'Outras Apreciações'))
-    consulta = models.ForeignKey(Consulta, on_delete=models.CASCADE)
-    nota = models.TextField()
-    autor = models.ForeignKey(UtilizadorBackoffice, on_delete=models.CASCADE)
-    categoria = models.CharField(max_length=3, choices=CATEGORIA)
+# Appointment
+
+class Appointment(models.Model):
+    details = models.OneToOneField(Event, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
-class ConsultaSerializer(serializers.HyperlinkedModelSerializer):
-    consulta = ConsultaSerializer()
-    autor = UtilizadorBackOfficeSerializer()
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ('details', 'user', 'pk')
+
+
+class AppointmentNote(models.Model):
+    CATEGORY = (('ENF', 'Enfermagem'), ('CLI', 'Clinica'), ('PSI', 'Psicologia'), ('OTR', 'Outras Apreciações'))
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE)
+    note = models.TextField()
+    author = models.ForeignKey(BackofficeUser, on_delete=models.CASCADE)
+    category = models.CharField(max_length=3, choices=CATEGORY)
+
+
+class AppointmentNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AppointmentNote
+        fields = ('note', 'author', 'appointment', 'category', 'pk')
+
+
+# Medication
+
+
+class Medicine(models.Model):
+    activeSubs = models.TextField()
+    name = models.TextField()
+    pharmaceuticalForm = models.TextField()
+    dosage = models.IntegerField()
+    holder = models.TextField()
+    generic = models.TextField()
+
+
+class MedicineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Medicine
+        fields = ('activeSubs', 'name', 'pharmaceuticalForm', 'dosage', 'holder', 'generic', 'pk')
+
+
+class Prescription(models.Model):
+    date = models.DateField()
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    author = models.ForeignKey(BackofficeUser, on_delete=models.CASCADE)
+
+
+class PrescriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Consulta
-        fields = ('url', 'nota', 'categoria', 'pk')
+        model = Prescription
+        fields = ('date', 'patient', 'author' 'pk')
 
 
-# Medicação
-
-# ver data type
-class Medicamento(models.Model):
-    subsAtiva = models.TextField()
-    nome = models.TextField()
-    formaFarmaceutica = models.TextField()
-    dosagem = models.IntegerField()
-    titular = models.TextField()
-    generico = models.TextField()
+class Medication(models.Model):
+    STATE = (('E', 'Experimental'), ('A', 'Ativo'), ('I', 'Inativo'))
+    quantity = models.IntegerField()
+    state = models.CharField(max_length=2, choices=STATE)
+    details = models.OneToOneField(Event, on_delete=models.CASCADE)
+    medication = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    prescription = models.ForeignKey(Prescription, on_delete=models.CASCADE)
 
 
-class MedicamentoSerializer(serializers.HyperlinkedModelSerializer):
+class MedicationSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Medicamento
-        fields = ('url', 'subsAtiva', 'nome', 'formaFarmaceutica', 'dosagem', 'titular', 'generico', 'pk')
+        model = Medication
+        fields = ('quantity', 'state', 'details', 'medication', 'prescription', 'pk')
 
 
-class Prescricao(models.Model):
-    data = models.DateField()
-    utente = models.ForeignKey(Utente,on_delete=models.CASCADE)
-    autor = models.ForeignKey(UtilizadorBackoffice, on_delete=models.CASCADE)
+class Take(models.Model):
+    date = models.DateField()
+    medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
 
 
-class PrescricaoSerializer(serializers.HyperlinkedModelSerializer):
-    utente = UtenteSerializer()
-    autor = UtilizadorBackOfficeSerializer()
+class TakeSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Prescricao
-        fields = ('url', 'data', 'pk')
+        model = Take
+        fields = ('date', 'medication', 'pk')
 
 
-class Medicacao(models.Model):
-    ESTADO = (('E', 'Experimental'), ('A', 'Ativo'), ('I', 'Inativo'))
-    quantidade = models.IntegerField()
-    estado = models.CharField(max_length=2, choices=ESTADO)
-    detalhes = models.OneToOneField(Event, on_delete=models.CASCADE)
-    medicamento = models.ForeignKey(Medicamento, on_delete=models.CASCADE)
-    prescricao = models.ForeignKey(Prescricao, on_delete=models.CASCADE)
+# Session
 
-
-class MedicacaoSerializer(serializers.HyperlinkedModelSerializer):
-    detalhes = EventSerializer()
-    medicamento = MedicamentoSerializer()
-    prescricao = PrescricaoSerializer()
-
-    class Meta:
-        model = Medicacao
-        fields = ('url', 'quantidade', 'pk')
-
-
-class Toma(models.Model):
-    data = models.DateField()
-    medicacao = models.ForeignKey(Medicacao, on_delete=models.CASCADE)
-
-
-class TomaSerializer(serializers.HyperlinkedModelSerializer):
-    medicacao = MedicacaoSerializer()
-
-    class Meta:
-        model = Toma
-        fields = ('url', 'data', 'pk')
-
-
-# Sessões
-
-class Sessao(models.Model):
-    TIPO = (('I', 'Individual'), ('G', 'Grupo'))
-    ESTADO = (('E', 'Espera'), ('A', 'Aceite'), ('R', 'Revisao'), ('C', 'Concluida'))
-    tema = models.TextField()
-    tipo = models.CharField(max_length=1, choices=TIPO)
-    descricao = models.TextField()
-    objetivo = models.TextField()
+class Session(models.Model):
+    TYPE = (('I', 'Individual'), ('G', 'Grupo'))
+    STATE = (('E', 'Espera'), ('A', 'Aceite'), ('R', 'Revisao'), ('C', 'Concluida'))
+    topic = models.TextField()
+    type = models.CharField(max_length=1, choices=TYPE)
+    description = models.TextField()
+    goal = models.TextField()
     material = models.TextField()
-    detalhes = models.OneToOneField(Event, on_delete=models.CASCADE)
-    estado = models.CharField(max_length=1, choices=ESTADO)
+    details = models.OneToOneField(Event, on_delete=models.CASCADE)
+    state = models.CharField(max_length=1, choices=STATE)
     # Relação many-to-many só tem que estar num model
-    participantes = models.ManyToManyField('Cuidador')
+    participants = models.ManyToManyField(Caregiver)
 
-class SessaoSerializer(serializers.HyperlinkedModelSerializer):
+
+class SessaoSerializer(serializers.ModelSerializer):
     # Relação many-to-many
-    participantes = CuidadorSerializer(many=True)
-    detalhes = EventSerializer()
+    participants = CaregiverSerializer(many=True)
 
     class Meta:
-        model = Sessao
-        fields = ('url', 'tema', 'tipo', 'descricao', 'objetivo', 'material', 'estado', 'pk')
+        model = Session
+        fields = ('topic', 'type', 'description', 'goal', 'material', 'details', 'state', 'participants', 'pk')
 
 
-class Avaliacao(models.Model):
-    comentario = models.TextField()
-    cuidador = models.ForeignKey(Cuidador, on_delete=models.CASCADE)
-    sessao = models.ForeignKey(Sessao, on_delete=models.CASCADE)
+class Evaluation(models.Model):
+    comment = models.TextField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
 
 
-class AvaliacaoSerializer(serializers.HyperlinkedModelSerializer):
-    cuidador = CuidadorSerializer()
-    sessao = SessaoSerializer()
-
+class EvaluationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Avaliacao
-        fields = ('url', 'comentario', 'pk')
+        model = Evaluation
+        fields = ('comment', 'caregiver', 'session', 'pk')
