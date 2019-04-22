@@ -9,10 +9,10 @@ const getters = {
     return state.calendars
   },
   calendarAppoint: state => {
-    return state.calendars.find(calendar => calendar.url === 'http://localhost:8000/cuida24/calendars/1/')
+    return state.calendars.find(calendar => calendar.pk === '1')
   },
   calendarMedication: state => {
-    return state.calendars.find(calendar => calendar.url === 'http://localhost:8000/cuida24/calendars/2/')
+    return state.calendars.find(calendar => calendar.pk === '2')
   }
 }
 
