@@ -157,7 +157,7 @@ export default {
         'patients': this.patientsSelected
       }
       let data = {
-        'calendar': this.calendarAppoint.pk,
+        'calendar': this.calendarAppoint.url,
         'color': this.calendarAppoint.color,
         'description': this.form.specialty,
         'forecolor': this.calendarAppoint.forecolor,
