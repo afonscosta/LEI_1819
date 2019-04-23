@@ -264,14 +264,14 @@ class CalendarSerializer(serializers.ModelSerializer):
 
 
 class Schedule(models.Model):
-    duration = models.IntegerField()
-    durationInDays = models.IntegerField()
-    durationUnit = models.TextField()
-    dayOfWeek = models.IntegerField()
-    weekspanOfMonth = models.IntegerField()
-    dayOfMonth = models.IntegerField()
-    month = models.IntegerField()
-    times = models.TimeField()
+    duration = models.IntegerField(blank=True, null=True)
+    durationInDays = models.IntegerField(blank=True, null=True)
+    durationUnit = models.TextField(blank=True, null=True)
+    dayOfWeek = models.IntegerField(blank=True, null=True)
+    weekspanOfMonth = models.IntegerField(blank=True, null=True)
+    dayOfMonth = models.IntegerField(blank=True, null=True)
+    month = models.IntegerField(blank=True, null=True)
+    times = models.TimeField(blank=True, null=True)
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -287,7 +287,7 @@ class Event(models.Model):
     # repeticao
     location = models.TextField()
     description = models.TextField()
-    visible = models.BooleanField()
+    visible = models.BooleanField(blank=True, null=True)
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
