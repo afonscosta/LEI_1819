@@ -74,7 +74,6 @@ import editAppoint from './BackofficeEditAppoint'
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { FormWizard, TabContent } from 'vue-form-wizard'
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
-import { Schedule, Event } from 'dayspan'
 import { DateTime as LuxonDateTime } from 'luxon'
 
 export default {
@@ -181,10 +180,14 @@ export default {
         this.form.sched.duration = this.form.duration
         this.form.sched.durationUnit = this.form.durationUnit
       }
-      let sched = new Schedule(this.form.sched)
-      let ev = new Event(sched, data)
+      // let sched = new Schedule(this.form.sched)
+      // let ev = new Event(sched, data)
       let payload = {
-        'event': ev,
+        'event': {
+          'data': data,
+          'schedule': this.form.sched,
+          'id': null
+        },
         'users': users
       }
       this.addEvent(payload)
