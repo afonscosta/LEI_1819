@@ -52,7 +52,7 @@
             ></addAppoint>
             <editAppoint 
               v-if="this.selected === 'editAppoint'"
-              :form="form"
+              :userPK="user"
             ></editAppoint>
           </b-col>
           <b-col md="6" sm="12">
@@ -134,6 +134,13 @@ export default {
       return this.patients.map(function (i) {
         return {'text': i.info.name, 'value': i.pk}
       })
+    },
+    user: function () {
+      if (this.caregiversSelected) {
+        return this.caregiversSelected[0]
+      } else if (this.patientsSelected) {
+        return this.patientsSelected[0]
+      }
     }
   },
   methods: {
@@ -187,6 +194,7 @@ export default {
           'data': data,
           'schedule': this.form.sched,
           'id': null
+          // 'visible': true
         },
         'users': users
       }
