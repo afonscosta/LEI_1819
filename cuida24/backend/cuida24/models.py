@@ -289,7 +289,7 @@ class Event(models.Model):
     description = models.TextField()
     visible = models.BooleanField()
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
-    schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE)
+    schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -297,8 +297,8 @@ class Event(models.Model):
 
 class EventSerializer(serializers.ModelSerializer):
     visible = serializers.BooleanField(required=False)
-    calendar = CalendarSerializer()
-    schedule = ScheduleSerializer()
+    calendar = CalendarSerializer(read_only=True)
+    schedule = ScheduleSerializer(required=False)
 
     class Meta:
         model = Event
@@ -306,25 +306,29 @@ class EventSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         logger.info("OLA FROM SERIALIZER CREATE")
-        users = self.request.data['users']  # Fazer a ligação entre os users e o event!
-        logger.info(users)
+        request = self.context.get("request")
+        logger.info(request)
+        users = request['users']
         logger.info(validated_data)
-        calendar = validated_data['data']['calendar']
-        request = self.context['request'].data
-        # falta criar o schedule e assocar ao event
-        event = Event.objects.create(**validated_data)
+        calendar = Calendar.objects.get(pk=request['event']['data']['calendar'])
+        # falta criar o schedule e associar ao event
+        event = Event.objects.create(calendar=calendar, **validated_data)
 
         # Notification of a event
-        for notification in validated_data['notify']:
-            notification_req_data = {'dateTime':notification, 'event':event}
-            notification_serializer = NotificationSerializer(data=notification_req_data)
-            notification_serializer.save()
+        for notification in request['event']['data']['notify']:
+            notification_req_data = {'dateTime': notification, 'event': event}
+            Notification.objects.create(**notification_req_data)
 
         # Specifies type of event
+        logger.info(calendar.calendar)
         if calendar.calendar == 'Consultas':
-            appointment_req_data = {'user': request['users'][0], 'details': event}
-            appointment_serializer = AppointmentSerializer(data=appointment_req_data)
-            appointment_serializer.save()
+            for user in request['users']['caregivers']:
+                req_data = {'user': Caregiver.objects.get(pk=user).info , 'details': event}
+                Appointment.objects.create(**req_data)
+
+            for user in request['users']['patients']:
+                req_data = {'user': Patient.objects.get(pk=user).info, 'details': event}
+                Appointment.objects.create(**req_data)
         return event
 
 

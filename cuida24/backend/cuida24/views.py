@@ -47,14 +47,19 @@ class EventViewSet(viewsets.ModelViewSet):
         logger.info("POST")
         logger.info(request.data)
         event = request.data['event']
+        logger.info("EVENT")
+        logger.info(event)
+        '''
         try:
             event['data']['calendar'] = Calendar.objects.get(color=event['data']['color']).id
         except Calendar.DoesNotExist:
             logger.info('Calendario selecionado não existe!!')
             return Response(event, status=status.HTTP_400_BAD_REQUEST)
-
+        '''
         event['data']['visible'] = event['visible']
-        serializer = EventSerializer(data=event['data'], context={'request': request})
+        serializer = EventSerializer(data=event['data'], context={'request': request.data})
+        logger.info("DATA SENT")
+        logger.info(event['data'])
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
