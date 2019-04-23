@@ -3,13 +3,13 @@ from django.views.decorators.cache import never_cache
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 
-from backend.settings.dev import LOGGING
 from .models import Message, MessageSerializer
-from .models import DefAtividade, DefAtividadeSerializer
+from .models import DefActivity, DefActivitySerializer
 from .models import Event, EventSerializer
 from .models import Calendar, CalendarSerializer
-from .models import Cuidador, CuidadorSerializer
-from .models import Utente, UtenteSerializer
+from .models import Caregiver, CaregiverSerializer
+from .models import Patient, PatientSerializer
+from .models import Appointment, AppointmentSerializer
 import logging
 
 
@@ -26,36 +26,27 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
 
 
-class DefAtividadeViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
-    queryset = DefAtividade.objects.all()
-    serializer_class = DefAtividadeSerializer
+class DefActivityViewSet(viewsets.ModelViewSet):
+    queryset = DefActivity.objects.all()
+    serializer_class = DefActivitySerializer
 
 
 class EventViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     """
     Post method
     """
     def create(self, request, *args, **kwargs):
+        logger.info("POST")
         logger.info(request.data)
         event = request.data['event']
-        users = request.data['users'] # Fazer a ligação entre os users e o event!
-        logger.info(users)
-        try:
-            event['data']['calendar'] = 'http://127.0.0.1:8000/cuida24/calendars/' + \
-                                       str(Calendar.objects.get(color=event['data']['color']).id) + '/'
-        except Calendar.DoesNotExist:
-            logger.info('Calendario selecionado não existe!!')
-            return Response(event, status=status.HTTP_400_BAD_REQUEST)
+        logger.info("EVENT")
+        logger.info(event)
         event['data']['visible'] = event['visible']
-        serializer = EventSerializer(data=event['data'], context={'request': request})
+        serializer = EventSerializer(data=event['data'], context={'request': request.data})
+        logger.info("DATA SENT")
+        logger.info(event['data'])
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -66,6 +57,7 @@ class EventViewSet(viewsets.ModelViewSet):
     Get method
     """
     def list(self, request, *args, **kwargs):
+        logger.info("GET")
         events = Event.objects.all()
         logger.info(events)
         serializer = EventSerializer(events, many=True, context={'request': request})
@@ -75,22 +67,20 @@ class EventViewSet(viewsets.ModelViewSet):
 
 
 class CalendarViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
     queryset = Calendar.objects.all()
     serializer_class = CalendarSerializer
 
+
 class CaregiverViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
-    queryset = Cuidador.objects.all()
-    serializer_class = CuidadorSerializer
+    queryset = Caregiver.objects.all()
+    serializer_class = CaregiverSerializer
+
 
 class PatientViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
-    queryset = Utente.objects.all()
-    serializer_class = UtenteSerializer
+    queryset = Patient.objects.all()
+    serializer_class = PatientSerializer
+
+
+class AppointmentViewSet(viewsets.ModelViewSet):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer

@@ -38,7 +38,7 @@ const mutations = {
     state.calendar = cal
   },
   addEvent (state, dictEvent) {
-    let event = dictEvent['event']
+    let sched = new Schedule(dictEvent['event']['schedule'])
     let infoEvent = dictEvent['infoEvent']
     let cal = Calendar.fromInput(state.calendar)
     let data = {
@@ -50,7 +50,7 @@ const mutations = {
       'notify': [],
       'title': infoEvent['title']
     }
-    let ev = new Event(event['schedule'], data, infoEvent['pk'], infoEvent['visible'])
+    let ev = new Event(sched, data, infoEvent['pk'], true)
     cal.removeEvent(event)
     cal.addEvent(ev)
     state.calendar = cal
@@ -78,7 +78,6 @@ const actions = {
       })
   },
   addEvent ({ commit }, payload) {
-    delete payload['event']['data']['icon']
     eventService.postEvent(payload)
       .then(infoEvent => {
         commit('addEvent', {

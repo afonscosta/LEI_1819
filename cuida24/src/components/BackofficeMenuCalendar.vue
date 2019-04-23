@@ -74,7 +74,6 @@ import editAppoint from './BackofficeEditAppoint'
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { FormWizard, TabContent } from 'vue-form-wizard'
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
-import { Schedule, Event } from 'dayspan'
 import { DateTime as LuxonDateTime } from 'luxon'
 
 export default {
@@ -128,12 +127,12 @@ export default {
     ]),
     caregiversParsed: function () {
       return this.caregivers.map(function (i) {
-        return {'text': i.name, 'value': i.pk}
+        return {'text': i.info.name, 'value': i.pk}
       })
     },
     patientsParsed: function () {
       return this.patients.map(function (i) {
-        return {'text': i.name, 'value': i.pk}
+        return {'text': i.info.name, 'value': i.pk}
       })
     }
   },
@@ -157,7 +156,7 @@ export default {
         'patients': this.patientsSelected
       }
       let data = {
-        'calendar': this.calendarAppoint.url,
+        'calendar': this.calendarAppoint.pk,
         'color': this.calendarAppoint.color,
         'description': this.form.specialty,
         'forecolor': this.calendarAppoint.forecolor,
@@ -181,10 +180,14 @@ export default {
         this.form.sched.duration = this.form.duration
         this.form.sched.durationUnit = this.form.durationUnit
       }
-      let sched = new Schedule(this.form.sched)
-      let ev = new Event(sched, data)
+      // let sched = new Schedule(this.form.sched)
+      // let ev = new Event(sched, data)
       let payload = {
-        'event': ev,
+        'event': {
+          'data': data,
+          'schedule': this.form.sched,
+          'id': null
+        },
         'users': users
       }
       this.addEvent(payload)
