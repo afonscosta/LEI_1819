@@ -50,13 +50,19 @@
               :form="form"
               @throwEvent="parseScheduleOption"
             ></addAppoint>
+          </b-col>
+          <b-col 
+            v-if="this.selected === 'addAppoint'"
+            md="6"
+            sm="12"
+          >
+            <calReadOnly></calReadOnly>
+          </b-col>
+          <b-col md="12" sm="12">
             <editAppoint 
               v-if="this.selected === 'editAppoint'"
               :userPK="user"
             ></editAppoint>
-          </b-col>
-          <b-col md="6" sm="12">
-            <calReadOnly></calReadOnly>
           </b-col>
         </b-row>
       </b-container>
@@ -187,18 +193,17 @@ export default {
         this.form.sched.duration = this.form.duration
         this.form.sched.durationUnit = this.form.durationUnit
       }
-      // let sched = new Schedule(this.form.sched)
-      // let ev = new Event(sched, data)
       let payload = {
         'event': {
           'data': data,
           'schedule': this.form.sched,
-          'id': null
-          // 'visible': true
+          'id': null,
+          'visible': true
         },
         'users': users
       }
       this.addEvent(payload)
+      // this.$router.go('/boMenuCalendar')
     },
     parseScheduleOption (option) {
       let dt = LuxonDateTime.fromISO(this.form.dateValue)
