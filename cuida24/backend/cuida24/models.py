@@ -270,23 +270,25 @@ class Schedule(models.Model):
     durationInDays = models.IntegerField(blank=True, null=True)
     durationUnit = models.TextField(blank=True, null=True)
     dayOfWeek = models.IntegerField(blank=True, null=True)
-    weekspanOfMonth = models.IntegerField(blank=True, null=True)
     dayOfMonth = models.IntegerField(blank=True, null=True)
     month = models.IntegerField(blank=True, null=True)
     times = models.TimeField(blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ('duration', 'durationInDays', 'durationUnit', 'dayOfWeek', 'weekspanOfMonth', 'dayOfMonth', 'month',
+        fields = ('duration', 'durationInDays', 'durationUnit', 'dayOfWeek', 'year', 'dayOfMonth', 'month',
                   'times', 'pk')
 
 
 class Event(models.Model):
     title = models.TextField()
-    # repeticao
+    dayOfMonth = models.IntegerField()
+    month = models.IntegerField()
+    year = models.IntegerField()
     location = models.TextField()
     description = models.TextField()
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
@@ -302,7 +304,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('title', 'location', 'description', 'calendar', 'schedule', 'pk')
+        fields = ('title', 'dayOfMonth', 'month', 'year', 'location', 'description', 'calendar', 'schedule', 'pk')
 
     def create(self, validated_data):
         logger.info("OLA FROM SERIALIZER CREATE")
@@ -310,8 +312,8 @@ class EventSerializer(serializers.ModelSerializer):
         logger.info(request)
         logger.info(validated_data)
         calendar = get_object_or_404(Calendar, pk=request['calendar'])
-        #Falta associar o schedule
-        event = Event.objects.create(calendar=calendar, **validated_data)
+        schedule = Schedule.objects.create(**request['schedule'])
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **validated_data)
 
         # Notification of a event
         for notification in request['notification']:

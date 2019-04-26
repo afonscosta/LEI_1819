@@ -41,16 +41,16 @@ class EventViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         logger.info("POST")
         logger.info(request.data)
-        event = request.data['event']
-        logger.info("EVENT")
-        logger.info(event)
         req_data = EventFrontToBackJSON(request.data)
         serializer = EventSerializer(data=req_data['event'], context={'request': req_data})
         logger.info("DATA SENT")
-        logger.info(event['data'])
+        logger.info(req_data)
         if serializer.is_valid(raise_exception=False):
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = EventBackTofrontJSON(request.data, serializer.data)
+            return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
