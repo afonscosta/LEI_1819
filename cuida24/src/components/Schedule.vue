@@ -21,29 +21,9 @@
       Mensalmente
     </b-dropdown-item>
     <b-dropdown-item
-      @click="throwEvent('monthlyByDay')"
-    >
-      Mensalmente no mesmo dia
-    </b-dropdown-item>
-    <b-dropdown-item
       @click="throwEvent('annually')"
     >
       Anualmente
-    </b-dropdown-item>
-    <b-dropdown-item
-      @click="throwEvent('annuallyByDay')"
-    >
-      Anualmente no mesmo dia
-    </b-dropdown-item>
-    <b-dropdown-item
-      @click="throwEvent('everyWeekday')"
-    >
-      Todos os dias da semana (de segunda a sexta)
-    </b-dropdown-item>
-    <b-dropdown-item
-      @click="throwEvent('custom')"
-    >
-      Personalizado...
     </b-dropdown-item>
   </b-dropdown>
 </template>
