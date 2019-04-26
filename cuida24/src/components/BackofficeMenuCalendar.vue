@@ -180,21 +180,25 @@ export default {
         this.form.sched.duration = this.form.duration
         this.form.sched.durationUnit = this.form.durationUnit
       }
-      // let sched = new Schedule(this.form.sched)
-      // let ev = new Event(sched, data)
+      let dt = LuxonDateTime.fromISO(this.form.dateValue)
       let payload = {
         'event': {
           'data': data,
           'schedule': this.form.sched,
           'id': null
         },
-        'users': users
+        'users': users,
+        'occurrenceDate': {
+          'dayOfMonth': dt.c.day,
+          'month': dt.c.month,
+          'year': dt.c.year
+        }
       }
       this.addEvent(payload)
     },
     parseScheduleOption (option) {
       let dt = LuxonDateTime.fromISO(this.form.dateValue)
-      let wsom = this.weekSpanOfMonth(dt)
+      // let wsom = this.weekSpanOfMonth(dt)
       let dow = dt.weekday % 7
       dt.c.month = dt.c.month - 1
       switch (option) {
@@ -212,36 +216,13 @@ export default {
           break
         case 'monthly':
           this.form.sched = {
-            'dayOfWeek': [dow],
-            'weekspanOfMonth': [wsom]
-          }
-          break
-        case 'monthlyByDay':
-          this.form.sched = {
             'dayOfMonth': [dt.c.day]
           }
           break
         case 'annually':
           this.form.sched = {
-            'dayOfWeek': [dow],
-            'month': [dt.c.month],
-            'weekspanOfMonth': [wsom]
-          }
-          break
-        case 'annuallyByDay':
-          this.form.sched = {
             'dayOfMonth': [dt.c.day],
             'month': [dt.c.month]
-          }
-          break
-        case 'everyWeekday':
-          this.form.sched = {
-            'dayOfWeek': [1, 2, 3, 4, 5]
-          }
-          break
-        case 'custom':
-          this.form.sched = {
-            'custom': 'custom'
           }
           break
         default:
@@ -251,14 +232,14 @@ export default {
             'year': [dt.c.year]
           }
       }
-    },
-    weekSpanOfMonth (dt) {
-      // month_number is in the range 1..12
-      let date = new Date(''.concat(dt.c.year, '-', dt.c.month, '-', dt.c.day))
-      var firstWeekday = new Date(date.getFullYear(), date.getMonth(), 1).getDay()
-      var offsetDate = date.getDate() + firstWeekday - 1
-      return Math.floor(offsetDate / 7)
     }
+    // weekSpanOfMonth (dt) {
+    //   // month_number is in the range 1..12
+    //   let date = new Date(''.concat(dt.c.year, '-', dt.c.month, '-', dt.c.day))
+    //   var firstWeekday = new Date(date.getFullYear(), date.getMonth(), 1).getDay()
+    //   var offsetDate = date.getDate() + firstWeekday - 1
+    //   return Math.floor(offsetDate / 7)
+    // }
   }
 }
 </script>
