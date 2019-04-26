@@ -305,7 +305,7 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('title', 'dayOfMonth', 'month', 'year', 'location', 'description', 'calendar', 'schedule', 'pk')
-
+    '''
     def create(self, validated_data):
         logger.info("OLA FROM SERIALIZER CREATE")
         request = self.context.get("request")
@@ -331,6 +331,7 @@ class EventSerializer(serializers.ModelSerializer):
                 req_data = {'user': Patient.objects.get(pk=user).info, 'details': event}
                 Appointment.objects.create(**req_data)
         return event
+      '''
 
 
 class Notification(models.Model):
@@ -355,11 +356,38 @@ class Appointment(models.Model):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     details = EventSerializer()
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Appointment
         fields = ('details', 'user', 'pk')
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        logger.info(request)
+        logger.info(validated_data)
+
+        # Details(event) of appointment
+        calendar = get_object_or_404(Calendar, pk=request['calendar'])
+        schedule = Schedule.objects.create(**request['schedule'])
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **request['details'])
+
+        # Notification associate to event
+        for notification in request['notification']:
+            notification_req_data = {'dateTime': notification, 'event': event}
+            Notification.objects.create(**notification_req_data)
+
+        # Create appointment with user and event
+        appointment = None
+        for user in request['users']['caregivers']:
+            req_data = {'user': get_object_or_404(Caregiver, pk=user).info, 'details': event}
+            appointment = Appointment.objects.create(**req_data)
+
+        if not appointment:
+            for user in request['users']['patients']:
+                req_data = {'user': Patient.objects.get(pk=user).info, 'details': event}
+                appointment = Appointment.objects.create(**req_data)
+        return appointment
 
 
 class AppointmentNote(models.Model):
