@@ -3,7 +3,7 @@ import store from '@/store/modules/login'
 
 export default {
   fetchEvents () {
-    // console.log("teste " + store.state.accesstoken);
+    console.log('teste ' + store.state.accesstoken)
     return cuida24.get(`events/`, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
