@@ -15,90 +15,67 @@ import { StackNavigator } from 'react-navigation';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { sha256 } from 'react-native-sha256';
 
-const addAppointment = async (appt, hash, appointmentCalendar) => {
+const createEvent(appt, hash, appointmentCalendar) => {
+  return {
+    calendarId: appointmentCalendar.id,
+    startDate: '2019-04-28T19:26:00.000Z',
+    endDate: '2019-04-28T19:26:00.000Z',
+    allDay: true,
+    location: appt.details.location,
+    notes: String(hash),
+    description: appt.details.description
+    //recurrence: null
+  }
+}
+
+const addNewAppointment = async (appt, hash, appointmentCalendar) => {
+  console.log('Adicionando evento...', appt);
+  RNCalendarEvents.saveEvent(
+    appt.details.title, 
+    createEvent(appt, hash, appointmentCalendar)
+  ).then(id => { 
+    (async () => {
+      try {
+        await AsyncStorage.setItem(
+          '@appointmentCalendar:' + appt.pk,
+          JSON.stringify({ 'id': id, 'hash': String(hash) })
+        );
+      } catch (error) {
+        console.warn('AsyncStorage - setItem', error);
+      }
+    })();
+  }).catch(error => console.warn('RNCalendarEvents - saveEvent', error));
+}
+
+const handleAppointment = async (appt, hash, appointmentCalendar) => {
   try {
     //await AsyncStorage.clear();
     const oldEvData = await AsyncStorage.getItem('@appointmentCalendar:' + appt.pk);
-    console.log('oldEvData', oldEvData);
-    if (oldEvData == null) {
-      console.log('Adicionando evento...', appt);
-      RNCalendarEvents.saveEvent(appt.details.title, {
-        calendarId: appointmentCalendar.id,
-        startDate: '2019-04-28T19:26:00.000Z',
-        endDate: '2019-04-28T19:26:00.000Z',
-        allDay: true,
-        location: appt.details.location,
-        notes: String(hash),
-        description: appt.details.description
-        //recurrence: null
-      })
-        .then(id => { 
-          (async () => {
-            try {
-              await AsyncStorage.setItem(
-                '@appointmentCalendar:' + appt.pk,
-                JSON.stringify({ 'id': id, 'hash': String(hash) })
-              ).then(item => console.log('setItem', item));
-              console.log('map guardado na storage');
-            } catch (error) {
-              console.warn('asyncStorage', error);
-            }
-          })();
-          console.log('adicionou ao storage');
-        })
-        .catch(error => console.warn('Add event Error: ', error));
-      console.log('Evento adicionado.');
+    if (oldEvData == null) { // O evento ainda não existe
+      addNewAppointment(appt, hash, appointmentCalendar);
     }
     else { // Já tem o evento. Está atualizado?
-      console.log('o evento já existe!');
       var oldEvDataParsed = JSON.parse(oldEvData);
-      console.log('oldEvDataParsed', oldEvDataParsed);
       if (oldEvDataParsed.hash !== hash) { // O evento mudou
-        console.log('o evento mudou');
         RNCalendarEvents.removeEvent(oldEvDataParsed.id)
-          .then(event => {
-            console.log('remove event success', event);
-            console.log('Adicionando evento...', appt);
-            (async () => {
+          .then(() => {
+            (async () => { // Remove a key do asyncStorage
               try {
                 await AsyncStorage.removeItem('@appointmentCalendar:' + appt.pk);
               } catch (error) {
-                console.warn('asyncStorage removeItem', error);
+                console.warn('AsyncStorage - removeItem', error);
               }
             })();
-            RNCalendarEvents.saveEvent(appt.details.title, {
-              calendarId: appointmentCalendar.id,
-              startDate: '2019-04-28T19:26:00.000Z',
-              endDate: '2019-04-28T19:26:00.000Z',
-              allDay: true,
-              location: appt.details.location,
-              notes: String(hash),
-              description: appt.details.description
-              //recurrence: null
-            })
-              .then(id => { 
-                (async () => {
-                  try {
-                    await AsyncStorage.setItem(
-                      '@appointmentCalendar:' + appt.pk,
-                      JSON.stringify({ 'id': id, 'hash': String(hash) })
-                    );
-                    console.log('map guardado na storage');
-                  } catch (error) {
-                    console.warn('asyncStorage', error);
-                  }
-                })();
-              })
-              .catch(error => console.warn('Add event Error: ', error));
-            console.log('Evento adicionado.');
+            // Adiciona o evento atualizado
+            addNewAppointment(appt, hash, appointmentCalendar);
           })
           .catch(error => {
-            console.log('remove event error', error);
+            console.log('RNCalendarEvents - removeEvent', error);
           });
       }
     }
   } catch (error) {
-    console.warn('asyncStorage', error);
+    console.warn('AsyncStorage - handleAppointment', error);
   }
 }
 
@@ -114,6 +91,24 @@ export default class MedicationPage extends React.Component {
       refreshing: false,
       base_url: "http://10.0.3.2:8000/cuida24/"
     }
+  }
+
+  getAppointmentCalendar(result) {
+    return result.find(c =>
+      c.title === 'Consultas' &&
+      c.type === 'LOCAL' && 
+      c.isPrimary &&
+      !c.allowsModifications
+    );
+  }
+
+  getMedicationCalendar(result) {
+    return result.find(c =>
+      c.title === 'Medicação' &&
+      c.type === 'LOCAL' && 
+      c.isPrimary &&
+      !c.allowsModifications
+    );
   }
 
   componentWillMount () {
@@ -146,83 +141,10 @@ export default class MedicationPage extends React.Component {
       .catch(error => console.warn('Auth Error: ', error));
   }
 
-  addCalendars() {
-    this.state.calendars.forEach( function(cal) {
-      RNCalendarEvents.findCalendars()
-      .then((result) => {
-        if (result.length <= 0) {
-          return console.log('no calendar found');
-        }
-
-        const appointmentCalendar = result.find(c =>
-          c.title === 'Consultas' &&
-          c.type === 'LOCAL' && 
-          c.isPrimary &&
-          !c.allowsModifications
-        );
-
-        const medicationCalendar = result.find(c => 
-          c.title === 'Medicação' &&
-          c.type === 'LOCAL' && 
-          c.isPrimary &&
-          !c.allowsModifications
-        );
-
-        if (appointmentCalendar && cal.calendar === 'Consultas') { 
-          console.log('não vai inserir calendário das consultas!');
-          return; 
-        }
-        if (medicationCalendar && cal.calendar === 'Medicação') { 
-          console.log('não vai inserir calendário da medicação!');
-          return; 
-        }
-
-        const calendar = {
-          title: cal.calendar,
-          color: cal.color,
-          entityType: 'event',
-          source: {
-            name: result[0].source,
-            isLocalAccount: true
-            // type: result[0].type,
-          },
-          name: cal.calendar,
-          accessLevel: 'read',
-          ownerAccount: result[0].source,
-        };
-        console.log(calendar);
-        return RNCalendarEvents.saveCalendar(calendar)
-          .then(calendarId => console.log('Calendar created successfully !', calendarId))
-          .then(() => console.log(RNCalendarEvents.findCalendars()));
-      }).catch(err => console.log('err', err));
-    });
-  }
-
   componentDidMount() {
-    this.fetchAppointmentsFromApi();
     this.fetchCalendarsFromApi();
+    this.fetchAppointmentsFromApi();
   }
-
-  fetchAppointmentsFromApi = ()  => {
-    const url = this.state.base_url + "appointments";
-
-    this.setState({ loading: true });
-
-    fetch(url)
-      .then(res => res.json())
-      .then(res => {
-
-        this.setState({
-          appointments: res,
-          error: null,
-          loading: false,
-          refreshing: false
-        }, () => this.saveAppointments());//() => console.log('events', this.state.events));
-      })
-      .catch(error => {
-        this.setState({ error, loading : false });
-      })
-  };
 
   fetchCalendarsFromApi = ()  => {
     const url = this.state.base_url + "calendars";
@@ -244,6 +166,92 @@ export default class MedicationPage extends React.Component {
       })
   };
 
+  addCalendars() {
+    this.state.calendars.forEach( (cal) => {
+      RNCalendarEvents.findCalendars()
+      .then((result) => {
+        if (result.length <= 0) {
+          return console.log('No calendar found');
+        }
+
+        const appointmentCalendar = this.getAppointmentCalendar(result);
+        const medicationCalendar = this.getMedicationCalendar(result);
+
+        // Calendário consultas já existe
+        if (appointmentCalendar && cal.calendar === 'Consultas') { 
+          return; 
+        }
+        // Calendário medicação já existe
+        if (medicationCalendar && cal.calendar === 'Medicação') { 
+          return; 
+        }
+
+        const calendar = {
+          title: cal.calendar,
+          color: cal.color,
+          entityType: 'event',
+          source: {
+            name: result[0].source,
+            isLocalAccount: true
+            // type: result[0].type,
+          },
+          name: cal.calendar,
+          accessLevel: 'read',
+          ownerAccount: result[0].source,
+        };
+
+        return RNCalendarEvents.saveCalendar(calendar)
+          .then(calendarId => console.log('Calendar created successfully!', calendarId))
+          .catch(error => console.log('RNCalendarEvents - saveCalendar', error));
+
+      }).catch(err => console.log('RNCalendarEvents - findCalendars', err));
+    });
+  }
+
+  fetchAppointmentsFromApi = ()  => {
+    const url = this.state.base_url + "appointments";
+
+    this.setState({ loading: true });
+
+    fetch(url)
+      .then(res => res.json())
+      .then(res => {
+
+        this.setState({
+          appointments: res,
+          error: null,
+          loading: false,
+          refreshing: false
+        }, () => this.handleAppointments());//() => console.log('events', this.state.events));
+      })
+      .catch(error => {
+        this.setState({ error, loading : false });
+      })
+  };
+
+  handleAppointments() {
+    RNCalendarEvents.findCalendars()
+    .then((result) => {
+      const appointmentCalendar = this.getAppointmentCalendar(result);
+      const medicationCalendar = this.getMedicationCalendar(result);
+
+      if (!appointmentCalendar) { return; }
+      if (!medicationCalendar) { return; }
+
+      this.state.appointments.forEach( function(appt) {
+        sha256(JSON.stringify(appt)).then( hash => {
+          (async () => {
+            try {
+              handleAppointment(appt, hash, appointmentCalendar);
+            } catch (error) {
+              console.warn('handleAppointment - outside', error);
+            }
+          })();
+        }).catch(error => console.warn('sha256', error));
+      });
+    });
+  }
+
   handleRefresh = () => {
     this.setState(
       {
@@ -255,76 +263,12 @@ export default class MedicationPage extends React.Component {
     );
   };
 
-  onPressLearnMore() {
+  openCalendar() {
     if(Platform.OS === 'ios') {
       Linking.openURL('calshow:');
     } else if(Platform.OS === 'android') { 
       Linking.openURL('content://com.android.calendar/time/');
     }
-  }
-
-  auxSaveAppointments(appointmentCalendar, medicationCalendar) {
-    RNCalendarEvents.saveEvent('Consulta 1', {
-      calendarId: appointmentCalendar.id,
-      startDate: '2019-04-25T19:26:00.000Z',
-      endDate: '2019-04-25T19:26:00.000Z',
-      location: 'Porto',
-      notes: 'Não esquecer da consulta!',
-      description: 'descrição',
-      recurrence: 'weekly'
-    }) 
-    RNCalendarEvents.saveEvent('Medicação 1', {
-      calendarId: medicationCalendar.id,
-      startDate: '2019-04-26T19:26:00.000Z',
-      endDate: '2019-04-26T19:26:00.000Z',
-      location: 'Braga',
-      notes: 'Não esquecer da medicação',
-      description: 'descrição',
-      recurrence: 'monthly'
-    }) 
-    if(Platform.OS === 'ios') {
-      Linking.openURL('calshow:');
-    } else if(Platform.OS === 'android') { 
-      Linking.openURL('content://com.android.calendar/time/');
-    }
-  }
-
-  saveAppointments() {
-    RNCalendarEvents.findCalendars()
-    .then((result) => {
-      console.log('result', result);
-      const appointmentCalendar = result.find(c =>
-        c.title === 'Consultas' &&
-        c.type === 'LOCAL' && 
-        c.isPrimary &&
-        !c.allowsModifications
-      );
-
-      const medicationCalendar = result.find(c => 
-        c.title === 'Medicação' &&
-        c.type === 'LOCAL' && 
-        c.isPrimary &&
-        !c.allowsModifications
-      );
-
-      if (!appointmentCalendar) { return; }
-      if (!medicationCalendar) { return; }
-
-      //auxSaveAppointments(appointmentCalendar, medicationCalendar);
-      console.log(this.state.appointments);
-      this.state.appointments.forEach( function(appt) {
-        sha256(JSON.stringify(appt)).then( hash => {
-          (async () => {
-            try {
-              addAppointment(appt, hash, appointmentCalendar);
-            } catch (error) {
-              console.warn('outside asyncStorage', error);
-            }
-          })();
-        }).catch(error => console.warn('Hash Error: ', error));
-      });
-      console.log('depois');
-    });
   }
 
   render() {
@@ -332,10 +276,10 @@ export default class MedicationPage extends React.Component {
       <View style={styles.container}>
         <Text>Medication page</Text>
         <Button
-          onPress={this.saveAppointments}
-          title="Learn More"
+          onPress={this.openCalendar}
+          title="Abrir calendário"
           color="#841584"
-          accessibilityLabel="Learn more about this purple button"
+          accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
         />
       </View>
     )
