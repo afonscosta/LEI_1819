@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework.response import Response
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 
 from .models import Message, MessageSerializer
 from .models import DefActivity, DefActivitySerializer
@@ -50,6 +50,7 @@ class EventViewSet(viewsets.ModelViewSet):
             logger.info("SERIALIZER RETURN DATA")
             logger.info(serializer.data)
             sent_data = EventBackTofrontJSON(request.data, serializer.data)
+            logger.info(sent_data)
             return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

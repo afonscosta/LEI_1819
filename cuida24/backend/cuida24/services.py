@@ -1,7 +1,8 @@
-from typing import Dict, Any
+import copy
 
 
-def EventFrontToBackJSON(request):
+def EventFrontToBackJSON(request_param):
+    request = copy.deepcopy(request_param)
     req_data = {'event': request['event']['data'], 'calendar': request['event']['data']['calendar'],
                 'notification': request['event']['data']['notify'], 'users': request['users']}
 
@@ -17,7 +18,7 @@ def EventFrontToBackJSON(request):
         if req_data['schedule']['dayOfMonth']:
             req_data['schedule']['dayOfMonth'] = req_data['schedule']['dayOfMonth'][0]
     if 'month' in req_data['schedule']:
-      if req_data['schedule']['month']:
+        if req_data['schedule']['month']:
             req_data['schedule']['month'] = req_data['schedule']['month'][0]
     if 'year' in req_data['schedule']:
         if req_data['schedule']['year']:
@@ -28,7 +29,8 @@ def EventFrontToBackJSON(request):
     return req_data
 
 
-def EventBackTofrontJSON(request, serializer_data):
+def EventBackTofrontJSON(request_param, serializer_data):
+    request = copy.deepcopy(request_param)
     sent_data = request
     sent_data['event']['id'] = serializer_data['pk']
     return sent_data
