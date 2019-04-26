@@ -2,6 +2,8 @@ from django.db import models
 from rest_framework import serializers
 import logging
 
+from rest_framework.generics import get_object_or_404
+
 logger = logging.getLogger("mylogger")
 
 
@@ -287,7 +289,6 @@ class Event(models.Model):
     # repeticao
     location = models.TextField()
     description = models.TextField()
-    visible = models.BooleanField(blank=True, null=True)
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -296,26 +297,24 @@ class Event(models.Model):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    visible = serializers.BooleanField(required=False)
     calendar = CalendarSerializer(read_only=True)
     schedule = ScheduleSerializer(required=False)
 
     class Meta:
         model = Event
-        fields = ('title', 'location', 'description', 'visible', 'calendar', 'schedule', 'pk')
+        fields = ('title', 'location', 'description', 'calendar', 'schedule', 'pk')
 
     def create(self, validated_data):
         logger.info("OLA FROM SERIALIZER CREATE")
         request = self.context.get("request")
         logger.info(request)
-        users = request['users']
         logger.info(validated_data)
-        calendar = Calendar.objects.get(pk=request['event']['data']['calendar'])
-        # falta criar o schedule e associar ao event
+        calendar = get_object_or_404(Calendar, pk=request['calendar'])
+        #Falta associar o schedule
         event = Event.objects.create(calendar=calendar, **validated_data)
 
         # Notification of a event
-        for notification in request['event']['data']['notify']:
+        for notification in request['notification']:
             notification_req_data = {'dateTime': notification, 'event': event}
             Notification.objects.create(**notification_req_data)
 

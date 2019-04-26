@@ -10,6 +10,7 @@ from .models import Calendar, CalendarSerializer
 from .models import Caregiver, CaregiverSerializer
 from .models import Patient, PatientSerializer
 from .models import Appointment, AppointmentSerializer
+from .services import  *
 import logging
 
 
@@ -43,8 +44,8 @@ class EventViewSet(viewsets.ModelViewSet):
         event = request.data['event']
         logger.info("EVENT")
         logger.info(event)
-        event['data']['visible'] = event['visible']
-        serializer = EventSerializer(data=event['data'], context={'request': request.data})
+        req_data = EventFrontToBackJSON(request.data)
+        serializer = EventSerializer(data=req_data['event'], context={'request': req_data})
         logger.info("DATA SENT")
         logger.info(event['data'])
         if serializer.is_valid(raise_exception=False):
