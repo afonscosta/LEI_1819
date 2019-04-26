@@ -21,18 +21,7 @@ const mutations = {
       updateRows: true
     })
     var newEvents = events.map(function (ev) {
-      let data = {
-        'calendar': ev['calendar'],
-        'color': '#1976d2',
-        'description': ev['description'],
-        'forecolor': '#ffffff',
-        'location': ev['location'],
-        'notify': [],
-        'title': ev['title']
-      }
-      // TODO: acabar o schedule
-      let newEv = new Event(new Schedule(), data, ev['pk'], ev['visible'])
-      return newEv
+      return new Event(ev['event']['schedule'], ev['event']['data'], ev['event']['id'], true)
     })
     cal.addEvents(newEvents)
     state.calendar = cal
@@ -40,16 +29,7 @@ const mutations = {
   addEvent (state, event) {
     let sched = new Schedule(event['schedule'])
     let cal = Calendar.fromInput(state.calendar)
-    let data = {
-      'calendar': event['data']['calendar'],
-      'color': event['data']['color'],
-      'description': event['data']['description'],
-      'forecolor': event['data']['forecolor'],
-      'location': event['data']['location'],
-      'notify': [],
-      'title': event['data']['title']
-    }
-    let ev = new Event(sched, data, event['id'], true)
+    let ev = new Event(sched, event['data'], event['id'], true)
     cal.addEvent(ev)
     state.calendar = cal
   },
@@ -72,13 +52,14 @@ const actions = {
   getEvents ({ commit }) {
     eventService.fetchEvents()
       .then(events => {
+        console.log('Resultado do fetch do vue', events)
         commit('setEvents', events)
       })
   },
   addEvent ({ commit }, payload) {
     eventService.postEvent(payload)
       .then(event => {
-        console.log(event)
+        console.log('Resultado recebido depois do post', event)
         commit('addEvent', event['event'])
       })
   },

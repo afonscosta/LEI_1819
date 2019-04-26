@@ -3,15 +3,14 @@ import store from '@/store/modules/login'
 
 export default {
   fetchEvents () {
-    // console.log("teste " + store.state.accesstoken);
-    return cuida24.get(`events/`, {
+    return cuida24.get(`appointments/`, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
   postEvent (payload) {
-    return cuida24.post(`events/`, payload, {
+    return cuida24.post(`appointments/`, payload, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }
