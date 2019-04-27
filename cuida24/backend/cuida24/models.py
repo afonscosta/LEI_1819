@@ -340,7 +340,7 @@ class Notification(models.Model):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    event = EventSerializer()
+    event = EventSerializer(required=False)
 
     class Meta:
         model = Notification
@@ -357,6 +357,7 @@ class Appointment(models.Model):
 class AppointmentSerializer(serializers.ModelSerializer):
     details = EventSerializer()
     user = UserSerializer(read_only=True)
+
 
     class Meta:
         model = Appointment

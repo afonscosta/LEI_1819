@@ -12,7 +12,8 @@ from .models import Caregiver, CaregiverSerializer
 from .models import Patient, PatientSerializer
 from .models import Appointment, AppointmentSerializer
 from .models import User,UserSerializer
-from .services import  *
+from .models import Notification,NotificationSerializer
+from .services import *
 import logging
 import json
 
@@ -102,43 +103,36 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
             logger.info(serializer.data)
-            sent_data = eventBackTofrontJSON(request.data, serializer.data)
+            sent_data = eventBackToFrontJSON(request.data, serializer.data)
             logger.info(sent_data)
             return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     """
-    Get method
-    
-      logger.info("GET")
-        events = Event.objects.all()
-        logger.info(events)
-        serializer = EventSerializer(events, many=True, context={'request': request})
-        logger.info("JSON DEVOLVIDO:")
-        logger.info(serializer.data)
-
+    Get method 
     """
     def list(self, request, *args, **kwargs):
         logger.info("GET")
+        logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
+        isPatient = False
         logger.info(data)
-        if data['caregivers']:
-            user = get_object_or_404(Caregiver, pk=data['caregivers'][0]).info
-        else:
-            user = get_object_or_404(Patient, pk=data['patients'][0]).info
-        queryset = Appointment.objects.filter(user=user)
-        serializer = AppointmentSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-    def retrieve(self, request, *args, **kwargs):
-        logger.info("RETRIEVE")
-        data = dict(request.GET)['users'][0]
         if data['caregivers']:
             user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
         else:
             user = get_object_or_404(Patient, pk=data['patients'][0])
-        queryset = Appointment.objects.filter(user=user)
-        serializer = AppointmentSerializer(queryset, many=True)
-        return Response(serializer.data)
+            isPatient = True
+        queryset = Appointment.objects.filter(user=user.info)
+        serializer_appointment = AppointmentSerializer(queryset, many=True)
+        for appointment in serializer_appointment.data:
+            queryset2 = Notification.objects.filter(event=appointment['details']['pk']).values('dateTime')
+            serializer_notification = NotificationSerializer(queryset2, many=True)
+            appointment['details']['notification'] = serializer_notification.data
+            if isPatient:
+                appointment['patientPK'] = user.pk
+            else:
+                appointment['caregiverPK'] = user.pk
+        logger.info(serializer_appointment.data)
+        sent_data = appointmentBackToFrontJSON(serializer_appointment.data)
+        return Response(sent_data, status=status.HTTP_200_OK)
