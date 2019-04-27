@@ -22,7 +22,12 @@ const mutations = {
       updateRows: true
     })
     var newEvents = events.map(function (ev) {
-      return new Event(ev['event']['schedule'], ev['event']['data'], ev['event']['id'], true)
+      return new Event(
+        new Schedule(ev['event']['schedule']),
+        ev['event']['data'],
+        ev['event']['id'],
+        true
+      )
     })
     cal.addEvents(newEvents)
     state.calendar = cal
@@ -52,24 +57,21 @@ const mutations = {
 const actions = {
   getEvents ({ commit }, payload) {
     console.log('payload', payload)
-    eventService.fetchEvents(payload)
-      .then(events => {
-        console.log('Resultado do fetch do vue', events)
-        commit('setEvents', events)
-      })
+    eventService.fetchEvents(payload).then(events => {
+      console.log('Resultado do fetch do vue', events)
+      commit('setEvents', events)
+    })
   },
   addEvent ({ commit }, payload) {
-    eventService.postEvent(payload)
-      .then(event => {
-        console.log('Resultado recebido depois do post', event)
-        commit('addEvent', event['event'])
-      })
+    eventService.postEvent(payload).then(event => {
+      console.log('Resultado recebido depois do post', event)
+      commit('addEvent', event['event'])
+    })
   },
   updateEvent ({ commit }, event) {
-    eventService.postEvent(event)
-      .then(() => {
-        commit('updateEvent', event)
-      })
+    eventService.postEvent(event).then(() => {
+      commit('updateEvent', event)
+    })
   },
   deleteEvent ({ commit }, event) {
     eventService.deleteEvent(event.id)
