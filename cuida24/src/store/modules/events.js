@@ -16,6 +16,7 @@ const getters = {
 
 const mutations = {
   setEvents (state, events) {
+    console.log('events', events)
     let cal = Calendar.months(undefined, undefined, undefined, {
       fill: true,
       updateRows: true
@@ -49,8 +50,9 @@ const mutations = {
 }
 
 const actions = {
-  getEvents ({ commit }) {
-    eventService.fetchEvents()
+  getEvents ({ commit }, payload) {
+    console.log('payload', payload)
+    eventService.fetchEvents(payload)
       .then(events => {
         console.log('Resultado do fetch do vue', events)
         commit('setEvents', events)

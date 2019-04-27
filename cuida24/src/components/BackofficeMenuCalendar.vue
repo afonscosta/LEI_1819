@@ -11,7 +11,7 @@
             <listUsers 
               :listName="'Cuidadores'"
               :users="caregiversParsed"
-              :selected="caregiversSelected"
+              :selected="users.caregivers"
               @toggleAll="toggleAllCaregivers"
               @updateSelected="updateSelectedCaregivers"
             ></listUsers>
@@ -20,7 +20,7 @@
             <listUsers 
               :listName="'Utentes'"
               :users="patientsParsed"
-              :selected="patientsSelected"
+              :selected="users.patients"
               @toggleAll="toggleAllPatients"
               @updateSelected="updateSelectedPatients"
             ></listUsers>
@@ -42,24 +42,16 @@
       </b-container>
     </tab-content>
     <tab-content title="Realização da operação">
-      <b-container>
-        <b-row sm="auto">
-          <b-col md="6" sm="12">
-            <addAppoint 
-              v-if="this.selected === 'addAppoint'"
-              :form="form"
-              @throwEvent="parseScheduleOption"
-            ></addAppoint>
-            <editAppoint 
-              v-if="this.selected === 'editAppoint'"
-              :form="form"
-            ></editAppoint>
-          </b-col>
-          <b-col md="6" sm="12">
-            <calReadOnly></calReadOnly>
-          </b-col>
-        </b-row>
-      </b-container>
+      <addAppoint 
+        v-if="this.selected === 'addAppoint'"
+        :form="form"
+        :users="users"
+        @throwEvent="parseScheduleOption"
+      ></addAppoint>
+      <editAppoint 
+        v-if="this.selected === 'editAppoint'"
+        :form="form"
+      ></editAppoint>
       <h4 v-if="this.selected === 'addMedication'">Adicionar medicação</h4>
       <calReadOnly v-if="this.selected === 'editMedication'"></calReadOnly>
     </tab-content>
@@ -98,8 +90,10 @@ export default {
       notify: [],
       sched: null
     },
-    caregiversSelected: [],
-    patientsSelected: [],
+    users: {
+      caregivers: [],
+      patients: []
+    },
     selected: '',
     options: [
       { text: 'Adicionar consulta', value: 'addAppoint' },
@@ -139,21 +133,21 @@ export default {
   methods: {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
     toggleAllCaregivers (checked) {
-      this.caregiversSelected = checked ? this.caregivers.slice() : []
+      this.users.caregivers = checked ? this.caregivers.slice() : []
     },
     updateSelectedCaregivers (checked) {
-      this.caregiversSelected = checked
+      this.users.caregivers = checked
     },
     toggleAllPatients (checked) {
-      this.patientsSelected = checked ? this.patients.slice() : []
+      this.users.patients = checked ? this.patients.slice() : []
     },
     updateSelectedPatients (checked) {
-      this.patientsSelected = checked
+      this.users.patients = checked
     },
     complete () {
       const users = {
-        'caregivers': this.caregiversSelected,
-        'patients': this.patientsSelected
+        'caregivers': this.users.caregivers,
+        'patients': this.users.patients
       }
       let data = {
         'calendar': this.calendarAppoint.pk,

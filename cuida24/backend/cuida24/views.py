@@ -14,6 +14,7 @@ from .models import Appointment, AppointmentSerializer
 from .models import User,UserSerializer
 from .services import  *
 import logging
+import json
 
 
 # Serve Vue Application
@@ -120,11 +121,12 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     """
     def list(self, request, *args, **kwargs):
         logger.info("GET")
-        logger.info(request.data)
-        if request.data['users']['caregivers']:
-            user = get_object_or_404(Caregiver, pk=request.data['users']['caregivers'][0]).info
+        data = json.loads(dict(request.GET)['users'][0])
+        logger.info(data)
+        if data['caregivers']:
+            user = get_object_or_404(Caregiver, pk=data['caregivers'][0]).info
         else:
-            user = get_object_or_404(Patient, pk=request.data['users']['patients'][0]).info
+            user = get_object_or_404(Patient, pk=data['patients'][0]).info
         queryset = Appointment.objects.filter(user=user)
         serializer = AppointmentSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -132,10 +134,11 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         logger.info("RETRIEVE")
-        if request.data['users']['caregivers']:
-            user = get_object_or_404(Caregiver, pk=request.data['users']['caregivers'][0])
+        data = dict(request.GET)['users'][0]
+        if data['caregivers']:
+            user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
         else:
-            user = get_object_or_404(Patient, pk=request.data['users']['patients'][0])
+            user = get_object_or_404(Patient, pk=data['patients'][0])
         queryset = Appointment.objects.filter(user=user)
         serializer = AppointmentSerializer(queryset, many=True)
         return Response(serializer.data)
