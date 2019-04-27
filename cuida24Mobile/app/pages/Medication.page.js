@@ -15,24 +15,20 @@ import { StackNavigator } from 'react-navigation';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { sha256 } from 'react-native-sha256';
 
-const createEvent(appt, hash, appointmentCalendar) => {
-  return {
-    calendarId: appointmentCalendar.id,
-    startDate: '2019-04-28T19:26:00.000Z',
-    endDate: '2019-04-28T19:26:00.000Z',
-    allDay: true,
-    location: appt.details.location,
-    notes: String(hash),
-    description: appt.details.description
-    //recurrence: null
-  }
-}
-
 const addNewAppointment = async (appt, hash, appointmentCalendar) => {
   console.log('Adicionando evento...', appt);
   RNCalendarEvents.saveEvent(
     appt.details.title, 
-    createEvent(appt, hash, appointmentCalendar)
+    {
+      calendarId: appointmentCalendar.id,
+      startDate: '2019-04-28T19:26:00.000Z',
+      endDate: '2019-04-28T19:26:00.000Z',
+      allDay: true,
+      location: appt.details.location,
+      notes: String(hash),
+      description: appt.details.description
+      //recurrence: null
+    }
   ).then(id => { 
     (async () => {
       try {
@@ -238,7 +234,24 @@ export default class MedicationPage extends React.Component {
       if (!appointmentCalendar) { return; }
       if (!medicationCalendar) { return; }
 
+      var eventsToRemove
+      (async () => {
+        try {
+          const eventsToRemoveStr = await AsyncStorage.getItem('@appointmentCalendar:etr');
+          if (eventsToRemoveStr == null) {
+            eventsToRemove = [];
+          } else {
+            eventsToRemove = JSON.parse(eventsToRemoveStr);
+          }
+        } catch (error) {
+          console.warn('AsyncStorage - getItem: eventsToRemove', error);
+        }
+      })();
+
       this.state.appointments.forEach( function(appt) {
+        if (eventsToRemove.includes(appt.pk)) {
+          eventsToRemove = eventsToRemove.filter(e => e !== appt.pk);
+        }
         sha256(JSON.stringify(appt)).then( hash => {
           (async () => {
             try {
@@ -249,6 +262,9 @@ export default class MedicationPage extends React.Component {
           })();
         }).catch(error => console.warn('sha256', error));
       });
+      // remover os eventos com as pk's que sobram no eventsToRemove
+      // fazer um array com as pk's do this.state.appointments
+      // colocar no @appointmentCalendar:etr
     });
   }
 
