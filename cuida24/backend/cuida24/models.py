@@ -2,6 +2,8 @@ from django.db import models
 from rest_framework import serializers
 import logging
 
+from rest_framework.generics import get_object_or_404
+
 logger = logging.getLogger("mylogger")
 
 
@@ -268,26 +270,27 @@ class Schedule(models.Model):
     durationInDays = models.IntegerField(blank=True, null=True)
     durationUnit = models.TextField(blank=True, null=True)
     dayOfWeek = models.IntegerField(blank=True, null=True)
-    weekspanOfMonth = models.IntegerField(blank=True, null=True)
     dayOfMonth = models.IntegerField(blank=True, null=True)
     month = models.IntegerField(blank=True, null=True)
     times = models.TimeField(blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schedule
-        fields = ('duration', 'durationInDays', 'durationUnit', 'dayOfWeek', 'weekspanOfMonth', 'dayOfMonth', 'month',
+        fields = ('duration', 'durationInDays', 'durationUnit', 'dayOfWeek', 'year', 'dayOfMonth', 'month',
                   'times', 'pk')
 
 
 class Event(models.Model):
     title = models.TextField()
-    # repeticao
+    dayOfMonth = models.IntegerField()
+    month = models.IntegerField()
+    year = models.IntegerField()
     location = models.TextField()
     description = models.TextField()
-    visible = models.BooleanField(blank=True, null=True)
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -296,26 +299,24 @@ class Event(models.Model):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    visible = serializers.BooleanField(required=False)
     calendar = CalendarSerializer(read_only=True)
     schedule = ScheduleSerializer(required=False)
 
     class Meta:
         model = Event
-        fields = ('title', 'location', 'description', 'visible', 'calendar', 'schedule', 'pk')
-
+        fields = ('title', 'dayOfMonth', 'month', 'year', 'location', 'description', 'calendar', 'schedule', 'pk')
+    '''
     def create(self, validated_data):
         logger.info("OLA FROM SERIALIZER CREATE")
         request = self.context.get("request")
         logger.info(request)
-        users = request['users']
         logger.info(validated_data)
-        calendar = Calendar.objects.get(pk=request['event']['data']['calendar'])
-        # falta criar o schedule e associar ao event
-        event = Event.objects.create(calendar=calendar, **validated_data)
+        calendar = get_object_or_404(Calendar, pk=request['calendar'])
+        schedule = Schedule.objects.create(**request['schedule'])
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **validated_data)
 
         # Notification of a event
-        for notification in request['event']['data']['notify']:
+        for notification in request['notification']:
             notification_req_data = {'dateTime': notification, 'event': event}
             Notification.objects.create(**notification_req_data)
 
@@ -330,6 +331,7 @@ class EventSerializer(serializers.ModelSerializer):
                 req_data = {'user': Patient.objects.get(pk=user).info, 'details': event}
                 Appointment.objects.create(**req_data)
         return event
+      '''
 
 
 class Notification(models.Model):
@@ -338,7 +340,7 @@ class Notification(models.Model):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    event = EventSerializer()
+    event = EventSerializer(required=False)
 
     class Meta:
         model = Notification
@@ -354,11 +356,39 @@ class Appointment(models.Model):
 
 class AppointmentSerializer(serializers.ModelSerializer):
     details = EventSerializer()
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
+
 
     class Meta:
         model = Appointment
         fields = ('details', 'user', 'pk')
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        logger.info(request)
+        logger.info(validated_data)
+
+        # Details(event) of appointment
+        calendar = get_object_or_404(Calendar, pk=request['calendar'])
+        schedule = Schedule.objects.create(**request['schedule'])
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **request['details'])
+
+        # Notification associate to event
+        for notification in request['notification']:
+            notification_req_data = {'dateTime': notification, 'event': event}
+            Notification.objects.create(**notification_req_data)
+
+        # Create appointment with user and event
+        appointment = None
+        for user in request['users']['caregivers']:
+            req_data = {'user': get_object_or_404(Caregiver, pk=user).info, 'details': event}
+            appointment = Appointment.objects.create(**req_data)
+
+        if not appointment:
+            for user in request['users']['patients']:
+                req_data = {'user': Patient.objects.get(pk=user).info, 'details': event}
+                appointment = Appointment.objects.create(**req_data)
+        return appointment
 
 
 class AppointmentNote(models.Model):
