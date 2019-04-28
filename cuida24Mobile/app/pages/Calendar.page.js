@@ -14,32 +14,110 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { StackNavigator } from 'react-navigation';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { sha256 } from 'react-native-sha256';
+import { addMinutes, addDays, addWeeks, addMonths } from 'date-fns';
 
 const addNewAppointment = async (appt, hash, appointmentCalendar) => {
   console.log('Adicionando evento...', appt);
+	var rec = null;
+	if (appt.event.schedule.duration &&
+	appt.event.schedule.durationInDays &&
+	appt.event.schedule.durationUnit &&
+	!appt.event.schedule.times &&
+	!appt.event.schedule.dayOfWeek &&
+	!appt.event.schedule.dayOfMonth &&
+	!appt.event.schedule.month &&
+	!appt.event.schedule.year) {
+		rec = 'daily';
+	}
+	else if (!appt.event.schedule.duration &&
+	!appt.event.schedule.durationInDays &&
+	!appt.event.schedule.durationUnit &&
+	!appt.event.schedule.times &&
+	appt.event.schedule.dayOfWeek &&
+	!appt.event.schedule.dayOfMonth &&
+	!appt.event.schedule.month &&
+	!appt.event.schedule.year) {
+		rec = 'weekly';
+	}
+	else if (!appt.event.schedule.duration &&
+	!appt.event.schedule.durationInDays &&
+	!appt.event.schedule.durationUnit &&
+	!appt.event.schedule.times &&
+	!appt.event.schedule.dayOfWeek &&
+	appt.event.schedule.dayOfMonth &&
+	!appt.event.schedule.month &&
+	!appt.event.schedule.year) {
+		rec = 'monthly';
+	}
+	else if (!appt.event.schedule.duration &&
+	!appt.event.schedule.durationInDays &&
+	!appt.event.schedule.durationUnit &&
+	!appt.event.schedule.times &&
+	!appt.event.schedule.dayOfWeek &&
+	appt.event.schedule.dayOfMonth &&
+	appt.event.schedule.month &&
+	!appt.event.schedule.year) {
+		rec = 'yearly';
+	}
+	var allDay = true;
+	var startDate;
+	var endDate;
+	var timeSplit = ["00", "00", "00"];
+	if (appt.event.schedule.times) {
+		allDay = false;
+		timeSplit = appt.event.schedule.times[0].split(":");
+		startDate = new Date(
+			appt.occurenceDate.year,
+			appt.occurenceDate.month-1, // Porque os meses são de 0 a 11
+			appt.occurenceDate.dayOfMonth,
+			parseInt(timeSplit[0])+1, // Porquê que preciso de somar 1???
+			parseInt(timeSplit[1]),
+			parseInt(timeSplit[2])
+		);
+		if (appt.event.schedule.durationUnit == "minutes") {
+			endDate = addMinutes(startDate, appt.event.schedule.duration);
+		}
+		else if (appt.event.schedule.durationUnit == "days") {
+			endDate = addDays(startDate, appt.event.schedule.duration);
+		}
+		else if (appt.event.schedule.durationUnit == "weeks") {
+			endDate = addWeeks(startDate, appt.event.schedule.duration);
+		}
+		else if (appt.event.schedule.durationUnit == "months") {
+			endDate = addMonths(startDate, appt.event.schedule.duration);
+		}
+	}
+	else {
+		endDate = startDate;
+	}
+	var eventData = {
+		calendarId: appointmentCalendar.id,
+		startDate: startDate.toISOString(),
+		endDate: endDate.toISOString(),
+		allDay: appt.event.schedule.times ? false : true,
+		location: appt.event.data.location,
+		description: appt.event.data.description,
+		recurrence: rec
+	};
+
+	if (eventData.recurrence == null) {
+		delete eventData.recurrence;
+	}
+	
   RNCalendarEvents.saveEvent(
-    appt.details.title, 
-    {
-      calendarId: appointmentCalendar.id,
-      startDate: '2019-04-28T19:26:00.000Z',
-      endDate: '2019-04-28T19:26:00.000Z',
-      allDay: true,
-      location: appt.details.location,
-      notes: String(hash),
-      description: appt.details.description
-      //recurrence: null
-    }
+    appt.event.data.title, 
+		eventData
   ).then(id => { 
-    (async () => {
-      try {
-        await AsyncStorage.setItem(
-          '@appointmentCalendar:' + appt.pk,
-          JSON.stringify({ 'id': id, 'hash': String(hash) })
-        );
-      } catch (error) {
-        console.warn('AsyncStorage - setItem', error);
-      }
-    })();
+		(async () => {
+			try {
+				await AsyncStorage.setItem(
+					'@appointmentCalendar:' + appt.pk,
+					JSON.stringify({ 'id': id, 'hash': String(hash) })
+				);
+			} catch (error) {
+				console.warn('AsyncStorage - setItem', error);
+			}
+		})();
   }).catch(error => console.warn('RNCalendarEvents - saveEvent', error));
 }
 
@@ -209,7 +287,11 @@ export default class CalendarPage extends React.Component {
 
     this.setState({ loading: true });
 
-    fetch(url)
+		const encodedValue = encodeURIComponent(
+			JSON.stringify({caregivers: [1], patients: []})
+		);
+
+    fetch(url + `?users=${encodedValue}`)
       .then(res => res.json())
       .then(res => {
 
@@ -218,8 +300,8 @@ export default class CalendarPage extends React.Component {
           error: null,
           loading: false,
           refreshing: false
-        //}, () => this.handleAppointments());
-        }, () => console.log('appointments', this.state.appointments));
+        }, () => this.handleAppointments());
+        //}, () => console.log('appointments', this.state.appointments));
       })
       .catch(error => {
         this.setState({ error, loading : false });
