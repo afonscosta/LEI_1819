@@ -3,8 +3,6 @@ package com.cuida24mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.reactnativecommunity.viewpager.RNCViewPagerPackage;
-import com.reactnativecommunity.slider.ReactSliderPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.sha256lib.Sha256Package;
 import com.calendarevents.CalendarEventsPackage;
@@ -29,8 +27,6 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNCViewPagerPackage(),
-            new ReactSliderPackage(),
             new AsyncStoragePackage(),
             new Sha256Package(),
             new CalendarEventsPackage(),

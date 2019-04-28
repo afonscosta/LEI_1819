@@ -844,16 +844,6 @@
     xcode "^2.0.0"
     xmldoc "^0.4.0"
 
-"@react-native-community/slider@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-1.1.0.tgz#98e4fbc5e40304be1d02216aea4fded4349301d8"
-  integrity sha512-73kn+OaPJ4e5gvxlG97GLSmCzUq/twQHfvqA+/6OjKfScOtPCs4em8e4V0mn2hSje/PNLtSqnjzNUNviB4f0+w==
-
-"@react-native-community/viewpager@^1.1.6":
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/@react-native-community/viewpager/-/viewpager-1.1.6.tgz#267da51adbdebfb709e2e22f5e06399f49e6b1ae"
-  integrity sha512-WnlLGNdzkL0GQQ1WK0++giXOgQcEU6Dx+WEj7uYmqLNCsIc1Jhvm1ChTEKOs5N7Otz+VgoPBOvQyEuAUKooSOg==
-
 "@react-navigation/core@~3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@react-navigation/core/-/core-3.4.0.tgz#776845f9d4f8b2b9cb99c5d2d4433ebcef290d92"

@@ -44,8 +44,6 @@
 		294702075B9F4380B54C46A4 /* libRNCalendarEvents.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 80762F5DED4A43B9B0F08043 /* libRNCalendarEvents.a */; };
 		96D48C789C314B8E9D9A3D1B /* libreact-native-sha256.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 893FC0E2D30947DE8C692F3E /* libreact-native-sha256.a */; };
 		6966979705DC47D69DD6A1BE /* libRNCAsyncStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BEE4209D3AA146BCAC364304 /* libRNCAsyncStorage.a */; };
-		399E50D4E6B54E109B8EC034 /* libRNCSlider.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4199ACDA02634174B1083175 /* libRNCSlider.a */; };
-		505FA9E13D68487094DDD274 /* libRNCViewpager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ECC1A29B1A7E4DBD97F39DE2 /* libRNCViewpager.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -362,10 +360,6 @@
 		893FC0E2D30947DE8C692F3E /* libreact-native-sha256.a */ = {isa = PBXFileReference; name = "libreact-native-sha256.a"; path = "libreact-native-sha256.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		43BE004A202E4AEF9EE2A900 /* RNCAsyncStorage.xcodeproj */ = {isa = PBXFileReference; name = "RNCAsyncStorage.xcodeproj"; path = "../node_modules/@react-native-community/async-storage/ios/RNCAsyncStorage.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		BEE4209D3AA146BCAC364304 /* libRNCAsyncStorage.a */ = {isa = PBXFileReference; name = "libRNCAsyncStorage.a"; path = "libRNCAsyncStorage.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		4E7FE77824E042AE8CEE7983 /* RNCSlider.xcodeproj */ = {isa = PBXFileReference; name = "RNCSlider.xcodeproj"; path = "../node_modules/@react-native-community/slider/ios/RNCSlider.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		4199ACDA02634174B1083175 /* libRNCSlider.a */ = {isa = PBXFileReference; name = "libRNCSlider.a"; path = "libRNCSlider.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		0C9D4F77413649B28F7995B8 /* RNCViewpager.xcodeproj */ = {isa = PBXFileReference; name = "RNCViewpager.xcodeproj"; path = "../node_modules/@react-native-community/viewpager/ios/RNCViewpager.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		ECC1A29B1A7E4DBD97F39DE2 /* libRNCViewpager.a */ = {isa = PBXFileReference; name = "libRNCViewpager.a"; path = "libRNCViewpager.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -398,8 +392,6 @@
 				294702075B9F4380B54C46A4 /* libRNCalendarEvents.a in Frameworks */,
 				96D48C789C314B8E9D9A3D1B /* libreact-native-sha256.a in Frameworks */,
 				6966979705DC47D69DD6A1BE /* libRNCAsyncStorage.a in Frameworks */,
-				399E50D4E6B54E109B8EC034 /* libRNCSlider.a in Frameworks */,
-				505FA9E13D68487094DDD274 /* libRNCViewpager.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -594,8 +586,6 @@
 				94198B53C1544D229077AD75 /* RNCalendarEvents.xcodeproj */,
 				4BC6589806CC4A598900CC4D /* react-native-sha256.xcodeproj */,
 				43BE004A202E4AEF9EE2A900 /* RNCAsyncStorage.xcodeproj */,
-				4E7FE77824E042AE8CEE7983 /* RNCSlider.xcodeproj */,
-				0C9D4F77413649B28F7995B8 /* RNCViewpager.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1223,13 +1213,6 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cuida24Mobile.app/cuida24Mobile";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1237,8 +1220,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Debug;
@@ -1260,13 +1241,6 @@
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/cuida24Mobile.app/cuida24Mobile";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1274,8 +1248,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Release;
@@ -1302,8 +1274,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Debug;
@@ -1329,8 +1299,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Release;
@@ -1360,13 +1328,6 @@
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1374,8 +1335,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Debug;
@@ -1405,13 +1364,6 @@
 				TVOS_DEPLOYMENT_TARGET = 9.2;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1419,8 +1371,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Release;
@@ -1449,13 +1399,6 @@
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1463,8 +1406,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Debug;
@@ -1493,13 +1434,6 @@
 				TVOS_DEPLOYMENT_TARGET = 10.1;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1507,8 +1441,6 @@
 					"$(SRCROOT)/../node_modules/react-native-calendar-events",
 					"$(SRCROOT)/../node_modules/react-native-sha256/ios/**",
 					"$(SRCROOT)/../node_modules/@react-native-community/async-storage/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/slider/ios",
-					"$(SRCROOT)/../node_modules/@react-native-community/viewpager/ios",
 				);
 			};
 			name = Release;

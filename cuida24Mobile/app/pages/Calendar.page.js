@@ -218,7 +218,8 @@ export default class CalendarPage extends React.Component {
           error: null,
           loading: false,
           refreshing: false
-        }, () => this.handleAppointments());//() => console.log('events', this.state.events));
+        //}, () => this.handleAppointments());
+        }, () => console.log('appointments', this.state.appointments));
       })
       .catch(error => {
         this.setState({ error, loading : false });
