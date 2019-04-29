@@ -10,9 +10,9 @@ export default {
       password: 'admin'
     }).then(response => response.data)
   },
-  refreshToken (refreshToken) {
+  refreshToken (payload) {
     return cuida24.post(`token/refresh/`, {
-      reshesh: refreshToken
+      reshesh: payload.refreshtoken
     }).then(response => response.data)
   }
 }

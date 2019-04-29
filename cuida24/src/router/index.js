@@ -13,6 +13,7 @@ import InfoDemencia from '@/components/InfoDemencia'
 import InfoApoio from '@/components/InfoApoio'
 import Messages from '@/components/Messages'
 import Login from '@/components/Login'
+import Registar from '@/components/Registar'
 
 Vue.use(Router)
 
@@ -77,6 +78,11 @@ export default new Router({
       path: '/info-apoio',
       name: 'info-apoio',
       component: InfoApoio
+    },
+    {
+      path: '/registar',
+      name: 'registar',
+      component: Registar
     },
     {
       path: '/messages',

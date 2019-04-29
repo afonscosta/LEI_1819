@@ -1,9 +1,8 @@
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework.response import Response
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions
 
-from backend.settings.dev import LOGGING
 from .models import Message, MessageSerializer
 from .models import DefAtividade, DefAtividadeSerializer
 from .models import Event, EventSerializer
@@ -34,12 +33,18 @@ class DefAtividadeViewSet(viewsets.ModelViewSet):
     serializer_class = DefAtividadeSerializer
 
 
+class FixAnAppointmentPermssion(permissions.BasePermission):
+  def has_permission(self, request, view):
+    logger.info('REQUEST PRINT' + request.user.username + str(request.user.id))
+    return True
+
 class EventViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows messages to be viewed or edited.
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+    permission_classes = (FixAnAppointmentPermssion,)
     """
     Post method
     """
@@ -81,12 +86,14 @@ class CalendarViewSet(viewsets.ModelViewSet):
     queryset = Calendar.objects.all()
     serializer_class = CalendarSerializer
 
+
 class CaregiverViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows messages to be viewed or edited.
     """
     queryset = Cuidador.objects.all()
     serializer_class = CuidadorSerializer
+
 
 class PatientViewSet(viewsets.ModelViewSet):
     """
