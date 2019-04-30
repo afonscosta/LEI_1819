@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 
@@ -44,10 +45,11 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    permission_classes = (FixAnAppointmentPermssion,)
     """
     Post method
     """
+
+    @permission_classes((FixAnAppointmentPermssion,))
     def create(self, request, *args, **kwargs):
         logger.info(request.data)
         event = request.data['event']
