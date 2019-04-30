@@ -99,15 +99,26 @@ import { mapState, mapActions } from 'vuex'
 import { Weekday, Month } from 'dayspan'
 import * as moment from 'moment'
 import notification from './Notification.vue'
-import listUsers from './ListUsers.vue'
 
 export default {
 
   name: 'calReadOnly',
 
   components: {
-    notification,
-    listUsers
+    notification
+  },
+
+  props: {
+    users: {
+      caregivers: {
+        default: [],
+        type: Array
+      },
+      patients: {
+        default: [],
+        type: Array
+      }
+    }
   },
 
   computed: mapState({
@@ -115,7 +126,7 @@ export default {
   }),
 
   created () {
-    this.$store.dispatch('calendar/getEvents')
+    this.$store.dispatch('calendar/getEvents', this.users)
   },
 
   mounted () {
@@ -129,12 +140,6 @@ export default {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
     addEventLocal (event) {
       this.addEvent(event)
-    },
-    toggleAll (checked) {
-      this.usersSelected = checked ? this.users.slice() : []
-    },
-    updateSelected (checked) {
-      this.usersSelected = checked
     },
     getCalendarTime (calendarEvent) {
       let sa = calendarEvent.start.format('a')

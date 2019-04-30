@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework.decorators import permission_classes
@@ -5,12 +6,16 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 
 from .models import Message, MessageSerializer
-from .models import DefAtividade, DefAtividadeSerializer
+from .models import DefActivity, DefActivitySerializer
 from .models import Event, EventSerializer
 from .models import Calendar, CalendarSerializer
-from .models import Cuidador, CuidadorSerializer
-from .models import Utente, UtenteSerializer
+from .models import Caregiver, CaregiverSerializer
+from .models import Patient, PatientSerializer
+from .models import Appointment, AppointmentSerializer
+from .models import Notification,NotificationSerializer
+from .services import *
 import logging
+import json
 
 
 # Serve Vue Application
@@ -26,12 +31,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     serializer_class = MessageSerializer
 
 
-class DefAtividadeViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
-    queryset = DefAtividade.objects.all()
-    serializer_class = DefAtividadeSerializer
+class DefActivityViewSet(viewsets.ModelViewSet):
+    queryset = DefActivity.objects.all()
+    serializer_class = DefActivitySerializer
 
 
 class FixAnAppointmentPermssion(permissions.BasePermission):
@@ -40,66 +42,105 @@ class FixAnAppointmentPermssion(permissions.BasePermission):
     return True
 
 class EventViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     """
     Post method
-    """
 
-    @permission_classes((FixAnAppointmentPermssion,))
     def create(self, request, *args, **kwargs):
+        logger.info("POST")
         logger.info(request.data)
-        event = request.data['event']
-        users = request.data['users'] # Fazer a ligação entre os users e o event!
-        logger.info(users)
-        try:
-            event['data']['calendar'] = 'http://127.0.0.1:8000/cuida24/calendars/' + \
-                                       str(Calendar.objects.get(color=event['data']['color']).id) + '/'
-        except Calendar.DoesNotExist:
-            logger.info('Calendario selecionado não existe!!')
-            return Response(event, status=status.HTTP_400_BAD_REQUEST)
-        event['data']['visible'] = event['visible']
-        serializer = EventSerializer(data=event['data'], context={'request': request})
+        req_data = EventFrontToBackJSON(request.data)
+        serializer = EventSerializer(data=req_data['event'], context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
         if serializer.is_valid(raise_exception=False):
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = EventBackTofrontJSON(request.data, serializer.data)
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    """
     Get method
-    """
     def list(self, request, *args, **kwargs):
+        logger.info("GET")
         events = Event.objects.all()
         logger.info(events)
         serializer = EventSerializer(events, many=True, context={'request': request})
         logger.info("JSON DEVOLVIDO:")
         logger.info(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    """
 
 
 class CalendarViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
     queryset = Calendar.objects.all()
     serializer_class = CalendarSerializer
 
 
 class CaregiverViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
-    queryset = Cuidador.objects.all()
-    serializer_class = CuidadorSerializer
+    queryset = Caregiver.objects.all()
+    serializer_class = CaregiverSerializer
+
 
 
 class PatientViewSet(viewsets.ModelViewSet):
+    queryset = Patient.objects.all()
+    serializer_class = PatientSerializer
+
+
+class AppointmentViewSet(viewsets.ModelViewSet):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    '''
+    Post method
+    '''
+
+    @permission_classes((FixAnAppointmentPermssion,))
+    def create(self, request, *args, **kwargs):
+        logger.info("POST")
+        logger.info(request.data)
+        req_data = appointmentFrontToBackJSON(request.data)
+        serializer = AppointmentSerializer(data=req_data, context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = eventBackToFrontJSON(request.data, serializer.data)
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     """
-    API endpoint that allows messages to be viewed or edited.
+    Get method 
     """
-    queryset = Utente.objects.all()
-    serializer_class = UtenteSerializer
+    def list(self, request, *args, **kwargs):
+        logger.info("GET")
+        logger.info(request.GET)
+        data = json.loads(dict(request.GET)['users'][0])
+        isPatient = False
+        logger.info(data)
+        if data['caregivers']:
+            user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
+        else:
+            user = get_object_or_404(Patient, pk=data['patients'][0])
+            isPatient = True
+        queryset = Appointment.objects.filter(user=user.info)
+        serializer_appointment = AppointmentSerializer(queryset, many=True)
+        for appointment in serializer_appointment.data:
+            queryset2 = Notification.objects.filter(event=appointment['details']['pk']).values('dateTime')
+            serializer_notification = NotificationSerializer(queryset2, many=True)
+            appointment['details']['notification'] = serializer_notification.data
+            if isPatient:
+                appointment['patientPK'] = user.pk
+            else:
+                appointment['caregiverPK'] = user.pk
+        logger.info(serializer_appointment.data)
+        sent_data = appointmentBackToFrontJSON(serializer_appointment.data)
+        return Response(sent_data, status=status.HTTP_200_OK)

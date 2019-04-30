@@ -16,42 +16,26 @@ const getters = {
 
 const mutations = {
   setEvents (state, events) {
+    console.log('events', events)
     let cal = Calendar.months(undefined, undefined, undefined, {
       fill: true,
       updateRows: true
     })
     var newEvents = events.map(function (ev) {
-      let data = {
-        'calendar': ev['calendar'],
-        'color': '#1976d2',
-        'description': ev['description'],
-        'forecolor': '#ffffff',
-        'location': ev['location'],
-        'notify': [],
-        'title': ev['title']
-      }
-      // TODO: acabar o schedule
-      let newEv = new Event(new Schedule(), data, ev['pk'], ev['visible'])
-      return newEv
+      return new Event(
+        new Schedule(ev['event']['schedule']),
+        ev['event']['data'],
+        ev['event']['id'],
+        true
+      )
     })
     cal.addEvents(newEvents)
     state.calendar = cal
   },
-  addEvent (state, dictEvent) {
-    let event = dictEvent['event']
-    let infoEvent = dictEvent['infoEvent']
+  addEvent (state, event) {
+    let sched = new Schedule(event['schedule'])
     let cal = Calendar.fromInput(state.calendar)
-    let data = {
-      'calendar': infoEvent['calendar'],
-      'color': '#1976d2',
-      'description': infoEvent['description'],
-      'forecolor': '#ffffff',
-      'location': infoEvent['location'],
-      'notify': [],
-      'title': infoEvent['title']
-    }
-    let ev = new Event(event['schedule'], data, infoEvent['pk'], infoEvent['visible'])
-    cal.removeEvent(event)
+    let ev = new Event(sched, event['data'], event['id'], true)
     cal.addEvent(ev)
     state.calendar = cal
   },
@@ -71,27 +55,23 @@ const mutations = {
 }
 
 const actions = {
-  getEvents ({ commit }) {
-    eventService.fetchEvents()
-      .then(events => {
-        commit('setEvents', events)
-      })
+  getEvents ({ commit }, payload) {
+    console.log('payload', payload)
+    eventService.fetchEvents(payload).then(events => {
+      console.log('Resultado do fetch do vue', events)
+      commit('setEvents', events)
+    })
   },
   addEvent ({ commit }, payload) {
-    delete payload['event']['data']['icon']
-    eventService.postEvent(payload)
-      .then(infoEvent => {
-        commit('addEvent', {
-          'event': payload['event'],
-          'infoEvent': infoEvent
-        })
-      })
+    eventService.postEvent(payload).then(event => {
+      console.log('Resultado recebido depois do post', event)
+      commit('addEvent', event['event'])
+    })
   },
   updateEvent ({ commit }, event) {
-    eventService.postEvent(event)
-      .then(() => {
-        commit('updateEvent', event)
-      })
+    eventService.postEvent(event).then(() => {
+      commit('updateEvent', event)
+    })
   },
   deleteEvent ({ commit }, event) {
     eventService.deleteEvent(event.id)

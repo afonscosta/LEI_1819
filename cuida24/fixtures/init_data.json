@@ -18,18 +18,32 @@
     }
   },
   {
-    "model": "cuida24.Cuidador",
+    "model": "cuida24.User",
     "pk": 1,
     "fields": {
         "name": "cuidador1"
     }
   },
   {
-    "model": "cuida24.Utente",
+    "model": "cuida24.User",
+    "pk": 2,
+    "fields": {
+       "name": "utente1"
+    }
+  },
+  {
+    "model": "cuida24.Caregiver",
     "pk": 1,
     "fields": {
-       "name": "utente1",
-       "cuidador": "1"
+       "info": "1"
+    }
+  },
+  {
+    "model": "cuida24.Patient",
+    "pk": 1,
+    "fields": {
+       "info": "2",
+       "caregiver": "1"
     }
   }
 ]

@@ -4,6 +4,7 @@ import messages from './modules/messages'
 import calendar from './modules/events'
 import users from './modules/users'
 import calendars from './modules/calendars'
+import appointments from './modules/appointments.js'
 import login from './modules/login'
 
 Vue.use(Vuex)
@@ -14,6 +15,7 @@ export default new Vuex.Store({
     calendar,
     calendars,
     users,
+    appointments,
     login
   }
 })
