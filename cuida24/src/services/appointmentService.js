@@ -2,8 +2,12 @@ import cuida24 from '@/services/cuida24'
 import store from '@/store/modules/login'
 
 export default {
-  fetchAppointments () {
+  fetchAppointments (payload) {
     return cuida24.get(`appointments/`, {
+      params: {
+        users: payload
+      }
+    }, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }

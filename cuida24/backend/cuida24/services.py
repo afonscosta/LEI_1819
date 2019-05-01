@@ -75,7 +75,7 @@ def appointmentBackToFrontJSON(serializer_appointment_data):
     req_data = []
     for appointment in request:
         temp = {'appointmentPK': appointment['pk'],
-                    'occurenceDate': {
+                    'occurrenceDate': {
                       'dayOfMonth': appointment['details']['dayOfMonth'],
                       'month': appointment['details']['month'],
                       'year': appointment['details']['year']

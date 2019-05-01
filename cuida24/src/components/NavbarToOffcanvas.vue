@@ -14,8 +14,8 @@
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
-        <li class="nav-item" v-bind:class="{ active: boMenuCalendarCurrent }">
-          <router-link class="nav-link" :to="{ name: 'boMenuCalendar' }" @click.native="toggleoffcanvas() + currentUpdate('boMenuCalendar')">
+        <li class="nav-item" v-bind:class="{ active: menuCalendarCurrent }">
+          <router-link class="nav-link" :to="{ name: 'menuCalendar' }" @click.native="toggleoffcanvas() + currentUpdate('menuCalendar')">
             Calendário (Backoffice)
             <span class="sr-only">(current)</span>
           </router-link>
@@ -72,7 +72,7 @@ export default {
     return {
       collapse: false,
       calendarioCurrent: false,
-      boMenuCalendarCurrent: false,
+      menuCalendarCurrent: false,
       medicacaoCurrent: false,
       habitosCurrent: false,
       chatCurrent: false,
@@ -91,7 +91,7 @@ export default {
     },
     currentUpdate: function (page) {
       this.calendarioCurrent = false
-      this.boMenuCalendarCurrent = false
+      this.menuCalendarCurrent = false
       this.medicacaoCurrent = false
       this.habitosCurrent = false
       this.chatCurrent = false
@@ -99,8 +99,8 @@ export default {
       this.infoCurrent = false
       if (page === 'calendario') {
         this.calendarioCurrent = true
-      } else if (page === 'boMenuCalendar') {
-        this.boMenuCalendarCurrent = true
+      } else if (page === 'menuCalendar') {
+        this.menuCalendarCurrent = true
       } else if (page === 'medicacao') {
         this.medicacaoCurrent = true
       } else if (page === 'habitos') {

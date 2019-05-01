@@ -3,6 +3,7 @@ package com.cuida24mobile;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.sha256lib.Sha256Package;
 import com.calendarevents.CalendarEventsPackage;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativePushNotificationPackage(),
             new AsyncStoragePackage(),
             new Sha256Package(),
             new CalendarEventsPackage(),

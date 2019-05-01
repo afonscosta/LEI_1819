@@ -2,7 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import VueDemo from '@/components/VueDemo'
 import Calendario from '@/components/Calendario'
-import boMenuCalendar from '@/components/BackofficeMenuCalendar'
+import MenuCalendar from '@/components/MenuCalendar'
+import EditAppoints from '@/components/EditAppoints'
+import FormAppoint from '@/components/FormAppoint'
 import Medicacao from '@/components/Medicacao'
 import Habitos from '@/components/Habitos'
 import Chat from '@/components/Chat'
@@ -34,9 +36,19 @@ export default new Router({
       component: Calendario
     },
     {
-      path: '/boMenuCalendar',
-      name: 'boMenuCalendar',
-      component: boMenuCalendar
+      path: '/menuCalendar',
+      name: 'menuCalendar',
+      component: MenuCalendar
+    },
+    {
+      path: '/menuCalendar/editAppoints',
+      name: 'editAppoints',
+      component: EditAppoints
+    },
+    {
+      path: '/menuCalendar/formAppoint',
+      name: 'formAppoint',
+      component: FormAppoint
     },
     {
       path: '/medicacao',

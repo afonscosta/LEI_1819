@@ -3,7 +3,6 @@ import store from '@/store/modules/login'
 
 export default {
   fetchEvents (payload) {
-    console.log('payload service', payload)
     return cuida24.get(`appointments/`, {
       params: {
         users: payload
