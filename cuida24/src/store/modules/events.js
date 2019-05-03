@@ -70,7 +70,7 @@ const actions = {
   },
   updateEvent ({ commit }, event) {
     console.log('Evento enviado pelo vue para ser atualizado', event)
-    eventService.postEvent(event).then(() => {
+    eventService.putEvent(event).then(() => {
       commit('updateEvent', event.event)
     })
   },

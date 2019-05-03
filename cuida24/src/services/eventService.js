@@ -20,6 +20,13 @@ export default {
       }
     }).then(response => response.data)
   },
+  putEvent (payload) {
+    return cuida24.put(`appointments/`, payload, {
+      headers: {
+        Authorization: 'Bearer ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
+  },
   deleteEvent (eventId) {
     return cuida24.delete(`events/${eventId}`, {
       headers: {
