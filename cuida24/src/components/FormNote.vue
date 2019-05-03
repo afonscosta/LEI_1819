@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-form @submit="onSubmit">
+    <b-form @submit.prevent="onSubmit">
       <b-form-textarea
         id="note"
-        v-model="note"
+        v-model="note.note"
         required
         rows="3"
         max-rows="6"
@@ -16,20 +16,41 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'formNote',
   components: {
   },
   props: {
-    note: {
-      required: true,
-      type: String
+    noteData: {
+      default: null,
+      type: Object
     }
+  },
+  data: () => ({
+    note: ''
+  }),
+  created () {
+    if (this.noteData) {
+      this.note = this.noteData
+    }
+  },
+  computed: {
+    ...mapState({
+      apptPK: state => state.notes.apptPK
+    })
   },
   methods: {
     onSubmit (evt) {
-      console.log('adding note', this.note)
-      this.$emit('addNote', this.note)
+      let payload = {
+        'note': this.note,
+        'author': 1,
+        'appointment': this.apptPK,
+        'category': 'ENF'
+      }
+      this.$emit('returnNote', payload)
+      this.note = ''
     }
   }
 }

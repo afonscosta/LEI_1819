@@ -1,6 +1,7 @@
 import notesService from '../../services/notesService'
 
 const state = {
+  apptPK: null,
   notes: []
 }
 
@@ -8,6 +9,21 @@ const getters = {
   // TODO: getter para cada tipo de user do backoffice
   notes: state => {
     return state.notes
+  },
+  notesEnf: state => {
+    return state.notes.filter(n => n.category === 'ENF')
+  },
+  notesCli: state => {
+    return state.notes.filter(n => n.category === 'CLI')
+  },
+  notesPsi: state => {
+    return state.notes.filter(n => n.category === 'PSI')
+  },
+  notesOut: state => {
+    return state.notes.filter(n => n.category === 'OUT')
+  },
+  apptPK: state => {
+    return state.apptPK
   }
   // getAppointmentsByUserId: (state) => (id) => {
   //   return state.appointments.filter(appt => appt.user.pk === id)
@@ -15,6 +31,9 @@ const getters = {
 }
 
 const mutations = {
+  setApptPK (state, apptPK) {
+    state.apptPK = apptPK
+  },
   setNotes (state, notes) {
     state.notes = notes
   },
@@ -31,9 +50,13 @@ const mutations = {
 }
 
 const actions = {
+  setApptPK ({ commit }, apptPK) {
+    commit('setApptPK', apptPK)
+  },
   getNotes ({ commit }, payload) {
     notesService.fetchNotes(payload)
       .then(notes => {
+        console.log('notas recebidas do django', notes)
         commit('setNotes', notes)
       })
   },

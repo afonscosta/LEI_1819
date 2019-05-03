@@ -45,7 +45,7 @@
             </b-card-text>
             <b-button variant="danger" @click="remove(appt.appointmentPK)">Eliminar</b-button>
             <b-button @click="edit(appt.appointmentPK)">Editar</b-button>
-            <b-button @click="viewNotes(appt.appointmentPK)">Consultar notas</b-button>
+            <b-button @click="viewNotes(appt.appointmentPK)">Notas de consulta</b-button>
           </b-card>
         </b-col>
       </b-row>
@@ -73,7 +73,8 @@ export default {
   computed: {
     ...mapState({
       appointments: state => state.appointments.appointments,
-      usersActive: state => state.users.usersActive
+      usersActive: state => state.users.usersActive,
+      apptPK: state => state.notes.apptPK
     }),
     ...mapGetters('appointments', [
       'getAppointmentsById'
@@ -94,6 +95,7 @@ export default {
   },
   methods: {
     ...mapActions('appointments', ['deleteAppointment']),
+    ...mapActions('notes', ['setApptPK']),
     log (info) {
       console.log(info)
     },
@@ -119,6 +121,7 @@ export default {
       this.$refs['my-modal'].hide()
     },
     viewNotes (apptPK) {
+      this.setApptPK(apptPK)
       this.$router.push({ name: 'notes' })
     }
   }

@@ -23,8 +23,8 @@ export default {
       }
     }).then(response => response.data)
   },
-  deleteAppointment (appointmentId) {
-    return cuida24.delete(`appointmentNotes/${appointmentId}`, {
+  deleteNote (noteId) {
+    return cuida24.delete(`appointmentNotes/${noteId}`, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }

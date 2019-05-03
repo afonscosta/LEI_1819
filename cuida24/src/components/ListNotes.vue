@@ -12,68 +12,137 @@
         <b-button class="mt-2" variant="success" block @click="confirme(false)">Não</b-button>
       </b-modal>
     </div>
+
     <h3 v-if="notes.length === 0">Esta consulta não tem notas associadas.</h3>
-    <!--<h3 v-if="appointments.length === 0">Carregue <router-link :to="{ name: 'formNote' }">aqui</router-link> para adicionar uma nova nota de consulta.</h3>-->
-    <div role="tablist">
+
+    <div role="tablist" v-if="notes.length !== 0">
       <b-card no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
-          <b-button block href="#" v-b-toggle.accordion-1 variant="info">Accordion 1</b-button>
+          <b-button block href="#" v-b-toggle.accordion-1>Notas de Enfermagem</b-button>
         </b-card-header>
-        <b-collapse id="accordion-1" visible accordion="my-accordion" role="tabpanel">
-          <b-card-body
-            v-for="note in notes"
-            :key="note.pk"
-            border-variant="dark"
-            header="Nota de consulta"
-          >
-            <b-card-text align="left">{{ note.note }}</b-card-text>
-            <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
-            <b-button @click="edit(note.pk)">Editar</b-button>
+        <b-collapse id="accordion-1" role="tabpanel">
+          <b-card-body>
+            <b-card
+              v-for="note in notesEnf"
+              :key="note.pk"
+              border-variant="dark"
+              header="Nota de consulta"
+            >
+              <FormNote v-if="editingNote" :noteData="note" @returnNote="beforeUpdateNote"></FormNote>
+              <div v-if="!editingNote">
+                <b-card-text align="left">{{ note.note }}</b-card-text>
+                <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+                <b-button @click="edit(note.pk)">Editar</b-button>
+              </div>
+            </b-card>
           </b-card-body>
         </b-collapse>
       </b-card>
 
       <b-card no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
-          <b-button block href="#" v-b-toggle.accordion-2 variant="info">Accordion 2</b-button>
+          <b-button block href="#" v-b-toggle.accordion-2>Notas Clínicas</b-button>
         </b-card-header>
-        <b-collapse id="accordion-2" accordion="my-accordion" role="tabpanel">
+        <b-collapse id="accordion-2" role="tabpanel">
           <b-card-body>
-            <b-card-text>Texto</b-card-text>
+            <b-card
+              v-for="note in notesCli"
+              :key="note.pk"
+              border-variant="dark"
+              header="Nota de consulta"
+            >
+              <b-card-text align="left">{{ note.note }}</b-card-text>
+              <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+              <b-button @click="edit(note.pk)">Editar</b-button>
+            </b-card>
           </b-card-body>
         </b-collapse>
       </b-card>
+
+      <b-card no-body class="mb-1">
+        <b-card-header header-tag="header" class="p-1" role="tab">
+          <b-button block href="#" v-b-toggle.accordion-3>Notas Psicólogo</b-button>
+        </b-card-header>
+        <b-collapse id="accordion-3" role="tabpanel">
+          <b-card-body>
+            <b-card
+              v-for="note in notesPsi"
+              :key="note.pk"
+              border-variant="dark"
+              header="Nota de consulta"
+            >
+              <b-card-text align="left">{{ note.note }}</b-card-text>
+              <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+              <b-button @click="edit(note.pk)">Editar</b-button>
+            </b-card>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
+
+      <b-card no-body class="mb-1">
+        <b-card-header header-tag="header" class="p-1" role="tab">
+          <b-button block href="#" v-b-toggle.accordion-4>Outras Apreciações</b-button>
+        </b-card-header>
+        <b-collapse id="accordion-4" role="tabpanel">
+          <b-card-body>
+            <b-card
+              v-for="note in notesOut"
+              :key="note.pk"
+              border-variant="dark"
+              header="Nota de consulta"
+            >
+              <b-card-text align="left">{{ note.note }}</b-card-text>
+              <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+              <b-button @click="edit(note.pk)">Editar</b-button>
+            </b-card>
+          </b-card-body>
+        </b-collapse>
+      </b-card>
+
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
+import FormNote from '@/components/FormNote'
 
 export default {
   name: 'listNotes',
   components: {
+    FormNote
   },
   props: {
   },
   data: () => ({
-    noteToRemove: null
+    noteToRemove: null,
+    editingNote: null
   }),
   created () {
+    // TODO: Fazer o getNotes do this.apptPK
     this.$store.dispatch('notes/getNotes')
+    console.log('notesEnf', this.notesEnf)
   },
   computed: {
     ...mapState({
-      notes: state => state.notes.notes
-    })
+      notes: state => state.notes.notes,
+      apptPK: state => state.notes.apptPK
+    }),
+    ...mapGetters('notes', [
+      'notesEnf',
+      'notesCli',
+      'notesPsi',
+      'notesOut'
+    ])
   },
   methods: {
-    ...mapActions('notes', ['deleteNote']),
+    ...mapActions('notes', ['updateNote', 'deleteNote']),
     log (info) {
       console.log(info)
     },
     edit (notePK) {
-      console.log('editNote', notePK)
+      // console.log('editNote', notePK)
+      this.editingNote = notePK
     },
     remove (notePK) {
       this.noteToRemove = notePK
@@ -89,6 +158,10 @@ export default {
       }
       this.noteToRemove = null
       this.$refs['my-modal'].hide()
+    },
+    beforeUpdateNote (note) {
+      this.editingNote = null
+      this.updateNote(note)
     }
   }
 }
