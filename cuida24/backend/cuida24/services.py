@@ -40,33 +40,40 @@ def eventBackToFrontJSON(request_param, serializer_data):
 
 def appointmentFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
-    req_data = {'details': request['event']['data'], 'calendar': request['event']['data']['calendar'],
-                'notification': request['event']['data']['notify'], 'users': request['users']}
-    del req_data['details']['calendar']
+    req_data = {'details': request['event']['data'], 'notification': request['event']['data']['notify'],
+                'users': request['users']}
+
+    calendar_pk = req_data['details']['calendar']
+    req_data['details']['calendar'] = {}
+    req_data['details']['calendar']['pk'] = calendar_pk
+    req_data['details']['calendar']['color'] = req_data['details']['color']
+    req_data['details']['calendar']['forcolor'] = req_data['details']['forecolor']
+
     del req_data['details']['color']
     del req_data['details']['forecolor']
     del req_data['details']['notify']
 
+    req_data['details']['pk'] = request['event']['id']
     req_data['details']['dayOfMonth'] = request['occurrenceDate']['dayOfMonth']
     req_data['details']['month'] = request['occurrenceDate']['month']
     req_data['details']['year'] = request['occurrenceDate']['year']
 
-    req_data['schedule'] = request['event']['schedule']
-    if 'dayOfWeek' in req_data['schedule']:
-      if req_data['schedule']['dayOfWeek']:
-        req_data['schedule']['dayOfWeek'] = req_data['schedule']['dayOfWeek'][0]
-    if 'dayOfMonth' in req_data['schedule']:
-      if req_data['schedule']['dayOfMonth']:
-        req_data['schedule']['dayOfMonth'] = req_data['schedule']['dayOfMonth'][0]
-    if 'month' in req_data['schedule']:
-      if req_data['schedule']['month']:
-        req_data['schedule']['month'] = req_data['schedule']['month'][0]
-    if 'year' in req_data['schedule']:
-      if req_data['schedule']['year']:
-        req_data['schedule']['year'] = req_data['schedule']['year'][0]
-    if 'times' in req_data['schedule']:
-      if req_data['schedule']['times']:
-        req_data['schedule']['times'] = req_data['schedule']['times'][0]
+    req_data['details']['schedule'] = request['event']['schedule']
+    if 'dayOfWeek' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['dayOfWeek']:
+        req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
+    if 'dayOfMonth' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['dayOfMonth']:
+        req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
+    if 'month' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['month']:
+        req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
+    if 'year' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['year']:
+        req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
+    if 'times' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['times']:
+        req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
     return req_data
 
 

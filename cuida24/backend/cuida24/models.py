@@ -130,12 +130,15 @@ class BackofficeUser(models.Model):
       ('ADM', 'Administrador'), ('COR', 'Coordenador'), ('REM', 'Responsável Medicação'), ('PRF', 'Profissional Saúde'),
       ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
     type = models.CharField(max_length=3, choices=TYPE)
+    info = models.OneToOneField(User, on_delete=models.CASCADE)
 
 
 class BackofficeUserSerializer(serializers.ModelSerializer):
+    info = UserSerializer()
+
     class Meta:
         model = BackofficeUser
-        fields = ('type', 'pk')
+        fields = ('type', 'info', 'pk')
 
 
 # Historic
@@ -305,33 +308,28 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('title', 'dayOfMonth', 'month', 'year', 'location', 'description', 'calendar', 'schedule', 'pk')
-    '''
-    def create(self, validated_data):
-        logger.info("OLA FROM SERIALIZER CREATE")
-        request = self.context.get("request")
-        logger.info(request)
-        logger.info(validated_data)
-        calendar = get_object_or_404(Calendar, pk=request['calendar'])
-        schedule = Schedule.objects.create(**request['schedule'])
-        event = Event.objects.create(calendar=calendar, schedule=schedule, **validated_data)
+        depth = 1
 
-        # Notification of a event
-        for notification in request['notification']:
-            notification_req_data = {'dateTime': notification, 'event': event}
-            Notification.objects.create(**notification_req_data)
+    def update(self, instance, validated_data):
+        logger.info("UPDATE SERIALIZER EVENT")
+        calendar_data = validated_data.pop("calendar")
+        schedule_data = validated_data.pop("schedule")
+        calendar = instance.calendar
+        schedule = instance.schedule
 
-        # Specifies type of event
-        logger.info(calendar.calendar)
-        if calendar.calendar == 'Consultas':
-            for user in request['users']['caregivers']:
-                req_data = {'user': Caregiver.objects.get(pk=user).info , 'details': event}
-                Appointment.objects.create(**req_data)
+        # update event fields
+        instance.title = validated_data.get("title", instance.title)
+        instance.save()
 
-            for user in request['users']['patients']:
-                req_data = {'user': Patient.objects.get(pk=user).info, 'details': event}
-                Appointment.objects.create(**req_data)
-        return event
-      '''
+        # update calendar fields
+        calendar.calendar = calendar_data.get("calendar", calendar.calendar)
+        calendar.save()
+
+        # update schedule fields
+        schedule.duration = schedule_data.get("duration", schedule.duration)
+        schedule.save()
+
+        return instance
 
 
 class Notification(models.Model):
@@ -358,20 +356,21 @@ class AppointmentSerializer(serializers.ModelSerializer):
     details = EventSerializer()
     user = UserSerializer(read_only=True)
 
-
     class Meta:
         model = Appointment
         fields = ('details', 'user', 'pk')
+        depth = 1
 
     def create(self, validated_data):
         request = self.context.get("request")
-        logger.info(request)
+        logger.info("VALIDATED_DATA")
         logger.info(validated_data)
 
         # Details(event) of appointment
-        calendar = get_object_or_404(Calendar, pk=request['calendar'])
-        schedule = Schedule.objects.create(**request['schedule'])
-        event = Event.objects.create(calendar=calendar, schedule=schedule, **request['details'])
+        calendar = get_object_or_404(Calendar, pk=request['details']['calendar']['pk'])
+        schedule_data = validated_data['details'].pop('schedule')
+        schedule = Schedule.objects.create(**schedule_data)
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **validated_data['details'])
 
         # Notification associate to event
         for notification in request['notification']:
@@ -386,12 +385,17 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
         if not appointment:
             for user in request['users']['patients']:
-                req_data = {'user': Patient.objects.get(pk=user).info, 'details': event}
+                req_data = {'user': get_object_or_404(Patient, pk=user).info, 'details': event}
                 appointment = Appointment.objects.create(**req_data)
         return appointment
 
     def update(self, instance, validated_data):
         logger.info("UPDATE SERIALIZER")
+        request = self.context.get("request")
+        logger.info(request)
+        logger.info("VALIDATED_DATA")
+        logger.info(validated_data)
+
 
 
 

@@ -32,6 +32,13 @@
     }
   },
   {
+    "model": "cuida24.User",
+    "pk": 3,
+    "fields": {
+       "name": "coordenador1"
+    }
+  },
+  {
     "model": "cuida24.Caregiver",
     "pk": 1,
     "fields": {
@@ -44,6 +51,14 @@
     "fields": {
        "info": "2",
        "caregiver": "1"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 1,
+    "fields": {
+       "info": "3",
+       "type": "ADM"
     }
   }
 ]
