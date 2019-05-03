@@ -136,3 +136,18 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         logger.info(serializer_appointment.data)
         sent_data = appointmentBackToFrontJSON(serializer_appointment.data)
         return Response(sent_data, status=status.HTTP_200_OK)
+
+    """
+    Update method
+    """
+    def update(self, request, *args, **kwargs):
+        logger.info("UPDATE")
+        logger.info(request.data)
+        return Response(request.data, status=status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        logger.info("PARTIAL UPDATE")
+        logger.info(request.data)
+        return Response(request.data, status=status.HTTP_200_OK)
+
+

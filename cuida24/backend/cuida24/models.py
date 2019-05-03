@@ -390,6 +390,11 @@ class AppointmentSerializer(serializers.ModelSerializer):
                 appointment = Appointment.objects.create(**req_data)
         return appointment
 
+    def update(self, instance, validated_data):
+        logger.info("UPDATE SERIALIZER")
+
+
+
 
 class AppointmentNote(models.Model):
     CATEGORY = (('ENF', 'Enfermagem'), ('CLI', 'Clinica'), ('PSI', 'Psicologia'), ('OTR', 'Outras Apreciações'))
