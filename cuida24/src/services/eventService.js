@@ -3,7 +3,6 @@ import store from '@/store/modules/login'
 
 export default {
   fetchEvents (payload) {
-    console.log('payload service', payload)
     return cuida24.get(`appointments/`, {
       params: {
         users: payload
@@ -16,6 +15,13 @@ export default {
   },
   postEvent (payload) {
     return cuida24.post(`appointments/`, payload, {
+      headers: {
+        Authorization: 'Bearer ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
+  },
+  putEvent (payload) {
+    return cuida24.put(`appointments/`, payload, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }

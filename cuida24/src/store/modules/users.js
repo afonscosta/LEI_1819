@@ -4,12 +4,19 @@ const state = {
   users: {
     caregivers: [],
     patients: []
+  },
+  usersActive: {
+    caregivers: [],
+    patients: []
   }
 }
 
 const getters = {
   users: state => {
     return state.users
+  },
+  usersActive: state => {
+    return state.usersActive
   },
   caregivers: state => {
     return state.users.caregivers

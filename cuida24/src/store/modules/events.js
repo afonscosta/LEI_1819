@@ -16,7 +16,6 @@ const getters = {
 
 const mutations = {
   setEvents (state, events) {
-    console.log('events', events)
     let cal = Calendar.months(undefined, undefined, undefined, {
       fill: true,
       updateRows: true
@@ -43,6 +42,7 @@ const mutations = {
     let cal = Calendar.fromInput(state.calendar)
     let oldEvent = cal.findEvent(event.id)
     cal.removeEvent(oldEvent)
+    event['visible'] = true
     cal.addEvent(event)
     state.calendar = cal
   },
@@ -56,21 +56,22 @@ const mutations = {
 
 const actions = {
   getEvents ({ commit }, payload) {
-    console.log('payload', payload)
     eventService.fetchEvents(payload).then(events => {
       console.log('Resultado do fetch do vue', events)
       commit('setEvents', events)
     })
   },
   addEvent ({ commit }, payload) {
+    console.log('Novo evento enviado pelo vue', payload)
     eventService.postEvent(payload).then(event => {
-      console.log('Resultado recebido depois do post', event)
+      console.log('Resultado recebido depois de enviar o post de um novo evento', event)
       commit('addEvent', event['event'])
     })
   },
   updateEvent ({ commit }, event) {
-    eventService.postEvent(event).then(() => {
-      commit('updateEvent', event)
+    console.log('Evento enviado pelo vue para ser atualizado', event)
+    eventService.putEvent(event).then(() => {
+      commit('updateEvent', event.event)
     })
   },
   deleteEvent ({ commit }, event) {

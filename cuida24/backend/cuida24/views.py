@@ -12,7 +12,9 @@ from .models import Calendar, CalendarSerializer
 from .models import Caregiver, CaregiverSerializer
 from .models import Patient, PatientSerializer
 from .models import Appointment, AppointmentSerializer
-from .models import Notification,NotificationSerializer
+from .models import AppointmentNote, AppointmentNoteSerializer
+from .models import Notification, NotificationSerializer
+from .models import BackofficeUser, BackofficeUserSerializer
 from .services import *
 import logging
 import json
@@ -92,6 +94,11 @@ class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
 
 
+class BackofficeUserViewSet(viewsets.ModelViewSet):
+    queryset = BackofficeUser.objects.all()
+    serializer_class = BackofficeUserSerializer
+
+
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
@@ -124,23 +131,52 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         logger.info("GET")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
-        isPatient = False
+        is_patient = False
         logger.info(data)
         if data['caregivers']:
             user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
         else:
             user = get_object_or_404(Patient, pk=data['patients'][0])
-            isPatient = True
+            is_patient = True
         queryset = Appointment.objects.filter(user=user.info)
         serializer_appointment = AppointmentSerializer(queryset, many=True)
         for appointment in serializer_appointment.data:
             queryset2 = Notification.objects.filter(event=appointment['details']['pk']).values('dateTime')
             serializer_notification = NotificationSerializer(queryset2, many=True)
             appointment['details']['notification'] = serializer_notification.data
-            if isPatient:
+            if is_patient:
                 appointment['patientPK'] = user.pk
             else:
                 appointment['caregiverPK'] = user.pk
         logger.info(serializer_appointment.data)
         sent_data = appointmentBackToFrontJSON(serializer_appointment.data)
         return Response(sent_data, status=status.HTTP_200_OK)
+
+    """
+    Update method
+    """
+    def put(self, request):
+        logger.info("PUT")
+        logger.info(request.data)
+        req_data = appointmentFrontToBackJSON(request.data)
+        appointment = get_object_or_404(Appointment, pk=req_data['details']['pk'])
+        serializer = AppointmentSerializer(data=req_data, instance=appointment, context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = eventBackToFrontJSON(request.data, serializer.data)
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AppointmentNoteViewSet(viewsets.ModelViewSet):
+    queryset = AppointmentNote.objects.all()
+    serializer_class = AppointmentNoteSerializer
+
+
+

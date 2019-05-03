@@ -10,6 +10,9 @@ const getters = {
   },
   getAppointmentsByUserId: (state) => (id) => {
     return state.appointments.filter(appt => appt.user.pk === id)
+  },
+  getAppointmentsById: (state) => (id) => {
+    return state.appointments.find(appt => appt.appointmentPK === id)
   }
 }
 
@@ -30,8 +33,8 @@ const mutations = {
 }
 
 const actions = {
-  getAppointments ({ commit }) {
-    appointmentService.fetchAppointments()
+  getAppointments ({ commit }, payload) {
+    appointmentService.fetchAppointments(payload)
       .then(appointments => {
         commit('setAppointments', appointments)
       })

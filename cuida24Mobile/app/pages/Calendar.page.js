@@ -15,9 +15,21 @@ import { StackNavigator } from 'react-navigation';
 import RNCalendarEvents from 'react-native-calendar-events';
 import { sha256 } from 'react-native-sha256';
 import { addMinutes, addDays, addWeeks, addMonths } from 'date-fns';
+import PushNotification from 'react-native-push-notification';
 
 const addNewAppointment = async (appt, hash, appointmentCalendar) => {
   console.log('Adicionando evento...', appt);
+  appt.event.data.notify.forEach((notif) => {
+    PushNotification.localNotificationSchedule({
+      message: appt.event.data.title + '\n' + 
+        appt.event.data.description + '\n' +
+        appt.event.data.location,
+      date: new Date(notif)
+    });
+    //PushNotification.localNotification({
+      //message: 'Isto é um exemplo de uma notificação!'
+    //});
+  });
 	var rec = null;
 	if (appt.event.schedule.duration &&
 	appt.event.schedule.durationInDays &&
