@@ -1,99 +1,103 @@
 <template>
-  <b-container>
-    <b-row sm="auto">
-      <b-col md="6" sm="12">
-        <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+  <div>
+    <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Não foi selecionado nenhum utilizador.</h3>
+    <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Carregue <router-link :to="{ name: 'menuCalendar' }">aqui</router-link> para escolher um.</h3>
+    <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
+      <b-row sm="auto">
+        <b-col md="6" sm="12">
+          <b-form @submit="onSubmit" @reset="onReset" v-if="show">
 
-          <b-form-group id="input-group-1" label="Especialidade:" label-for="input-1">
-            <b-form-input
-              id="input-1"
-              v-model="formData.specialty"
-              required
-              placeholder="Introduza a especialidade da consulta"
-            ></b-form-input>
-          </b-form-group>
+            <b-form-group id="input-group-1" label="Especialidade:" label-for="input-1">
+              <b-form-input
+                id="input-1"
+                v-model="formData.specialty"
+                required
+                placeholder="Introduza a especialidade da consulta"
+              ></b-form-input>
+            </b-form-group>
 
-          <b-form-group
-            id="input-group-2"
-            label="Data/Hora:"
-            label-for="input-2"
-          >
-            <datetime 
-              type="date" 
-              v-model="formData.dateValue"
-              :phrases="datetime.phrases"
-              :week-start="datetime['week-start']"
-              :min-datetime="datetime.minDatetime"
-            ></datetime>
-          </b-form-group>
+            <b-form-group
+              id="input-group-2"
+              label="Data/Hora:"
+              label-for="input-2"
+            >
+              <datetime 
+                type="date" 
+                v-model="formData.dateValue"
+                :phrases="datetime.phrases"
+                :week-start="datetime['week-start']"
+                :min-datetime="datetime.minDatetime"
+              ></datetime>
+            </b-form-group>
 
-          <b-form-group
-            id="input-group-6"
-            label="Repetição:"
-            label-for="input-6"
-          >
-            <schedule
-              @throwEvent="parseScheduleOption"
-            ></schedule>
-          </b-form-group>
+            <b-form-group
+              id="input-group-6"
+              label="Repetição:"
+              label-for="input-6"
+            >
+              <schedule
+                @throwEvent="parseScheduleOption"
+              ></schedule>
+            </b-form-group>
 
-          <b-form-group
-            id="input-group-3"
-            label="Duração:"
-            label-for="input-3"
-          >
-            <b-form-checkbox-group v-model="formData.allDay" id="checkboxes-3">
-              <b-form-checkbox value="true">Dia inteiro</b-form-checkbox>
-            </b-form-checkbox-group>
+            <b-form-group
+              id="input-group-3"
+              label="Duração:"
+              label-for="input-3"
+            >
+              <b-form-checkbox-group v-model="formData.allDay" id="checkboxes-3">
+                <b-form-checkbox value="true">Dia inteiro</b-form-checkbox>
+              </b-form-checkbox-group>
 
-            <datetime 
-              type="time"
-              v-if="!formData.allDay"
-              v-model="formData.timeValue"
-            ></datetime>
-            <b-form-input
-              v-if="!formData.allDay"
-              id="input-3"
-              v-model="formData.duration"
-              required
-              placeholder="Duração"
-            ></b-form-input>
-            <b-form-select
-              v-if="!formData.allDay"
-              id="input-4"
-              v-model="formData.durationUnit"
-              :options="durations"
-              required
-            ></b-form-select>
-          </b-form-group>
+              <datetime 
+                type="time"
+                v-if="!formData.allDay"
+                v-model="formData.timeValue"
+              ></datetime>
+              <b-form-input
+                v-if="!formData.allDay"
+                id="input-3"
+                v-model="formData.duration"
+                required
+                placeholder="Duração"
+              ></b-form-input>
+              <b-form-select
+                v-if="!formData.allDay"
+                id="input-4"
+                v-model="formData.durationUnit"
+                :options="durations"
+                required
+              ></b-form-select>
+            </b-form-group>
 
-          <b-form-group id="input-group-5" label="Localização:" label-for="input-5">
-            <b-form-input
-              id="input-5"
-              v-model="formData.local"
-              required
-              placeholder="Introduza localização"
-            ></b-form-input>
-          </b-form-group>
+            <b-form-group id="input-group-5" label="Localização:" label-for="input-5">
+              <b-form-input
+                id="input-5"
+                v-model="formData.local"
+                required
+                placeholder="Introduza localização"
+              ></b-form-input>
+            </b-form-group>
 
-          <b-form-group id="input-group-6" label="Notificações:" label-for="input-6">
-            <notification
-              :notify="formData.notify"
-            ></notification>
-          </b-form-group>
-        </b-form>
-      </b-col>
-      <b-col md="6" sm="12">
-        <calReadOnly></calReadOnly>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
-        <b-button variant="outline-dark" @click="submit">Submeter</b-button>
-      </b-col>
-    </b-row>
+            <b-form-group id="input-group-6" label="Notificações:" label-for="input-6">
+              <notification
+                :notify="formData.notify"
+              ></notification>
+            </b-form-group>
+          </b-form>
+        </b-col>
+        <b-col md="6" sm="12">
+          <calReadOnly></calReadOnly>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col>
+          <b-button variant="outline-dark" @click="submit">Submeter</b-button>
+        </b-col>
+      </b-row>
 
-  </b-container>
+    </b-container>
+  </div>
 </template>
 
 <script>

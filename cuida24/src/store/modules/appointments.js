@@ -27,8 +27,8 @@ const mutations = {
     state.appointments = state.appointments.filter(a => a.pk !== appointment.pk)
     state.appointments.push(appointment)
   },
-  deleteEvent (state, appointmentID) {
-    state.appointments = state.appointments.filter(a => a.pk !== appointmentID)
+  deleteAppointment (state, appointmentID) {
+    state.appointments = state.appointments.filter(a => a.appointmentPK !== appointmentID)
   }
 }
 
@@ -51,9 +51,9 @@ const actions = {
         commit('updateAppointment', appointment)
       })
   },
-  deleteAppointment ({ commit }, appointment) {
-    appointmentService.deleteAppointment(appointment.id)
-    commit('deleteAppointment', appointment.id)
+  deleteAppointment ({ commit }, appointmentID) {
+    appointmentService.deleteAppointment(appointmentID)
+    commit('deleteAppointment', appointmentID)
   }
 }
 

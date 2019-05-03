@@ -5,6 +5,7 @@ import Calendario from '@/components/Calendario'
 import MenuCalendar from '@/components/MenuCalendar'
 import EditAppoints from '@/components/EditAppoints'
 import FormAppoint from '@/components/FormAppoint'
+import Notes from '@/components/Notes'
 import Medicacao from '@/components/Medicacao'
 import Habitos from '@/components/Habitos'
 import Chat from '@/components/Chat'
@@ -49,6 +50,11 @@ export default new Router({
       path: '/menuCalendar/formAppoint',
       name: 'formAppoint',
       component: FormAppoint
+    },
+    {
+      path: '/menuCalendar/notes',
+      name: 'notes',
+      component: Notes
     },
     {
       path: '/medicacao',

@@ -99,7 +99,9 @@ export default {
   }),
 
   created () {
-    this.$store.dispatch('calendar/getEvents', this.usersActive)
+    if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
+      this.$store.dispatch('calendar/getEvents', this.usersActive)
+    }
   },
 
   methods:
