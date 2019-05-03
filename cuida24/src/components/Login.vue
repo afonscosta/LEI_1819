@@ -31,7 +31,6 @@ export default {
         password: this.password
       }).then(() => {
         // this code is only executed after dispatch
-        console.log('teste de receção token ' + this.$store.state.login.accesstoken)
       })
     }
   }

@@ -7,6 +7,7 @@ The `urlpatterns` list routes URLs to views. For more information please see:
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
+from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .cuida24.views import index_view, MessageViewSet, DefActivityViewSet, EventViewSet, CalendarViewSet, \
@@ -32,13 +33,8 @@ urlpatterns = [
     # http://localhost:8000/cuida24/admin/
     path('cuida24/admin/', admin.site.urls),
 
-
     # foi necessário criar um superuser para conseguir pedir o token (python manage.py createsuperuser)
 
-    # to get the JWT token for the first time
-    path('cuida24/token/', TokenObtainPairView.as_view()),
-
-    # to refresh the JWT token
-    path('cuida24/token/refresh/', TokenRefreshView.as_view())
+    path('cuida24/token/', obtain_auth_token, name='token')
 ]
 

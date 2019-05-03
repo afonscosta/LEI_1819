@@ -1,27 +1,19 @@
 import loginService from '../../services/loginService'
 
 const state = {
-  accesstoken: '',
-  refreshtoken: ''
+  accesstoken: ''
 }
 
 const getters = {
   accesstoken: state => {
     return state.accesstoken
-  },
-  refreshtoken: state => {
-    return state.refreshtoken
   }
 }
 
 const mutations = {
   setToken (state, response) {
-    state.accesstoken = response.access
-    state.refreshtoken = response.refresh
-    // console.log("teste mutations " + state.refreshtoken)
-  },
-  refreshToken (state, response) {
-    state.accesstoken = response.access
+    state.accesstoken = response.token
+    console.log('teste mutations ' + state.accesstoken)
   }
 }
 
@@ -31,12 +23,7 @@ const actions = {
       .then(response => {
         commit('setToken', response)
       })
-  },
-  refreshtoken ({ commit }) {
-    loginService.refreshToken(state.refreshtoken)
-      .then(response => {
-        commit('refreshtoken', response)
-      })
+    console.log('teste de receção token na action ' + state.accesstoken)
   }
 }
 
