@@ -37,23 +37,27 @@ const actions = {
     appointmentService.fetchAppointments(payload)
       .then(appointments => {
         commit('setAppointments', appointments)
+        this.dispatch('calendar/setEvents', appointments)
       })
   },
   addAppointment ({ commit }, appointment) {
     appointmentService.postAppointment(appointment)
       .then(newAppointment => {
         commit('addAppointment', newAppointment)
+        this.dispatch('calendar/addEvent', newAppointment.event)
       })
   },
   updateAppointment ({ commit }, appointment) {
-    appointmentService.postAppointment(appointment)
+    appointmentService.putAppointment(appointment)
       .then(() => {
         commit('updateAppointment', appointment)
+        this.dispatch('calendar/updateEvent', appointment.event)
       })
   },
-  deleteAppointment ({ commit }, appointmentID) {
-    appointmentService.deleteAppointment(appointmentID)
-    commit('deleteAppointment', appointmentID)
+  deleteAppointment ({ commit }, appointment) {
+    appointmentService.deleteAppointment(appointment.appointmentPK)
+    commit('deleteAppointment', appointment.appointmentPK)
+    this.dispatch('calendar/deleteEvent', appointment.event.id)
   }
 }
 

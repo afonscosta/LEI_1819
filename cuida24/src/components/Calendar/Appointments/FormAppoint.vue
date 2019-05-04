@@ -1,11 +1,11 @@
 <template>
   <div>
     <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Não foi selecionado nenhum utilizador.</h3>
-    <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Carregue <router-link :to="{ name: 'menuCalendar' }">aqui</router-link> para escolher um.</h3>
+    <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row sm="auto">
         <b-col md="6" sm="12">
-          <b-form @submit="onSubmit" @reset="onReset" v-if="show">
+          <b-form>
 
             <b-form-group id="input-group-1" label="Especialidade:" label-for="input-1">
               <b-form-input
@@ -92,7 +92,7 @@
       </b-row>
       <b-row>
         <b-col>
-          <b-button variant="outline-dark" @click="submit">Submeter</b-button>
+          <b-button variant="primary" @click="onSubmit">Submeter</b-button>
         </b-col>
       </b-row>
 
@@ -102,9 +102,9 @@
 
 <script>
 import { DateTime as LuxonDateTime } from 'luxon'
-import notification from './Notification.vue'
-import schedule from './Schedule'
-import calReadOnly from './CalendarReadOnly'
+import notification from '@/components/Notification.vue'
+import schedule from '@/components/Schedule'
+import calReadOnly from '@/components/Calendar/CalendarReadOnly'
 import { mapActions, mapState, mapGetters } from 'vuex'
 
 export default {
@@ -199,24 +199,7 @@ export default {
     ])
   },
   methods: {
-    ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    onSubmit (evt) {
-      evt.preventDefault()
-      alert(JSON.stringify(this.formData))
-    },
-    onReset (evt) {
-      evt.preventDefault()
-      // Reset our form values
-      this.datetimeValue = ''
-      this.local = ''
-      this.specialty = ''
-      this.notify = []
-      // Trick to reset/clear native browser form validation state
-      this.show = false
-      this.$nextTick(() => {
-        this.show = true
-      })
-    },
+    ...mapActions('appointments', ['addAppointment', 'updateAppointment', 'deleteAppointment']),
     parseScheduleOption (option) {
       console.log('OPTION', option)
       let dt = LuxonDateTime.fromISO(this.formData.dateValue)
@@ -255,7 +238,7 @@ export default {
           }
       }
     },
-    submit () {
+    onSubmit () {
       const users = {
         'caregivers': this.usersActive.caregivers,
         'patients': this.usersActive.patients
@@ -300,12 +283,12 @@ export default {
         }
       }
       if (payload.event.id) {
-        this.updateEvent(payload)
-        this.$emit('eventUpdated', payload.occurrenceDate)
+        this.updateAppointment(payload)
+        this.$emit('appointmentUpdated', payload.occurrenceDate)
         // this.$router.push({ name: 'editAppoints' })
       } else {
-        this.addEvent(payload)
-        this.$router.push({ name: 'menuCalendar' })
+        this.addAppointment(payload)
+        this.$router.push({ name: 'calendar' })
       }
       // this.formData = {
       //   dateValue: '',
@@ -319,7 +302,7 @@ export default {
       //   sched: {},
       //   id: null
       // }
-      // this.$router.push({ name: 'menuCalendar' })
+      // this.$router.push({ name: 'calendar' })
     }
   }
 }

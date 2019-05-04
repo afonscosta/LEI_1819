@@ -18,7 +18,7 @@
           <h3 v-if="appointments.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Este utilizador não tem consultas associadas.</h3>
           <h3 v-if="appointments.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Carregue <router-link :to="{ name: 'formAppoint' }">aqui</router-link> para adicionar uma nova consulta.</h3>
           <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Não foi selecionado nenhum utilizador.</h3>
-          <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Carregue <router-link :to="{ name: 'menuCalendar' }">aqui</router-link> para escolher um.</h3>
+          <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
           <b-card
             v-for="appt in appointments"
             :key="appt.appointmentPK"
@@ -43,7 +43,7 @@
             <b-card-text align="left">
               <b>Localização:</b> {{ appt.event.data.location }}
             </b-card-text>
-            <b-button variant="danger" @click="remove(appt.appointmentPK)">Eliminar</b-button>
+            <b-button variant="danger" @click="remove(appt)">Eliminar</b-button>
             <b-button @click="edit(appt.appointmentPK)">Editar</b-button>
             <b-button @click="viewNotes(appt.appointmentPK)">Notas de consulta</b-button>
           </b-card>
@@ -105,8 +105,8 @@ export default {
         this.getAppointmentsById(apptPK)
       )
     },
-    remove (apptPK) {
-      this.apptToRemove = apptPK
+    remove (appt) {
+      this.apptToRemove = appt
       this.showModal()
     },
     showModal () {
@@ -114,7 +114,7 @@ export default {
     },
     confirme (bool) {
       if (bool === true) {
-        console.log('deleting appt with PK =', this.apptToRemove)
+        console.log('deleting appt with PK =', this.apptToRemove.appointmentPK)
         this.deleteAppointment(this.apptToRemove)
       }
       this.apptToRemove = null

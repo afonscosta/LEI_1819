@@ -105,7 +105,7 @@
 
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex'
-import FormNote from '@/components/FormNote'
+import FormNote from '@/components/Calendar/Notes/FormNote'
 
 export default {
   name: 'listNotes',
@@ -121,7 +121,6 @@ export default {
   created () {
     // TODO: Fazer o getNotes do this.apptPK
     this.$store.dispatch('notes/getNotes')
-    console.log('notesEnf', this.notesEnf)
   },
   computed: {
     ...mapState({

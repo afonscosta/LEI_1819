@@ -29,7 +29,12 @@ export default {
     }
   },
   data: () => ({
-    note: ''
+    note: {
+      note: '',
+      author: 1,
+      appointment: null,
+      category: 'ENF'
+    }
   }),
   created () {
     if (this.noteData) {
@@ -43,14 +48,14 @@ export default {
   },
   methods: {
     onSubmit (evt) {
-      let payload = {
-        'note': this.note,
-        'author': 1,
-        'appointment': this.apptPK,
-        'category': 'ENF'
+      this.note.appointment = this.apptPK
+      this.$emit('returnNote', this.note)
+      this.note = {
+        note: '',
+        author: 1,
+        appointment: null,
+        category: 'ENF'
       }
-      this.$emit('returnNote', payload)
-      this.note = ''
     }
   }
 }

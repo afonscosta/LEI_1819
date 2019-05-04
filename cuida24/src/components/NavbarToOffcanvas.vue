@@ -8,15 +8,15 @@
   
     <div class="navbar-collapse offcanvas-collapse" v-bind:class="{ open: collapse }" id="navbarsExampleDefault">
       <ul class="navbar-nav mr-auto">
-        <li class="nav-item" v-bind:class="{ active: calendarioCurrent }">
-          <router-link class="nav-link" :to="{ name: 'calendario' }" @click.native="toggleoffcanvas() + currentUpdate('calendario')">
+        <!--<li class="nav-item" v-bind:class="{ active: calendarioCurrent }">-->
+          <!--<router-link class="nav-link" :to="{ name: 'calendario' }" @click.native="toggleoffcanvas() + currentUpdate('calendario')">-->
+            <!--Calendário-->
+            <!--<span class="sr-only">(current)</span>-->
+          <!--</router-link>-->
+        <!--</li>-->
+        <li class="nav-item" v-bind:class="{ active: calendarCurrent }">
+          <router-link class="nav-link" :to="{ name: 'calendar' }" @click.native="toggleoffcanvas() + currentUpdate('calendar')">
             Calendário
-            <span class="sr-only">(current)</span>
-          </router-link>
-        </li>
-        <li class="nav-item" v-bind:class="{ active: menuCalendarCurrent }">
-          <router-link class="nav-link" :to="{ name: 'menuCalendar' }" @click.native="toggleoffcanvas() + currentUpdate('menuCalendar')">
-            Calendário (Backoffice)
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
@@ -72,7 +72,7 @@ export default {
     return {
       collapse: false,
       calendarioCurrent: false,
-      menuCalendarCurrent: false,
+      calendarCurrent: false,
       medicacaoCurrent: false,
       habitosCurrent: false,
       chatCurrent: false,
@@ -91,16 +91,14 @@ export default {
     },
     currentUpdate: function (page) {
       this.calendarioCurrent = false
-      this.menuCalendarCurrent = false
+      this.calendarCurrent = false
       this.medicacaoCurrent = false
       this.habitosCurrent = false
       this.chatCurrent = false
       this.jogosCurrent = false
       this.infoCurrent = false
-      if (page === 'calendario') {
-        this.calendarioCurrent = true
-      } else if (page === 'menuCalendar') {
-        this.menuCalendarCurrent = true
+      if (page === 'calendar') {
+        this.calendarCurrent = true
       } else if (page === 'medicacao') {
         this.medicacaoCurrent = true
       } else if (page === 'habitos') {

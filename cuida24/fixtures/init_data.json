@@ -18,6 +18,15 @@
     }
   },
   {
+    "model": "cuida24.Calendar",
+    "pk": 3,
+    "fields": {
+       "calendar": "Sessões de Grupo",
+       "color": "#4CAF50",
+       "forecolor": "#ffffff"
+    }
+  },
+  {
     "model": "cuida24.User",
     "pk": 1,
     "fields": {

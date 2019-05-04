@@ -6,6 +6,7 @@ import users from './modules/users'
 import calendars from './modules/calendars'
 import appointments from './modules/appointments.js'
 import notes from './modules/notes.js'
+import groupSessions from './modules/groupSessions.js'
 import login from './modules/login'
 
 Vue.use(Vuex)
@@ -18,6 +19,7 @@ export default new Vuex.Store({
     users,
     appointments,
     notes,
+    groupSessions,
     login
   }
 })

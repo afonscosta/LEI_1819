@@ -22,38 +22,20 @@
         </b-col>
       </b-row>
     </b-container>
-    <router-link :to="{ name: 'formAppoint' }">Adicionar Consulta</router-link> |
-    <router-link :to="{ name: 'editAppoints' }">Editar Consultas</router-link>
-    <addAppoint 
-      v-if="selected === 'addAppoint'"
-      :form="form"
-      @throwEvent="parseScheduleOption"
-    ></addAppoint>
-    <editAppoints 
-      v-if="selected === 'editAppoint'"
-      :form="form"
-      @editAppointment="editAppointment"
-    ></editAppoints>
-    <h4 v-if="selected === 'addMedication'">Adicionar medicação</h4>
+    <b-button @click="goToAppointments">Consultas</b-button>
+    <b-button @click="goToGroupSession">Sessões de Grupo</b-button>
   </div>
 </template>
 
 <script>
-import listUsers from './ListUsers'
-import addAppoint from './FormAppoint'
-import editAppoints from './EditAppoints'
+import listUsers from '@/components/ListUsers'
 import { mapState, mapActions, mapGetters } from 'vuex'
-import { FormWizard, TabContent } from 'vue-form-wizard'
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 
 export default {
   name: 'MenuCalendar',
   components: {
-    listUsers,
-    addAppoint,
-    editAppoints,
-    FormWizard,
-    TabContent
+    listUsers
   },
   data: () => ({
     form: {
@@ -68,21 +50,15 @@ export default {
       sched: null,
       id: null
     },
-    selected: '',
-    options: [
-      { text: 'Adicionar consulta', value: 'addAppoint' },
-      { text: 'Editar consulta', value: 'editAppoint' },
-      { text: 'Adicionar medicação', value: 'addMedication' },
-      { text: 'Editar medicação', value: 'editMedication' },
-      { text: 'Adicionar sessão de grupo', value: 'addGroupSession' },
-      { text: 'Editar sessão de grupo', value: 'editGroupSession' },
-      { text: 'Adicionar sessão individual', value: 'addIndividualSession' },
-      { text: 'Editar sessão individual', value: 'editIndividualSession' }
-    ]
+    selected: ''
   }),
   created () {
     this.$store.dispatch('calendars/getCalendars')
     this.$store.dispatch('users/getUsers')
+  },
+  mounted () {
+    this.usersActive.caregivers = []
+    this.usersActive.patients = []
   },
   computed: {
     ...mapState({
@@ -125,6 +101,12 @@ export default {
     },
     updateSelectedPatients (checked) {
       this.usersActive.patients = checked
+    },
+    goToAppointments () {
+      this.$router.push({ name: 'appointments' })
+    },
+    goToGroupSession () {
+      this.$router.push({ name: 'groupSession' })
     }
     // weekSpanOfMonth (dt) {
     //   // month_number is in the range 1..12
