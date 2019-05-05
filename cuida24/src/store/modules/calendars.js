@@ -13,6 +13,9 @@ const getters = {
   },
   calendarMedication: state => {
     return state.calendars.find(calendar => calendar.pk === 2)
+  },
+  calendarGroupSession: state => {
+    return state.calendars.find(calendar => calendar.pk === 3)
   }
 }
 

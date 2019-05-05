@@ -21,6 +21,15 @@
         </b-col>
       </b-row>
     </b-container>
+    <b-container>
+      <b-row class="justify-content-md-center">
+        <b-col xl="8" lg="8" md="8" sm="12" cols="12">
+          <b-button 
+            v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0"
+            @click="goToFormAppoint">Adicionar Consulta</b-button>
+        </b-col>
+      </b-row>
+    </b-container>
     <listAppoints 
       v-if="!appointmentSel"
       @editAppointment="editAppointment"
@@ -28,7 +37,7 @@
     <formAppoint 
       v-if="appointmentSel"
       :form="form"
-      @eventUpdated="eventUpdated"
+      @appointmentUpdated="appointmentUpdated"
     ></formAppoint>
   </div>
 </template>
@@ -36,6 +45,7 @@
 <script>
 import listAppoints from './ListAppoints'
 import formAppoint from './FormAppoint'
+import { mapState } from 'vuex'
 import { DateTime as LuxonDateTime } from 'luxon'
 
 export default {
@@ -55,6 +65,9 @@ export default {
   created () {
   },
   computed: {
+    ...mapState({
+      usersActive: state => state.users.usersActive
+    })
   },
   methods: {
     log (info) {
@@ -136,9 +149,12 @@ export default {
     countDownChanged  (dismissCountDown) {
       this.dismissCountDown = dismissCountDown
     },
-    eventUpdated (occurrenceDate) {
+    appointmentUpdated (occurrenceDate) {
       this.appointmentSel = null
       this.dismissCountDown = this.dismissSecs
+    },
+    goToFormAppoint () {
+      this.$router.push({ name: 'formAppoint' })
     }
   }
 }

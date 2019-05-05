@@ -116,8 +116,8 @@ import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
 import { Weekday, Month } from 'dayspan'
 import * as moment from 'moment'
-import notification from './Notification.vue'
-import listUsers from './ListUsers.vue'
+import notification from '@/components/Notification.vue'
+import listUsers from '@/components/ListUsers.vue'
 
 export default {
 

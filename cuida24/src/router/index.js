@@ -1,49 +1,61 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import VueDemo from '@/components/VueDemo'
-import Calendario from '@/components/Calendario'
-import MenuCalendar from '@/components/MenuCalendar'
-import EditAppoints from '@/components/EditAppoints'
-import FormAppoint from '@/components/FormAppoint'
-import Medicacao from '@/components/Medicacao'
-import Habitos from '@/components/Habitos'
-import Chat from '@/components/Chat'
-import Jogos from '@/components/Jogos'
-import Info from '@/components/Info'
-import InfoIadem from '@/components/InfoIadem'
-import InfoDemencia from '@/components/InfoDemencia'
-import InfoApoio from '@/components/InfoApoio'
-import Messages from '@/components/Messages'
+
+// Miscellaneous
+import Home from '@/components/Home'
 import Login from '@/components/Login'
+
+// Calendar
+import Calendar from '@/components/Calendar/Calendar'
+import Appointments from '@/components/Calendar/Appointments/Appointments'
+import FormAppoint from '@/components/Calendar/Appointments/FormAppoint'
+import Notes from '@/components/Calendar/Notes/Notes'
+import GroupSession from '@/components/Calendar/GroupSession/GroupSession'
+
+// Medication
+import Medicacao from '@/components/Medication/Medicacao'
+
+// Habits
+import Habitos from '@/components/Habits/Habitos'
+
+// Chat
+import Chat from '@/components/Chat/Chat'
+
+// Games
+import Jogos from '@/components/Games/Jogos'
+
+// Information
+import Info from '@/components/Info/Info'
+import InfoIadem from '@/components/Info/InfoIadem'
+import InfoDemencia from '@/components/Info/InfoDemencia'
+import InfoApoio from '@/components/Info/InfoApoio'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
+    // Miscellaneous
     {
       path: '/',
       name: 'home',
-      component: VueDemo
+      component: Home
     },
     {
       path: '/login',
       name: 'login',
       component: Login
     },
+
+    // Calendar
     {
-      path: '/calendario',
-      name: 'calendario',
-      component: Calendario
+      path: '/calendar',
+      name: 'calendar',
+      component: Calendar
     },
     {
-      path: '/menuCalendar',
-      name: 'menuCalendar',
-      component: MenuCalendar
-    },
-    {
-      path: '/menuCalendar/editAppoints',
-      name: 'editAppoints',
-      component: EditAppoints
+      path: '/menuCalendar/appointments',
+      name: 'appointments',
+      component: Appointments
     },
     {
       path: '/menuCalendar/formAppoint',
@@ -51,25 +63,45 @@ export default new Router({
       component: FormAppoint
     },
     {
+      path: '/menuCalendar/notes',
+      name: 'notes',
+      component: Notes
+    },
+    {
+      path: '/menuCalendar/groupSession',
+      name: 'groupSession',
+      component: GroupSession
+    },
+
+    // Medication
+    {
       path: '/medicacao',
       name: 'medicacao',
       component: Medicacao
     },
+
+    // Habits
     {
       path: '/habitos',
       name: 'habitos',
       component: Habitos
     },
+
+    // Chat
     {
       path: '/chat',
       name: 'chat',
       component: Chat
     },
+
+    // Games
     {
       path: '/jogos',
       name: 'jogos',
       component: Jogos
     },
+
+    // Information
     {
       path: '/info',
       name: 'info',
@@ -89,11 +121,6 @@ export default new Router({
       path: '/info-apoio',
       name: 'info-apoio',
       component: InfoApoio
-    },
-    {
-      path: '/messages',
-      name: 'messages',
-      component: Messages
     }
   ]
 })

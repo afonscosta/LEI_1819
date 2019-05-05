@@ -1,4 +1,3 @@
-import eventService from '../../services/eventService'
 import { Calendar, Schedule, Event } from 'dayspan'
 
 const state = {
@@ -55,28 +54,19 @@ const mutations = {
 }
 
 const actions = {
-  getEvents ({ commit }, payload) {
-    eventService.fetchEvents(payload).then(events => {
-      console.log('Resultado do fetch do vue', events)
-      commit('setEvents', events)
-    })
+  setEvents ({ commit }, events) {
+    commit('setEvents', events)
   },
-  addEvent ({ commit }, payload) {
-    console.log('Novo evento enviado pelo vue', payload)
-    eventService.postEvent(payload).then(event => {
-      console.log('Resultado recebido depois de enviar o post de um novo evento', event)
-      commit('addEvent', event['event'])
-    })
+  addEvent ({ commit }, event) {
+    console.log('Novo evento enviado pelo vue', event)
+    commit('addEvent', event)
   },
   updateEvent ({ commit }, event) {
     console.log('Evento enviado pelo vue para ser atualizado', event)
-    eventService.putEvent(event).then(() => {
-      commit('updateEvent', event.event)
-    })
+    commit('updateEvent', event)
   },
-  deleteEvent ({ commit }, event) {
-    eventService.deleteEvent(event.id)
-    commit('deleteEvent', event.id)
+  deleteEvent ({ commit }, eventID) {
+    commit('deleteEvent', eventID)
   }
 }
 
