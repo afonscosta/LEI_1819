@@ -312,23 +312,38 @@ class EventSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         logger.info("UPDATE SERIALIZER EVENT")
-        calendar_data = validated_data.pop("calendar")
+        request = self.context.get("request")
+        calendar_data = request['details']['calendar']
         schedule_data = validated_data.pop("schedule")
         calendar = instance.calendar
         schedule = instance.schedule
 
         # update event fields
         instance.title = validated_data.get("title", instance.title)
-        instance.save()
+        instance.dayOfMonth = validated_data.get("dayOfMonth", instance.dayOfMonth)
+        instance.month = validated_data.get("month", instance.month)
+        instance.year = validated_data.get("year", instance.year)
+        instance.location = validated_data.get("location", instance.location)
+        instance.description = validated_data.get("description", instance.description)
 
         # update calendar fields
         calendar.calendar = calendar_data.get("calendar", calendar.calendar)
+        calendar.color = calendar_data.get("color", calendar.color)
+        calendar.forecolor = calendar_data.get("forecolor", calendar.forecolor)
         calendar.save()
 
         # update schedule fields
         schedule.duration = schedule_data.get("duration", schedule.duration)
+        schedule.durationInDays = schedule_data.get("durationInDays", schedule.durationInDays)
+        schedule.durationUnit = schedule_data.get("durationUnit", schedule.durationUnit)
+        schedule.dayOfWeek = schedule_data.get("dayOfWeek", schedule.dayOfWeek)
+        schedule.dayOfMonth = schedule_data.get("dayOfMonth", schedule.dayOfMonth)
+        schedule.month = schedule_data.get("month", schedule.month)
+        schedule.times = schedule_data.get("times", schedule.times)
+        schedule.year = schedule_data.get("year", schedule.year)
         schedule.save()
 
+        instance.save()
         return instance
 
 
@@ -395,6 +410,14 @@ class AppointmentSerializer(serializers.ModelSerializer):
         logger.info(request)
         logger.info("VALIDATED_DATA")
         logger.info(validated_data)
+        event = get_object_or_404(Event, pk=request['details']['pk'])
+        event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
+        if event_serializer.is_valid(raise_exception=False):
+            event_serializer.save()
+            # return_data={'details': event_serializer., 'pk': instance.get('pk')}
+            # logger.info("RETURN DATA APPOIMENT")
+            # logger.info(return_data)
+        return instance
 
 
 
