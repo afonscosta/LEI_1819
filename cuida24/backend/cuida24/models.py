@@ -294,7 +294,7 @@ class Event(models.Model):
     year = models.IntegerField()
     location = models.TextField()
     description = models.TextField()
-    calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
+    calendar = models.ForeignKey(Calendar, on_delete=models.DO_NOTHING)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -349,18 +349,33 @@ class EventSerializer(serializers.ModelSerializer):
 
 class Notification(models.Model):
     dateTime = models.TextField()
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    event = EventSerializer(required=False)
+    event = EventSerializer(read_only=True)
 
     class Meta:
         model = Notification
         fields = ('dateTime', 'event', 'pk')
-
+    '''
+    def update(self, instance, validated_data):
+        logger.info("UPDATE SERIALIZER NOTIFICATION")
+        logger.info(validated_data)
+        request = self.context.get("request")
+        notification_data = request
+        if instance:
+            instance.dateTime = notification_data.get("dateTime", instance.dateTime)
+            instance.save()
+            return instance
+        else:
+            notification_req_data = {'dateTime': notification_data['dateTime'], 'event': notification_data['event']}
+            notification = Notification.objects.create(**notification_req_data)
+            return notification
+    '''
 
 # Appointment
+
 
 class Appointment(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
@@ -414,9 +429,24 @@ class AppointmentSerializer(serializers.ModelSerializer):
         event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
         if event_serializer.is_valid(raise_exception=False):
             event_serializer.save()
-            # return_data={'details': event_serializer., 'pk': instance.get('pk')}
-            # logger.info("RETURN DATA APPOIMENT")
-            # logger.info(return_data)
+
+
+        notifications = Notification.objects.filter(event=event)
+        actual_number_notification = len(notifications)
+        actual_index_change = 0
+        logger.info(actual_number_notification)
+        logger.info(notifications[0])
+        for income_notification in request['notification']:
+            if actual_index_change < actual_number_notification:
+                logger.info("VOU SUBSTITUIR")
+                logger.info(income_notification)
+                notification = notifications[actual_index_change]
+                notification.dateTime = income_notification
+                notification.save()
+                actual_index_change += 1
+            else:
+                notification_req_data = {'dateTime': income_notification,  'event': event}
+                Notification.objects.create(**notification_req_data)
         return instance
 
 

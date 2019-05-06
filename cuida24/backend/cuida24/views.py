@@ -139,6 +139,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
                 appointment['patientPK'] = user.pk
             else:
                 appointment['caregiverPK'] = user.pk
+        logger.info("SERIALIZER RETURN DATA")
         logger.info(serializer_appointment.data)
         sent_data = appointmentBackToFrontJSON(serializer_appointment.data)
         return Response(sent_data, status=status.HTTP_200_OK)
