@@ -311,7 +311,6 @@ class EventSerializer(serializers.ModelSerializer):
         depth = 1
 
     def update(self, instance, validated_data):
-        logger.info("UPDATE SERIALIZER EVENT")
         request = self.context.get("request")
         calendar_data = request['details']['calendar']
         schedule_data = validated_data.pop("schedule")
@@ -358,21 +357,6 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = ('dateTime', 'event', 'pk')
-    '''
-    def update(self, instance, validated_data):
-        logger.info("UPDATE SERIALIZER NOTIFICATION")
-        logger.info(validated_data)
-        request = self.context.get("request")
-        notification_data = request
-        if instance:
-            instance.dateTime = notification_data.get("dateTime", instance.dateTime)
-            instance.save()
-            return instance
-        else:
-            notification_req_data = {'dateTime': notification_data['dateTime'], 'event': notification_data['event']}
-            notification = Notification.objects.create(**notification_req_data)
-            return notification
-    '''
 
 # Appointment
 
@@ -393,8 +377,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        logger.info("VALIDATED_DATA")
-        logger.info(validated_data)
 
         # Details(event) of appointment
         calendar = get_object_or_404(Calendar, pk=request['details']['calendar']['pk'])
@@ -420,26 +402,17 @@ class AppointmentSerializer(serializers.ModelSerializer):
         return appointment
 
     def update(self, instance, validated_data):
-        logger.info("UPDATE SERIALIZER")
         request = self.context.get("request")
-        logger.info(request)
-        logger.info("VALIDATED_DATA")
-        logger.info(validated_data)
         event = get_object_or_404(Event, pk=request['details']['pk'])
         event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
         if event_serializer.is_valid(raise_exception=False):
             event_serializer.save()
 
-
         notifications = Notification.objects.filter(event=event)
         actual_number_notification = len(notifications)
         actual_index_change = 0
-        logger.info(actual_number_notification)
-        logger.info(notifications[0])
         for income_notification in request['notification']:
             if actual_index_change < actual_number_notification:
-                logger.info("VOU SUBSTITUIR")
-                logger.info(income_notification)
                 notification = notifications[actual_index_change]
                 notification.dateTime = income_notification
                 notification.save()
@@ -542,7 +515,7 @@ class Session(models.Model):
     participants = models.ManyToManyField(Caregiver)
 
 
-class SessaoSerializer(serializers.ModelSerializer):
+class SessionSerializer(serializers.ModelSerializer):
     # Relação many-to-many
     participants = CaregiverSerializer(many=True)
 

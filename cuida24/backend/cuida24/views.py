@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
+from rest_framework.decorators import action, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets, status, generics
 
@@ -14,6 +15,7 @@ from .models import Appointment, AppointmentSerializer
 from .models import AppointmentNote, AppointmentNoteSerializer
 from .models import Notification, NotificationSerializer
 from .models import BackofficeUser, BackofficeUserSerializer
+from .models import Session, SessionSerializer
 from .services import *
 import logging
 import json
@@ -40,36 +42,6 @@ class DefActivityViewSet(viewsets.ModelViewSet):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    """
-    Post method
-    
-    def create(self, request, *args, **kwargs):
-        logger.info("POST")
-        logger.info(request.data)
-        req_data = EventFrontToBackJSON(request.data)
-        serializer = EventSerializer(data=req_data['event'], context={'request': req_data})
-        logger.info("DATA SENT")
-        logger.info(req_data)
-        if serializer.is_valid(raise_exception=False):
-            serializer.save()
-            logger.info("SERIALIZER RETURN DATA")
-            logger.info(serializer.data)
-            sent_data = EventBackTofrontJSON(request.data, serializer.data)
-            logger.info(sent_data)
-            return Response(sent_data, status=status.HTTP_200_OK)
-        logger.info(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    Get method
-    def list(self, request, *args, **kwargs):
-        logger.info("GET")
-        events = Event.objects.all()
-        logger.info(events)
-        serializer = EventSerializer(events, many=True, context={'request': request})
-        logger.info("JSON DEVOLVIDO:")
-        logger.info(serializer.data)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    """
 
 
 class CalendarViewSet(viewsets.ModelViewSet):
@@ -99,31 +71,31 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     Post method
     '''
     def create(self, request, *args, **kwargs):
-        logger.info("POST")
+        logger.info("POST APPOINTMENTS")
         logger.info(request.data)
         req_data = appointmentFrontToBackJSON(request.data)
         serializer = AppointmentSerializer(data=req_data, context={'request': req_data})
-        logger.info("DATA SENT")
+        logger.info("DATA SENT TO SERIALIZER")
         logger.info(req_data)
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
             logger.info(serializer.data)
-            sent_data = eventBackToFrontJSON(request.data, serializer.data)
+            sent_data = appointmentBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
             logger.info(sent_data)
             return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     """
-    Get method 
+    Get method by user id
     """
     def list(self, request, *args, **kwargs):
-        logger.info("GET")
+        logger.info("GET APPOINTMENT")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
         is_patient = False
-        logger.info(data)
         if data['caregivers']:
             user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
         else:
@@ -141,14 +113,16 @@ class AppointmentViewSet(viewsets.ModelViewSet):
                 appointment['caregiverPK'] = user.pk
         logger.info("SERIALIZER RETURN DATA")
         logger.info(serializer_appointment.data)
-        sent_data = appointmentBackToFrontJSON(serializer_appointment.data)
+        sent_data = getAppointmentBackToFrontJSON(serializer_appointment.data)
+        logger.info("RETURN DATA")
+        logger.info(sent_data)
         return Response(sent_data, status=status.HTTP_200_OK)
 
     """
     Update method
     """
     def put(self, request):
-        logger.info("PUT")
+        logger.info("PUT APPOINTMENT")
         logger.info(request.data)
         req_data = appointmentFrontToBackJSON(request.data)
         appointment = get_object_or_404(Appointment, pk=req_data['details']['pk'])
@@ -159,16 +133,77 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
             logger.info(serializer.data)
-            sent_data = eventBackToFrontJSON(request.data, serializer.data)
+            sent_data = appointmentBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
             logger.info(sent_data)
             return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class AppointmentNoteViewSet(viewsets.ModelViewSet):
     queryset = AppointmentNote.objects.all()
     serializer_class = AppointmentNoteSerializer
 
+    @action(detail=False, methods=['get'])
+    def noteCategory(self, request):
+        logger.info("GET NOTE CATEGORY")
+        choices_value = AppointmentNote.CATEGORY
+        enum_values = []
+        for choice in choices_value:
+            enum_values.append(choice[1])
+        return Response(enum_values)
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET NOTE APPOINTMENT")
+        logger.info(request.data)
+        data = request.data['appointment']
+        appointment = get_object_or_404(Appointment, pk=data)
+        queryset = AppointmentNote.objects.filter(appointment=appointment)
+        appointment_note_serializer = AppointmentNoteSerializer(queryset, many=True)
+        logger.info("SERIALIZER RETURN DATA")
+        logger.info(appointment_note_serializer.data)
+        return Response(appointment_note_serializer.data, status=status.HTTP_200_OK)
 
 
+class SessionsViewSet(viewsets.ModelViewSet):
+    queryset = Session.objects.all()
+    serializer_class = SessionSerializer
+
+    def create(self, request, *args, **kwargs):
+        logger.info("POST SESSION")
+        logger.info(request.data)
+        req_data = sessionFrontToBackJSON(request.data)
+        serializer = SessionSerializer(data=req_data, context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = sessionBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(detail=False, methods=['get'])
+    def typeSession(self, request):
+        logger.info("GET TYPE SESSION")
+        choices_value = Session.TYPE
+        enum_values = []
+        for choice in choices_value:
+            enum_values.append(choice[1])
+        return Response(enum_values)
+
+    @action(detail=False, methods=['get'])
+    def statusSession(self,request):
+        logger.info("GET Status session")
+        choices_value = Session.STATE
+        enum_values = []
+        for choice in choices_value:
+            enum_values.append(choice[1])
+        return Response(enum_values)

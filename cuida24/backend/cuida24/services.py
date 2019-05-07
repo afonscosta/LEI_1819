@@ -31,10 +31,11 @@ def eventFrontToBackJSON(request_param):
     return req_data
 
 
-def eventBackToFrontJSON(request_param, serializer_data):
+def appointmentBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
     sent_data = request
-    sent_data['event']['id'] = serializer_data['pk']
+    sent_data['event']['id'] = serializer_data['details']['pk']
+    sent_data['id'] = serializer_data['pk']
     return sent_data
 
 
@@ -77,7 +78,7 @@ def appointmentFrontToBackJSON(request_param):
     return req_data
 
 
-def appointmentBackToFrontJSON(serializer_appointment_data):
+def getAppointmentBackToFrontJSON(serializer_appointment_data):
     request = copy.deepcopy(serializer_appointment_data)
     req_data = []
     for appointment in request:
@@ -94,7 +95,7 @@ def appointmentBackToFrontJSON(serializer_appointment_data):
                         'description': appointment['details']['description'],
                         'forecolor': appointment['details']['calendar']['forecolor'],
                         'location': appointment['details']['location'],
-                        'notify': notificationBackToFronJSON(appointment['details']['notification']),
+                        'notify': notificationBackToFrontJSON(appointment['details']['notification']),
                         'title': appointment['details']['title']
                       },
                       'id': appointment['details']['pk'],
@@ -109,7 +110,7 @@ def appointmentBackToFrontJSON(serializer_appointment_data):
     return req_data
 
 
-def notificationBackToFronJSON(notification_param):
+def notificationBackToFrontJSON(notification_param):
     notifications = copy.deepcopy(notification_param)
     req_data = []
     for notification in notifications:
@@ -142,3 +143,50 @@ def scheduleBackToFrontJSON(schedule_param):
         req_data['times'] = []
         req_data['times'].append(schedule['times'])
     return req_data
+
+
+def sessionFrontToBackJSON(request_param):
+    request = copy.deepcopy(request_param)
+    req_data = {'details': request['event']['data'], 'notification': request['event']['data']['notify'],
+                'users': request['users']}
+
+    calendar_pk = req_data['details']['calendar']
+    req_data['details']['calendar'] = {}
+    req_data['details']['calendar']['pk'] = calendar_pk
+    req_data['details']['calendar']['color'] = req_data['details']['color']
+    req_data['details']['calendar']['forcolor'] = req_data['details']['forecolor']
+
+    del req_data['details']['color']
+    del req_data['details']['forecolor']
+    del req_data['details']['notify']
+
+    req_data['details']['pk'] = request['event']['id']
+    req_data['details']['dayOfMonth'] = request['occurrenceDate']['dayOfMonth']
+    req_data['details']['month'] = request['occurrenceDate']['month']
+    req_data['details']['year'] = request['occurrenceDate']['year']
+
+    req_data['details']['schedule'] = request['event']['schedule']
+    if 'dayOfWeek' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['dayOfWeek']:
+        req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
+    if 'dayOfMonth' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['dayOfMonth']:
+        req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
+    if 'month' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['month']:
+        req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
+    if 'year' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['year']:
+        req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
+    if 'times' in req_data['details']['schedule']:
+      if req_data['details']['schedule']['times']:
+        req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
+    return req_data
+
+
+def sessionBackToFrontJSON(request_param, serializer_data):
+    request = copy.deepcopy(request_param)
+    sent_data = request
+    sent_data['event']['id'] = serializer_data['details']['pk']
+    sent_data['groupSession']['pk'] = serializer_data['pk']
+    return sent_data
