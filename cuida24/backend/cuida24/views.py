@@ -157,8 +157,8 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         logger.info("GET NOTE APPOINTMENT")
-        logger.info(request.data)
-        data = request.data['appointment']
+        logger.info(json.loads(dict(request.GET)['appointment'][0]))
+        data = json.loads(dict(request.GET)['appointment'][0])
         appointment = get_object_or_404(Appointment, pk=data)
         queryset = AppointmentNote.objects.filter(appointment=appointment)
         appointment_note_serializer = AppointmentNoteSerializer(queryset, many=True)
