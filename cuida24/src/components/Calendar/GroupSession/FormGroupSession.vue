@@ -232,7 +232,7 @@ export default {
       let eventData = this.prepareEvent()
       let payload = {
         'groupSession': this.groupSession,
-        'eventData': eventData
+        'event': eventData
       }
       this.$emit('returnGroupSession', payload)
       this.groupSession = {
@@ -325,11 +325,9 @@ export default {
       }
       let dt = LuxonDateTime.fromISO(this.form.dateValue)
       let payload = {
-        'event': {
-          'data': data,
-          'schedule': this.form.sched,
-          'id': this.form.id
-        },
+        'data': data,
+        'schedule': this.form.sched,
+        'id': this.form.id,
         'users': users,
         'occurrenceDate': {
           'dayOfMonth': dt.c.day,

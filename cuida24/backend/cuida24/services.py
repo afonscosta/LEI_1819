@@ -147,8 +147,11 @@ def scheduleBackToFrontJSON(schedule_param):
 
 def sessionFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
-    req_data = {'details': request['event']['data'], 'notification': request['event']['data']['notify'],
-                'users': request['users']}
+    req_data = {
+        'details': request['event']['data'],
+        'notification': request['event']['data']['notify'],
+        'users': request['event']['users']
+    }
 
     calendar_pk = req_data['details']['calendar']
     req_data['details']['calendar'] = {}
@@ -161,9 +164,9 @@ def sessionFrontToBackJSON(request_param):
     del req_data['details']['notify']
 
     req_data['details']['pk'] = request['event']['id']
-    req_data['details']['dayOfMonth'] = request['occurrenceDate']['dayOfMonth']
-    req_data['details']['month'] = request['occurrenceDate']['month']
-    req_data['details']['year'] = request['occurrenceDate']['year']
+    req_data['details']['dayOfMonth'] = request['event']['occurrenceDate']['dayOfMonth']
+    req_data['details']['month'] = request['event']['occurrenceDate']['month']
+    req_data['details']['year'] = request['event']['occurrenceDate']['year']
 
     req_data['details']['schedule'] = request['event']['schedule']
     if 'dayOfWeek' in req_data['details']['schedule']:
