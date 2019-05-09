@@ -1,4 +1,6 @@
+from django.contrib.auth.hashers import make_password
 from django.db import models
+from django.contrib.auth.models import User as UserAuth
 from rest_framework import serializers
 import logging
 
@@ -89,20 +91,36 @@ class IndividualLeisureSerializer(serializers.ModelSerializer):
 
 # Users
 
-class User(models.Model):
-    name = models.CharField(max_length=200)
+#class User(models.Model):
+#    name = models.CharField(max_length=200)
 
+
+#class UserSerializer(serializers.ModelSerializer):
+
+ #   class Meta:
+  #      model = User
+   #     fields = ('name', 'pk')
 
 class UserSerializer(serializers.ModelSerializer):
 
+    password = serializers.CharField(
+          write_only=True,
+    )
+
     class Meta:
-        model = User
-        fields = ('name', 'pk')
+       model = UserAuth
+       fields = ('password', 'username', 'first_name', 'last_name', 'email',)
+
+    def create(self, validated_data):
+        user = super(UserSerializer, self).create(validated_data)
+        if 'password' in validated_data:
+              user.set_password(validated_data['password'])
+              user.save()
+        return user
 
 
 class Caregiver(models.Model):
-    info = models.OneToOneField(User, on_delete=models.CASCADE)
-
+    info = models.OneToOneField(UserAuth, on_delete=models.CASCADE)
 
 class CaregiverSerializer(serializers.ModelSerializer):
     info = UserSerializer()
@@ -111,9 +129,18 @@ class CaregiverSerializer(serializers.ModelSerializer):
         model = Caregiver
         fields = ('info', 'pk')
 
+    def create(self, validated_data):
+        logger.info(validated_data)
+        user_data = validated_data.pop('info')
+        user_data['password'] = make_password(user_data['password'])
+        logger.info(user_data)
+        info = UserAuth.objects.create(**user_data)
+        caregiver = Caregiver.objects.create(info=info)
+        return caregiver
+
 
 class Patient(models.Model):
-    info = models.OneToOneField(User, on_delete=models.CASCADE)
+    info = models.OneToOneField(UserAuth, on_delete=models.CASCADE)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
@@ -130,7 +157,7 @@ class BackofficeUser(models.Model):
       ('ADM', 'Administrador'), ('COR', 'Coordenador'), ('REM', 'Responsável Medicação'), ('PRF', 'Profissional Saúde'),
       ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
     type = models.CharField(max_length=3, choices=TYPE)
-    info = models.OneToOneField(User, on_delete=models.CASCADE)
+    info = models.OneToOneField(UserAuth, on_delete=models.CASCADE)
 
 
 class BackofficeUserSerializer(serializers.ModelSerializer):
@@ -349,7 +376,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
 class Appointment(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
 
 
 class AppointmentSerializer(serializers.ModelSerializer):

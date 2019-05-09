@@ -43,6 +43,7 @@ class FixAnAppointmentPermssion(permissions.BasePermission):
     logger.info('REQUEST PRINT' + request.user.username + str(request.user.id))
     return True
 
+
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -88,7 +89,6 @@ class CaregiverViewSet(viewsets.ModelViewSet):
     serializer_class = CaregiverSerializer
 
 
-
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
@@ -106,7 +106,6 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     Post method
     '''
 
-    @permission_classes((FixAnAppointmentPermssion,))
     def create(self, request, *args, **kwargs):
         logger.info("POST")
         logger.info(request.data)

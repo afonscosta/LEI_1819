@@ -56,9 +56,10 @@
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </ul>
-      <router-link class="btn btn-primary" :to="{ name: 'login' }">
+      <router-link v-if="this.$store.state.login.accesstoken == ''" class="btn btn-primary" :to="{ name: 'login' }">
         Login
       </router-link>
+      {{ this.$store.state.login.accesstoken }}
     </div>
   </nav>
 
