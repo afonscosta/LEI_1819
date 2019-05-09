@@ -1,31 +1,17 @@
 <template>
   <div>
-    <b-container>
-      <b-row class="justify-content-md-center">
-        <b-col md="6">
-          <b-alert
-            :show="dismissCountDown"
-            dismissible
-            variant="success"
-            @dismissed="dismissCountDown=0"
-            @dismiss-count-down="countDownChanged"
-          >
-            <p>A consulta foi atualizada com sucesso.</p>
-            <b-progress
-              variant="success"
-              :max="dismissSecs"
-              :value="dismissCountDown"
-              height="4px"
-            ></b-progress>
-          </b-alert>
-        </b-col>
-      </b-row>
-    </b-container>
+    <notifications 
+      position="top center"
+      classes="notif"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+    />
     <b-container>
       <b-row class="justify-content-md-center">
         <b-col xl="8" lg="8" md="8" sm="12" cols="12">
           <b-button 
-            v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0"
+            v-if="(usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0) && appointments.length !== 0"
             @click="goToFormAppoint">Adicionar Consulta</b-button>
         </b-col>
       </b-row>
@@ -58,14 +44,13 @@ export default {
   },
   data: () => ({
     appointmentSel: null,
-    form: {},
-    dismissSecs: 3,
-    dismissCountDown: 0
+    form: {}
   }),
   created () {
   },
   computed: {
     ...mapState({
+      appointments: state => state.appointments.appointments,
       usersActive: state => state.users.usersActive
     })
   },
@@ -146,12 +131,12 @@ export default {
       console.log('form', this.form)
       // this.$emit('editAppointment', form)
     },
-    countDownChanged  (dismissCountDown) {
-      this.dismissCountDown = dismissCountDown
-    },
     appointmentUpdated (occurrenceDate) {
       this.appointmentSel = null
-      this.dismissCountDown = this.dismissSecs
+      this.$notify({
+        title: 'A consulta foi atualizada com sucesso.',
+        duration: 3000
+      })
     },
     goToFormAppoint () {
       this.$router.push({ name: 'formAppoint' })
@@ -159,3 +144,31 @@ export default {
   }
 }
 </script>
+
+<style>
+.notif {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #E8F9F0;
+  border: 2px solid #D0F2E1;
+}
+
+.notification-title {
+  letter-spacing: 1px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.v-fade-top-enter-active,
+.v-fade-top-leave-active,
+.v-fade-ltopmove {
+  transition: all .5s;
+}
+.v-fade-top-enter,
+.v-fade-top-leave-to {
+  opacity: 0;
+  transform: translateY(-500px) scale(0.2);
+}
+</style>

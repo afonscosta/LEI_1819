@@ -4,6 +4,10 @@ import store from '@/store/modules/login'
 export default {
   fetchNotes (payload) {
     return cuida24.get(`appointmentNotes/`, {
+      params: {
+        appointment: payload
+      }
+    }, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }

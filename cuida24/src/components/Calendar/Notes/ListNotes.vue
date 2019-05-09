@@ -119,8 +119,7 @@ export default {
     editingNote: null
   }),
   created () {
-    // TODO: Fazer o getNotes do this.apptPK
-    this.$store.dispatch('notes/getNotes')
+    this.$store.dispatch('notes/getNotes', this.apptPK)
   },
   computed: {
     ...mapState({

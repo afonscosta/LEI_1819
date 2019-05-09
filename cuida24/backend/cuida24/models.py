@@ -512,12 +512,13 @@ class Session(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
     state = models.CharField(max_length=1, choices=STATE)
     # Relação many-to-many só tem que estar num model
-    participants = models.ManyToManyField(Caregiver)
+    participants = models.ManyToManyField(User)
 
 
 class SessionSerializer(serializers.ModelSerializer):
     # Relação many-to-many
-    participants = CaregiverSerializer(many=True, read_only=True)
+    participants = UserSerializer(many=True, read_only=True)
+    details = EventSerializer()
 
     class Meta:
         model = Session
@@ -525,12 +526,14 @@ class SessionSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-
+        logger.info("VALIDATED DATA POST SESSION")
+        logger.info(validated_data)
         # Details(event) of session
         calendar = get_object_or_404(Calendar, pk=request['details']['calendar']['pk'])
         schedule_data = validated_data['details'].pop('schedule')
+        event_data = validated_data.pop('details')
         schedule = Schedule.objects.create(**schedule_data)
-        event = Event.objects.create(calendar=calendar, schedule=schedule, **validated_data['details'])
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **event_data)
 
         # Notification associate to event
         for notification in request['notification']:
@@ -538,16 +541,16 @@ class SessionSerializer(serializers.ModelSerializer):
             Notification.objects.create(**notification_req_data)
 
         # Create appointment with user and event
-        session = None
-        for user in request['users']['caregivers']:
-            req_data = {'user': get_object_or_404(Caregiver, pk=user).info, 'details': event}
-            appointment = Appointment.objects.create(**req_data)
+        session = Session.objects.create(details=event, **validated_data)
+        participants = []
+        for user in request['participants']['caregivers']:
+            participants.append(get_object_or_404(Caregiver, pk=user).info)
 
-        if not appointment:
-          for user in request['users']['patients']:
-              req_data = validated_data + {'user': get_object_or_404(Patient, pk=user).info, 'details': event}
-              appointment = Appointment.objects.create(**req_data)
-        return appointment
+        for user in request['participants']['patients']:
+            participants.append(get_object_or_404(Patient, pk=user).info)
+        logger.info(participants)
+        session.participants.set(participants)
+        return session
 
 
 class Evaluation(models.Model):

@@ -1,5 +1,7 @@
 import copy
 import logging
+import json
+
 
 logger = logging.getLogger("mylogger")
 
@@ -147,17 +149,23 @@ def scheduleBackToFrontJSON(schedule_param):
 
 def sessionFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
-    req_data = {'details': request['eventData']['event']['data'], 'notification': request['eventData']['event']['data']['notify'],
-                'participants': request['eventData']['event']['users']}
 
-    req_data['topic'] = request['groupSession']['theme']
+    req_data = {'details': request['event']['data'], 'notification': request['event']['data']['notify'],
+                'participants': request['event']['users']}
+
     if 'groupSession' in request:
         req_data['type'] = 'G'
+        req_data['description'] = request['groupSession']['description']
+        req_data['goal'] = json.dumps(request['groupSession']['goals'])
+        req_data['material'] = json.dumps(request['groupSession']['material'])
+        req_data['topic'] =  request['groupSession']['theme']
     else:
         req_data['type'] = 'I'
-    req_data['description'] = request['groupSession']['description']
-    req_data['goal'] = request['groupSession']['goal']
-    req_data['material'] = request['groupSession']['material']
+        req_data['description'] = request['individualSession']['description']
+        req_data['goal'] = json.dumps(request['individualSession']['goals'])
+        req_data['material'] = json.dumps(request['individualSession']['material'])
+        req_data['topic'] = request['individualSession']['theme']
+
     req_data['state'] = 'E'
 
     calendar_pk = req_data['details']['calendar']
@@ -170,12 +178,12 @@ def sessionFrontToBackJSON(request_param):
     del req_data['details']['forecolor']
     del req_data['details']['notify']
 
-    req_data['details']['pk'] = request['eventData']['event']['id']
-    req_data['details']['dayOfMonth'] = request['eventData']['occurrenceDate']['dayOfMonth']
-    req_data['details']['month'] = request['eventData']['occurrenceDate']['month']
-    req_data['details']['year'] = request['eventData']['occurrenceDate']['year']
+    req_data['details']['pk'] = request['event']['id']
+    req_data['details']['dayOfMonth'] = request['event']['occurrenceDate']['dayOfMonth']
+    req_data['details']['month'] = request['event']['occurrenceDate']['month']
+    req_data['details']['year'] = request['event']['occurrenceDate']['year']
 
-    req_data['details']['schedule'] = request['eventData']['event']['schedule']
+    req_data['details']['schedule'] = request['event']['schedule']
     if 'dayOfWeek' in req_data['details']['schedule']:
         if req_data['details']['schedule']['dayOfWeek']:
             req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]

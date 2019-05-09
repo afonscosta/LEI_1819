@@ -1,5 +1,12 @@
 <template>
   <div>
+    <notifications 
+      position="top center"
+      classes="notif"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+    />
     <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Não foi selecionado nenhum utilizador.</h3>
     <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
@@ -27,6 +34,7 @@
                 :phrases="datetime.phrases"
                 :week-start="datetime['week-start']"
                 :min-datetime="datetime.minDatetime"
+                @close="updateNotify"
               ></datetime>
             </b-form-group>
 
@@ -106,6 +114,7 @@ import notification from '@/components/Notification.vue'
 import schedule from '@/components/Schedule'
 import calReadOnly from '@/components/Calendar/CalendarReadOnly'
 import { mapActions, mapState, mapGetters } from 'vuex'
+import { format, parse, subDays, subMonths } from 'date-fns'
 
 export default {
   name: 'addAppoint',
@@ -288,7 +297,23 @@ export default {
         // this.$router.push({ name: 'editAppoints' })
       } else {
         this.addAppointment(payload)
-        this.$router.push({ name: 'calendar' })
+        this.$notify({
+          title: 'A consulta foi adicionada com sucesso.',
+          duration: 3000
+        })
+        this.formData = {
+          dateValue: '',
+          timeValue: '',
+          allDay: true,
+          duration: 0,
+          durationUnit: '',
+          local: '',
+          specialty: '',
+          notify: [],
+          sched: {},
+          id: null
+        }
+        // this.$router.push({ name: 'calendar' })
       }
       // this.formData = {
       //   dateValue: '',
@@ -303,7 +328,45 @@ export default {
       //   id: null
       // }
       // this.$router.push({ name: 'calendar' })
+    },
+    updateNotify () {
+      if (this.formData.dateValue) {
+        var d = parse(this.formData.dateValue)
+        var prevMonth = format(subMonths(d, 1), 'YYYY-MM-DD') + 'T09:00:00.000Z'
+        var prev3Days = format(subDays(d, 3), 'YYYY-MM-DD') + 'T09:00:00.000Z'
+        this.formData.notify = [prevMonth, prev3Days]
+      } else {
+        this.formData.notify = []
+      }
     }
   }
 }
 </script>
+
+<style>
+.notif {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #E8F9F0;
+  border: 2px solid #D0F2E1;
+}
+
+.notification-title {
+  letter-spacing: 1px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.v-fade-top-enter-active,
+.v-fade-top-leave-active,
+.v-fade-ltopmove {
+  transition: all .5s;
+}
+.v-fade-top-enter,
+.v-fade-top-leave-to {
+  opacity: 0;
+  transform: translateY(-500px) scale(0.2);
+}
+</style>

@@ -25,6 +25,7 @@
               :phrases="datetime.phrases"
               :week-start="datetime['week-start']"
               :min-datetime="datetime.minDatetime"
+              @close="updateNotify"
             ></datetime>
 
             <schedule
@@ -118,6 +119,7 @@ import { DateTime as LuxonDateTime } from 'luxon'
 import notification from '@/components/Notification.vue'
 import schedule from '@/components/Schedule'
 import calReadOnly from '@/components/Calendar/CalendarReadOnly'
+import { format, parse, subDays, subMonths } from 'date-fns'
 
 export default {
   name: 'formGroupSession',
@@ -230,9 +232,17 @@ export default {
     },
     onSubmit (evt) {
       let eventData = this.prepareEvent()
-      let payload = {
-        'groupSession': this.groupSession,
-        'eventData': eventData
+      let payload = {}
+      if ((this.usersActive.caregivers.length + this.usersActive.patients.length) === 1) {
+        payload = {
+          'individualSession': this.groupSession,
+          'event': eventData
+        }
+      } else {
+        payload = {
+          'groupSession': this.groupSession,
+          'event': eventData
+        }
       }
       this.$emit('returnGroupSession', payload)
       this.groupSession = {
@@ -325,11 +335,9 @@ export default {
       }
       let dt = LuxonDateTime.fromISO(this.form.dateValue)
       let payload = {
-        'event': {
-          'data': data,
-          'schedule': this.form.sched,
-          'id': this.form.id
-        },
+        'data': data,
+        'schedule': this.form.sched,
+        'id': this.form.id,
         'users': users,
         'occurrenceDate': {
           'dayOfMonth': dt.c.day,
@@ -338,7 +346,45 @@ export default {
         }
       }
       return payload
+    },
+    updateNotify () {
+      if (this.form.dateValue) {
+        var d = parse(this.form.dateValue)
+        var prevMonth = format(subMonths(d, 1), 'YYYY-MM-DD') + 'T09:00:00.000Z'
+        var prev3Days = format(subDays(d, 3), 'YYYY-MM-DD') + 'T09:00:00.000Z'
+        this.form.notify = [prevMonth, prev3Days]
+      } else {
+        this.form.notify = []
+      }
     }
   }
 }
 </script>
+
+<style>
+.notif {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #E8F9F0;
+  border: 2px solid #D0F2E1;
+}
+
+.notification-title {
+  letter-spacing: 1px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.v-fade-top-enter-active,
+.v-fade-top-leave-active,
+.v-fade-ltopmove {
+  transition: all .5s;
+}
+.v-fade-top-enter,
+.v-fade-top-leave-to {
+  opacity: 0;
+  transform: translateY(-500px) scale(0.2);
+}
+</style>

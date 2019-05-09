@@ -43,6 +43,38 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
+    """
+       Get method by user id
+    
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET EVENT")
+        logger.info(request.GET)
+        data = json.loads(dict(request.GET)['users'][0])
+        is_patient = False
+        if data['caregivers']:
+            user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
+        else:
+            user = get_object_or_404(Patient, pk=data['patients'][0])
+            is_patient = True
+        queryset = Appointment.objects.filter(user=user.info)
+        serializer_appointment = AppointmentSerializer(queryset, many=True)
+        for appointment in serializer_appointment.data:
+          queryset2 = Notification.objects.filter(event=appointment['details']['pk']).values('dateTime')
+          serializer_notification = NotificationSerializer(queryset2, many=True)
+          appointment['details']['notification'] = serializer_notification.data
+          if is_patient:
+            appointment['patientPK'] = user.pk
+          else:
+            appointment['caregiverPK'] = user.pk
+        logger.info("SERIALIZER RETURN DATA")
+        logger.info(serializer_appointment.data)
+        sent_data = getAppointmentBackToFrontJSON(serializer_appointment.data)
+        logger.info("RETURN DATA")
+        logger.info(sent_data)
+        return Response(sent_data, status=status.HTTP_200_OK)
+ """
+
 
 class CalendarViewSet(viewsets.ModelViewSet):
     queryset = Calendar.objects.all()
@@ -157,8 +189,8 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         logger.info("GET NOTE APPOINTMENT")
-        logger.info(request.data)
-        data = request.data['appointment']
+        logger.info(json.loads(dict(request.GET)['appointment'][0]))
+        data = json.loads(dict(request.GET)['appointment'][0])
         appointment = get_object_or_404(Appointment, pk=data)
         queryset = AppointmentNote.objects.filter(appointment=appointment)
         appointment_note_serializer = AppointmentNoteSerializer(queryset, many=True)
