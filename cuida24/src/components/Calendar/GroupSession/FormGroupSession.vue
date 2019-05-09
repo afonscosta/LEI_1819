@@ -232,9 +232,17 @@ export default {
     },
     onSubmit (evt) {
       let eventData = this.prepareEvent()
-      let payload = {
-        'groupSession': this.groupSession,
-        'event': eventData
+      let payload = {}
+      if ((this.usersActive.caregivers.length + this.usersActive.patients.length) === 1) {
+        payload = {
+          'individualSession': this.groupSession,
+          'event': eventData
+        }
+      } else {
+        payload = {
+          'groupSession': this.groupSession,
+          'event': eventData
+        }
       }
       this.$emit('returnGroupSession', payload)
       this.groupSession = {
