@@ -517,11 +517,37 @@ class Session(models.Model):
 
 class SessionSerializer(serializers.ModelSerializer):
     # Relação many-to-many
-    participants = CaregiverSerializer(many=True)
+    participants = CaregiverSerializer(many=True, read_only=True)
 
     class Meta:
         model = Session
         fields = ('topic', 'type', 'description', 'goal', 'material', 'details', 'state', 'participants', 'pk')
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+
+        # Details(event) of session
+        calendar = get_object_or_404(Calendar, pk=request['details']['calendar']['pk'])
+        schedule_data = validated_data['details'].pop('schedule')
+        schedule = Schedule.objects.create(**schedule_data)
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **validated_data['details'])
+
+        # Notification associate to event
+        for notification in request['notification']:
+            notification_req_data = {'dateTime': notification, 'event': event}
+            Notification.objects.create(**notification_req_data)
+
+        # Create appointment with user and event
+        session = None
+        for user in request['users']['caregivers']:
+            req_data = {'user': get_object_or_404(Caregiver, pk=user).info, 'details': event}
+            appointment = Appointment.objects.create(**req_data)
+
+        if not appointment:
+          for user in request['users']['patients']:
+              req_data = validated_data + {'user': get_object_or_404(Patient, pk=user).info, 'details': event}
+              appointment = Appointment.objects.create(**req_data)
+        return appointment
 
 
 class Evaluation(models.Model):

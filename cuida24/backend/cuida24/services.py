@@ -147,8 +147,18 @@ def scheduleBackToFrontJSON(schedule_param):
 
 def sessionFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
-    req_data = {'details': request['event']['data'], 'notification': request['event']['data']['notify'],
-                'users': request['users']}
+    req_data = {'details': request['eventData']['event']['data'], 'notification': request['eventData']['event']['data']['notify'],
+                'participants': request['eventData']['event']['users']}
+
+    req_data['topic'] = request['groupSession']['theme']
+    if 'groupSession' in request:
+        req_data['type'] = 'G'
+    else:
+        req_data['type'] = 'I'
+    req_data['description'] = request['groupSession']['description']
+    req_data['goal'] = request['groupSession']['goal']
+    req_data['material'] = request['groupSession']['material']
+    req_data['state'] = 'E'
 
     calendar_pk = req_data['details']['calendar']
     req_data['details']['calendar'] = {}
@@ -160,27 +170,27 @@ def sessionFrontToBackJSON(request_param):
     del req_data['details']['forecolor']
     del req_data['details']['notify']
 
-    req_data['details']['pk'] = request['event']['id']
-    req_data['details']['dayOfMonth'] = request['occurrenceDate']['dayOfMonth']
-    req_data['details']['month'] = request['occurrenceDate']['month']
-    req_data['details']['year'] = request['occurrenceDate']['year']
+    req_data['details']['pk'] = request['eventData']['event']['id']
+    req_data['details']['dayOfMonth'] = request['eventData']['occurrenceDate']['dayOfMonth']
+    req_data['details']['month'] = request['eventData']['occurrenceDate']['month']
+    req_data['details']['year'] = request['eventData']['occurrenceDate']['year']
 
-    req_data['details']['schedule'] = request['event']['schedule']
+    req_data['details']['schedule'] = request['eventData']['event']['schedule']
     if 'dayOfWeek' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['dayOfWeek']:
-        req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
+        if req_data['details']['schedule']['dayOfWeek']:
+            req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
     if 'dayOfMonth' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['dayOfMonth']:
-        req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
+        if req_data['details']['schedule']['dayOfMonth']:
+            req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
     if 'month' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['month']:
-        req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
+        if req_data['details']['schedule']['month']:
+            req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
     if 'year' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['year']:
-        req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
+        if req_data['details']['schedule']['year']:
+            req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
     if 'times' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['times']:
-        req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
+        if req_data['details']['schedule']['times']:
+            req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
     return req_data
 
 
@@ -188,5 +198,8 @@ def sessionBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
     sent_data = request
     sent_data['event']['id'] = serializer_data['details']['pk']
-    sent_data['groupSession']['pk'] = serializer_data['pk']
+    if 'groupSession' in request:
+        sent_data['groupSession']['pk'] = serializer_data['pk']
+    else:
+        sent_data['individualSession']['pk'] = serializer_data['pk']
     return sent_data
