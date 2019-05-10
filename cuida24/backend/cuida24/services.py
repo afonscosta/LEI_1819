@@ -38,6 +38,9 @@ def eventFrontToBackJSON(request_param):
     return req_data
 
 
+'''
+JSON return on Post method with same JSON receive plus pk's created 
+'''
 def appointmentBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
     sent_data = request
@@ -68,47 +71,50 @@ def appointmentFrontToBackJSON(request_param):
 
     req_data['details']['schedule'] = request['event']['schedule']
     if 'dayOfWeek' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['dayOfWeek']:
-        req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
+        if req_data['details']['schedule']['dayOfWeek']:
+            req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
     if 'dayOfMonth' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['dayOfMonth']:
-        req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
+        if req_data['details']['schedule']['dayOfMonth']:
+            req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
     if 'month' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['month']:
-        req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
+        if req_data['details']['schedule']['month']:
+            req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
     if 'year' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['year']:
-        req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
+        if req_data['details']['schedule']['year']:
+            req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
     if 'times' in req_data['details']['schedule']:
-      if req_data['details']['schedule']['times']:
-        req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
+        if req_data['details']['schedule']['times']:
+            req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
     return req_data
 
 
+'''
+JSON return on Get method. Here is necessary to create all fields in JSON     
+'''
 def getAppointmentBackToFrontJSON(serializer_appointment_data):
     request = copy.deepcopy(serializer_appointment_data)
     req_data = []
     for appointment in request:
         temp = {'appointmentPK': appointment['pk'],
-                    'occurrenceDate': {
-                      'dayOfMonth': appointment['details']['dayOfMonth'],
-                      'month': appointment['details']['month'],
-                      'year': appointment['details']['year']
-                    },
-                    'event': {
-                      'data': {
-                        'calendar': appointment['details']['calendar']['pk'],
-                        'color': appointment['details']['calendar']['color'],
-                        'description': appointment['details']['description'],
-                        'forecolor': appointment['details']['calendar']['forecolor'],
-                        'location': appointment['details']['location'],
-                        'notify': notificationBackToFrontJSON(appointment['details']['notification']),
-                        'title': appointment['details']['title']
-                      },
-                      'id': appointment['details']['pk'],
-                      'schedule': scheduleBackToFrontJSON(appointment['details']['schedule'])
-                    }
-                  }
+                'occurrenceDate': {
+                  'dayOfMonth': appointment['details']['dayOfMonth'],
+                  'month': appointment['details']['month'],
+                  'year': appointment['details']['year']
+                },
+                'event': {
+                  'data': {
+                    'calendar': appointment['details']['calendar']['pk'],
+                    'color': appointment['details']['calendar']['color'],
+                    'description': appointment['details']['description'],
+                    'forecolor': appointment['details']['calendar']['forecolor'],
+                    'location': appointment['details']['location'],
+                    'notify': notificationBackToFrontJSON(appointment['details']['notification']),
+                    'title': appointment['details']['title']
+                  },
+                  'id': appointment['details']['pk'],
+                  'schedule': scheduleBackToFrontJSON(appointment['details']['schedule'])
+                }
+              }
         if 'patientPK' in appointment:
             temp['patientPK'] = appointment['patientPK']
         else:
@@ -211,6 +217,9 @@ def sessionFrontToBackJSON(request_param):
     return req_data
 
 
+'''
+JSON return on Post method with same JSON receive plus pk's created 
+'''
 def sessionBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
     sent_data = request
@@ -222,6 +231,9 @@ def sessionBackToFrontJSON(request_param, serializer_data):
     return sent_data
 
 
+'''
+JSON return on Get method. Here is necessary to create all fields in JSON     
+'''
 def getSessionBackToFrontJSON(serializer_appointment_data):
     request = copy.deepcopy(serializer_appointment_data)
     req_data = []
@@ -262,8 +274,10 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
     return req_data
 
 
+'''
+  Get user appointments
+'''
 def getAppointments(user, is_patient):
-    # get appointments
     queryset = Appointment.objects.filter(user=user.info)
     serializer_appointment = AppointmentSerializer(queryset, many=True)
     for appointment in serializer_appointment.data:
@@ -276,6 +290,10 @@ def getAppointments(user, is_patient):
             appointment['caregiverPK'] = user.pk
     return serializer_appointment.data
 
+
+'''
+  Get user(s) session
+'''
 def getSessions(participants):
     queryset = Session.objects.filter(participants__in=participants).distinct()
     serializer_session = SessionSerializer(queryset, many=True)

@@ -11,11 +11,8 @@ from .models import Event, EventSerializer
 from .models import Calendar, CalendarSerializer
 from .models import Caregiver, CaregiverSerializer
 from .models import Patient, PatientSerializer
-from .models import Appointment, AppointmentSerializer
 from .models import AppointmentNote, AppointmentNoteSerializer
-from .models import Notification, NotificationSerializer
 from .models import BackofficeUser, BackofficeUserSerializer
-from .models import Session, SessionSerializer
 from .services import *
 import logging
 import json
@@ -48,10 +45,10 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     def list(self, request,*args, **kwargs):
         logger.info("GET EVENT")
-        logger.info(request.GET)
-        data = json.loads(dict(request.GET)['users'][0])
-        #logger.info(request.data)
-        #data = request.data['users']
+        #logger.info(request.GET)
+        #data = json.loads(dict(request.GET)['users'][0])
+        logger.info(request.data)
+        data = request.data['users']
         is_patient = False
         sent_data = {'appointments': [], 'sessions': []}
         participants = []
@@ -95,6 +92,7 @@ class BackofficeUserViewSet(viewsets.ModelViewSet):
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
+
     '''
     Post method
     '''
@@ -237,9 +235,8 @@ class SessionsViewSet(viewsets.ModelViewSet):
       Get method
     """
     def list(self, request, *args, **kwargs):
-        logger.info("GET SESSION")
-        # logger.info(request.data)
-        # data = request.data['users']
+        #logger.info(request.data)
+        #data = request.data['users']
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
         sent_data = []

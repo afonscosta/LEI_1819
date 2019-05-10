@@ -23,7 +23,7 @@ router.register('patients', PatientViewSet)
 router.register('appointments', AppointmentViewSet)
 router.register('appointmentNotes', AppointmentNoteViewSet)
 router.register('backoffice_user', BackofficeUserViewSet)
-router.register('groupSessions', SessionsViewSet)
+router.register('sessions', SessionsViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
 urlpatterns = [
