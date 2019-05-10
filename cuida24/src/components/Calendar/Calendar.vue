@@ -6,7 +6,6 @@
           <listUsers 
             :listName="'Cuidadores'"
             :users="caregivers"
-            @toggleAll="toggleAllCaregivers"
             @updateSelected="updateSelectedCaregivers"
           ></listUsers>
         </b-col>
@@ -15,7 +14,6 @@
             :listName="'Utentes'"
             :users="patients"
             :selected="usersActive.patients"
-            @toggleAll="toggleAllPatients"
             @updateSelected="updateSelectedPatients"
           ></listUsers>
         </b-col>
@@ -81,19 +79,15 @@ export default {
   },
   methods: {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    toggleAllCaregivers (checked) {
-      this.usersActive.caregivers = checked ? this.caregivers.slice() : []
-      console.log('toggleAll', this.usersActive.caregivers)
-    },
     updateSelectedCaregivers (checked) {
-      this.usersActive.caregivers = checked
-      console.log('updateSelectedCaregivers', this.usersActive.caregivers)
-    },
-    toggleAllPatients (checked) {
-      this.usersActive.patients = checked ? this.patients.slice() : []
+      this.usersActive.caregivers = checked.map(function (c) {
+        return c.pk
+      })
     },
     updateSelectedPatients (checked) {
-      this.usersActive.patients = checked
+      this.usersActive.patients = checked.map(function (p) {
+        return p.pk
+      })
     },
     goToAppointments () {
       this.$router.push({ name: 'appointments' })
