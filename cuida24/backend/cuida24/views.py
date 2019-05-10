@@ -144,7 +144,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         logger.info("PUT APPOINTMENT")
         logger.info(request.data)
         req_data = appointmentFrontToBackJSON(request.data)
-        appointment = get_object_or_404(Appointment, pk=req_data['details']['pk'])
+        appointment = get_object_or_404(Appointment, details=req_data['details']['pk'])
         serializer = AppointmentSerializer(data=req_data, instance=appointment, context={'request': req_data})
         logger.info("DATA SENT")
         logger.info(req_data)
