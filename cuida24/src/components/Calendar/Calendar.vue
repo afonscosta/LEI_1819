@@ -1,12 +1,11 @@
 <template>
   <div>
-    <b-container v-if="selected === ''">
+    <b-container>
       <b-row sm="auto">
         <b-col md="6" cols="6">
           <listUsers 
             :listName="'Cuidadores'"
-            :users="caregiversParsed"
-            :selected="usersActive.caregivers"
+            :users="caregivers"
             @toggleAll="toggleAllCaregivers"
             @updateSelected="updateSelectedCaregivers"
           ></listUsers>
@@ -14,7 +13,7 @@
         <b-col md="6" cols="6">
           <listUsers 
             :listName="'Utentes'"
-            :users="patientsParsed"
+            :users="patients"
             :selected="usersActive.patients"
             @toggleAll="toggleAllPatients"
             @updateSelected="updateSelectedPatients"
@@ -49,8 +48,7 @@ export default {
       notify: [],
       sched: null,
       id: null
-    },
-    selected: ''
+    }
   }),
   created () {
     this.$store.dispatch('calendars/getCalendars')
@@ -79,22 +77,17 @@ export default {
       return this.patients.map(function (i) {
         return {'text': i.info.name, 'value': i.pk}
       })
-    },
-    user: function () {
-      if (this.caregiversSelected) {
-        return this.caregiversSelected[0]
-      } else if (this.patientsSelected) {
-        return this.patientsSelected[0]
-      }
     }
   },
   methods: {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
     toggleAllCaregivers (checked) {
       this.usersActive.caregivers = checked ? this.caregivers.slice() : []
+      console.log('toggleAll', this.usersActive.caregivers)
     },
     updateSelectedCaregivers (checked) {
       this.usersActive.caregivers = checked
+      console.log('updateSelectedCaregivers', this.usersActive.caregivers)
     },
     toggleAllPatients (checked) {
       this.usersActive.patients = checked ? this.patients.slice() : []
