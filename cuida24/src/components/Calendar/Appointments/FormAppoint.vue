@@ -310,24 +310,10 @@ export default {
           local: '',
           specialty: '',
           notify: [],
-          sched: {},
+          sched: null,
           id: null
         }
-        // this.$router.push({ name: 'calendar' })
       }
-      // this.formData = {
-      //   dateValue: '',
-      //   timeValue: '',
-      //   allDay: true,
-      //   duration: 0,
-      //   durationUnit: '',
-      //   local: '',
-      //   specialty: '',
-      //   notify: [],
-      //   sched: {},
-      //   id: null
-      // }
-      // this.$router.push({ name: 'calendar' })
     },
     updateNotify () {
       if (this.formData.dateValue) {
