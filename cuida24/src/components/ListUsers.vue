@@ -1,27 +1,13 @@
 <template>
   <div>
-    <b-form-group>
-      <template slot="label">
-        <b>{{ listName }}:</b><br>
-        <b-form-checkbox
-          v-model="allSelected"
-          @change="toggleAll"
-        >
-          {{ allSelected ? 'Limpar seleção' : 'Selecionar todos' }}
-        </b-form-checkbox>
-      </template>
-
-      <b-form-checkbox-group
-        id="users"
-        :checked="selected"
-        :options="users"
-        name="users"
-        stacked
-        buttons
-        button-variant="light"
-        @change="updateSelected"
-      ></b-form-checkbox-group>
-    </b-form-group>
+    <b-table
+      selectable
+      select-mode="multi"
+      selectedVariant="success"
+      :items="users"
+      :fields="fields"
+      @row-selected="rowSelected"
+    ></b-table>
   </div>
 </template>
 
@@ -36,21 +22,26 @@
       users: {
         required: true,
         type: Array
-      },
-      selected: {
-        type: Array,
-        default: []
       }
     },
     data: () => ({
-      allSelected: false
+      allSelected: false,
+      selected: [],
+      fields: {
+        'info.name': {
+          'label': 'Nome'
+        }
+      }
     }),
-    methods: {
-      toggleAll (checked) {
-        this.$emit('toggleAll', checked)
-      },
-      updateSelected (checked) {
+    watch: {
+      selected: function (checked) {
         this.$emit('updateSelected', checked)
+      }
+    },
+    methods: {
+      rowSelected (users) {
+        this.selected = users
+        this.$emit('updateSelected', users)
       }
     }
   }

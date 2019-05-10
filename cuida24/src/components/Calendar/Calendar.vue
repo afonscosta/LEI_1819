@@ -1,22 +1,19 @@
 <template>
   <div>
-    <b-container v-if="selected === ''">
+    <b-container>
       <b-row sm="auto">
         <b-col md="6" cols="6">
           <listUsers 
             :listName="'Cuidadores'"
-            :users="caregiversParsed"
-            :selected="usersActive.caregivers"
-            @toggleAll="toggleAllCaregivers"
+            :users="caregivers"
             @updateSelected="updateSelectedCaregivers"
           ></listUsers>
         </b-col>
         <b-col md="6" cols="6">
           <listUsers 
             :listName="'Utentes'"
-            :users="patientsParsed"
+            :users="patients"
             :selected="usersActive.patients"
-            @toggleAll="toggleAllPatients"
             @updateSelected="updateSelectedPatients"
           ></listUsers>
         </b-col>
@@ -49,8 +46,7 @@ export default {
       notify: [],
       sched: null,
       id: null
-    },
-    selected: ''
+    }
   }),
   created () {
     this.$store.dispatch('calendars/getCalendars')
@@ -79,28 +75,19 @@ export default {
       return this.patients.map(function (i) {
         return {'text': i.info.name, 'value': i.pk}
       })
-    },
-    user: function () {
-      if (this.caregiversSelected) {
-        return this.caregiversSelected[0]
-      } else if (this.patientsSelected) {
-        return this.patientsSelected[0]
-      }
     }
   },
   methods: {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    toggleAllCaregivers (checked) {
-      this.usersActive.caregivers = checked ? this.caregivers.slice() : []
-    },
     updateSelectedCaregivers (checked) {
-      this.usersActive.caregivers = checked
-    },
-    toggleAllPatients (checked) {
-      this.usersActive.patients = checked ? this.patients.slice() : []
+      this.usersActive.caregivers = checked.map(function (c) {
+        return c.pk
+      })
     },
     updateSelectedPatients (checked) {
-      this.usersActive.patients = checked
+      this.usersActive.patients = checked.map(function (p) {
+        return p.pk
+      })
     },
     goToAppointments () {
       this.$router.push({ name: 'appointments' })
