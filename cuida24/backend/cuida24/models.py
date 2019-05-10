@@ -552,6 +552,47 @@ class SessionSerializer(serializers.ModelSerializer):
         session.participants.set(participants)
         return session
 
+    def update(self, instance, validated_data):
+        logger.info("UPDATE SESSION")
+        logger.info("VALIDATED DATA POST SESSION")
+        logger.info(validated_data)
+        request = self.context.get("request")
+        event = get_object_or_404(Event, pk=request['details']['pk'])
+        event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
+        if event_serializer.is_valid(raise_exception=False):
+            event_serializer.save()
+
+        notifications = Notification.objects.filter(event=event)
+        actual_number_notification = len(notifications)
+        actual_index_change = 0
+        for income_notification in request['notification']:
+            if actual_index_change < actual_number_notification:
+                notification = notifications[actual_index_change]
+                notification.dateTime = income_notification
+                notification.save()
+                actual_index_change += 1
+            else:
+                notification_req_data = {'dateTime': income_notification, 'event': event}
+                Notification.objects.create(**notification_req_data)
+
+        # update instance
+        instance.topic = validated_data.get("topic", instance.topic)
+        instance.type = validated_data.get("type", instance.type)
+        instance.description = validated_data.get("description", instance.description)
+        instance.goal = validated_data.get("goal", instance.goal)
+        instance.material = validated_data.get("material", instance.material)
+        instance.state = validated_data.get("state", instance.state)
+        participants = []
+        for user in request['participants']['caregivers']:
+            participants.append(get_object_or_404(Caregiver, pk=user).info)
+
+        for user in request['participants']['patients']:
+            participants.append(get_object_or_404(Patient, pk=user).info)
+        instance.participants.set(participants)
+        instance.save()
+
+        return instance
+
 
 class Evaluation(models.Model):
     comment = models.TextField()

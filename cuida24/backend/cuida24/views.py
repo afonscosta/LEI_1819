@@ -44,36 +44,32 @@ class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
 
     """
-       Get method by user id
-    
-
-    def list(self, request, *args, **kwargs):
+       Get method by user id 
+    """
+    def list(self, request,*args, **kwargs):
         logger.info("GET EVENT")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
+        #logger.info(request.data)
+        #data = request.data['users']
         is_patient = False
-        if data['caregivers']:
-            user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
-        else:
-            user = get_object_or_404(Patient, pk=data['patients'][0])
-            is_patient = True
-        queryset = Appointment.objects.filter(user=user.info)
-        serializer_appointment = AppointmentSerializer(queryset, many=True)
-        for appointment in serializer_appointment.data:
-          queryset2 = Notification.objects.filter(event=appointment['details']['pk']).values('dateTime')
-          serializer_notification = NotificationSerializer(queryset2, many=True)
-          appointment['details']['notification'] = serializer_notification.data
-          if is_patient:
-            appointment['patientPK'] = user.pk
-          else:
-            appointment['caregiverPK'] = user.pk
-        logger.info("SERIALIZER RETURN DATA")
-        logger.info(serializer_appointment.data)
-        sent_data = getAppointmentBackToFrontJSON(serializer_appointment.data)
-        logger.info("RETURN DATA")
+        sent_data = {'appointments': [], 'sessions': []}
+        participants = []
+        for user in data['caregivers']:
+            user = get_object_or_404(Caregiver, pk=user)
+            participants.append(user.info)
+            serializer_data = getAppointments(user, is_patient)
+            sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+        for user in data['patients']:
+            user = get_object_or_404(Patient, pk=user)
+            participants.append(user.info)
+            serializer_data = getAppointments(user, is_patient)
+            sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+        # get session
+        serializer_data = getSessions(participants)
+        sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
         logger.info(sent_data)
         return Response(sent_data, status=status.HTTP_200_OK)
- """
 
 
 class CalendarViewSet(viewsets.ModelViewSet):
@@ -133,19 +129,10 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         else:
             user = get_object_or_404(Patient, pk=data['patients'][0])
             is_patient = True
-        queryset = Appointment.objects.filter(user=user.info)
-        serializer_appointment = AppointmentSerializer(queryset, many=True)
-        for appointment in serializer_appointment.data:
-            queryset2 = Notification.objects.filter(event=appointment['details']['pk']).values('dateTime')
-            serializer_notification = NotificationSerializer(queryset2, many=True)
-            appointment['details']['notification'] = serializer_notification.data
-            if is_patient:
-                appointment['patientPK'] = user.pk
-            else:
-                appointment['caregiverPK'] = user.pk
+        serializer_data = getAppointments(user, is_patient)
         logger.info("SERIALIZER RETURN DATA")
-        logger.info(serializer_appointment.data)
-        sent_data = getAppointmentBackToFrontJSON(serializer_appointment.data)
+        logger.info(serializer_data)
+        sent_data = getAppointmentBackToFrontJSON(serializer_data)
         logger.info("RETURN DATA")
         logger.info(sent_data)
         return Response(sent_data, status=status.HTTP_200_OK)
@@ -221,6 +208,51 @@ class SessionsViewSet(viewsets.ModelViewSet):
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    """
+        Update method
+    """
+
+    def put(self, request):
+        logger.info("PUT SESSION")
+        logger.info(request.data)
+        req_data = sessionFrontToBackJSON(request.data)
+        session = get_object_or_404(Session, pk=req_data['pk'])
+        logger.info(session.topic)
+        serializer = SessionSerializer(data=req_data, instance=session, context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = sessionBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    """
+      Get method
+    """
+    def list(self, request, *args, **kwargs):
+        logger.info("GET SESSION")
+        # logger.info(request.data)
+        # data = request.data['users']
+        logger.info(request.GET)
+        data = json.loads(dict(request.GET)['users'][0])
+        sent_data = []
+        participants = []
+        for user in data['caregivers']:
+            user = get_object_or_404(Caregiver, pk=user)
+            participants.append(user.info)
+        for user in data['patients']:
+            user = get_object_or_404(Patient, pk=user)
+            participants.append(user.info)
+        serializer_data = getSessions(participants)
+        sent_data.append(getSessionBackToFrontJSON(serializer_data))
+        return Response(sent_data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def typeSession(self, request):

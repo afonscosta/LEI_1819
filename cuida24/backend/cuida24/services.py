@@ -2,9 +2,14 @@ import copy
 import logging
 import json
 
+from backend.cuida24.models import Appointment, AppointmentSerializer, Notification, NotificationSerializer, Session, \
+  SessionSerializer
 
 logger = logging.getLogger("mylogger")
 
+'''
+Não está a a ser utilizado
+'''
 def eventFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
     req_data = {'event': request['event']['data'], 'calendar': request['event']['data']['calendar'],
@@ -158,13 +163,17 @@ def sessionFrontToBackJSON(request_param):
         req_data['description'] = request['groupSession']['description']
         req_data['goal'] = json.dumps(request['groupSession']['goals'])
         req_data['material'] = json.dumps(request['groupSession']['material'])
-        req_data['topic'] =  request['groupSession']['theme']
+        req_data['topic'] = request['groupSession']['theme']
+        if 'pk' in request['groupSession']:
+            req_data['pk'] = request['groupSession']['pk']
     else:
         req_data['type'] = 'I'
         req_data['description'] = request['individualSession']['description']
         req_data['goal'] = json.dumps(request['individualSession']['goals'])
         req_data['material'] = json.dumps(request['individualSession']['material'])
         req_data['topic'] = request['individualSession']['theme']
+        if 'pk' in request['individualSession']:
+            req_data['pk'] = request['individualSession']['pk']
 
     req_data['state'] = 'E'
 
@@ -211,3 +220,67 @@ def sessionBackToFrontJSON(request_param, serializer_data):
     else:
         sent_data['individualSession']['pk'] = serializer_data['pk']
     return sent_data
+
+
+def getSessionBackToFrontJSON(serializer_appointment_data):
+    request = copy.deepcopy(serializer_appointment_data)
+    req_data = []
+    for session in request:
+        temp = {}
+        temp_session = {'pk': session['pk'],
+                'theme': session['topic'],
+                'description': session['description'],
+                'goal': json.loads(session['goal']),
+                'material': json.loads(session['material'])
+                }
+        if session['type'] == 'I':
+            temp['individualSession'] = temp_session
+        else:
+            temp['groupSession'] = temp_session
+        temp_event = {'event': {
+                        'data': {
+                          'calendar': session['details']['calendar']['pk'],
+                          'color': session['details']['calendar']['color'],
+                          'description': session['details']['description'],
+                          'forecolor': session['details']['calendar']['forecolor'],
+                          'location': session['details']['location'],
+                          'notify': notificationBackToFrontJSON(session['details']['notification']),
+                          'title': session['details']['title']
+                        },
+                        'id': session['details']['pk'],
+                        'schedule': scheduleBackToFrontJSON(session['details']['schedule']),
+                        'participants': session['participants'],
+                        'occurrenceDate': {
+                            'dayOfMonth': session['details']['dayOfMonth'],
+                            'month': session['details']['month'],
+                            'year': session['details']['year']
+                          }
+                      }
+        }
+        temp.update(temp_event)
+        req_data.append(temp)
+    return req_data
+
+
+def getAppointments(user, is_patient):
+    # get appointments
+    queryset = Appointment.objects.filter(user=user.info)
+    serializer_appointment = AppointmentSerializer(queryset, many=True)
+    for appointment in serializer_appointment.data:
+        queryset2 = Notification.objects.filter(event=appointment['details']['pk']).values('dateTime')
+        serializer_notification = NotificationSerializer(queryset2, many=True)
+        appointment['details']['notification'] = serializer_notification.data
+        if is_patient:
+            appointment['patientPK'] = user.pk
+        else:
+            appointment['caregiverPK'] = user.pk
+    return serializer_appointment.data
+
+def getSessions(participants):
+    queryset = Session.objects.filter(participants__in=participants).distinct()
+    serializer_session = SessionSerializer(queryset, many=True)
+    for session in serializer_session.data:
+        queryset2 = Notification.objects.filter(event=session['details']['pk']).values('dateTime')
+        serializer_notification = NotificationSerializer(queryset2, many=True)
+        session['details']['notification'] = serializer_notification.data
+    return serializer_session.data
