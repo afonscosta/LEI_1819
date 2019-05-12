@@ -168,7 +168,7 @@ def sessionFrontToBackJSON(request_param):
         req_data['type'] = 'G'
         req_data['description'] = request['groupSession']['description']
         req_data['goal'] = json.dumps(request['groupSession']['goals'])
-        req_data['material'] = json.dumps(request['groupSession']['material'])
+        req_data['material'] = json.dumps(request['groupSession']['materials'])
         req_data['topic'] = request['groupSession']['theme']
         if 'pk' in request['groupSession']:
             req_data['pk'] = request['groupSession']['pk']
