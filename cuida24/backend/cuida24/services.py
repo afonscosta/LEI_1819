@@ -176,7 +176,7 @@ def sessionFrontToBackJSON(request_param):
         req_data['type'] = 'I'
         req_data['description'] = request['individualSession']['description']
         req_data['goal'] = json.dumps(request['individualSession']['goals'])
-        req_data['material'] = json.dumps(request['individualSession']['material'])
+        req_data['material'] = json.dumps(request['individualSession']['materials'])
         req_data['topic'] = request['individualSession']['theme']
         if 'pk' in request['individualSession']:
             req_data['pk'] = request['individualSession']['pk']
@@ -242,8 +242,8 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
         temp_session = {'pk': session['pk'],
                 'theme': session['topic'],
                 'description': session['description'],
-                'goal': json.loads(session['goal']),
-                'material': json.loads(session['material'])
+                'goals': json.loads(session['goal']),
+                'materials': json.loads(session['material'])
                 }
         if session['type'] == 'I':
             temp['individualSession'] = temp_session
