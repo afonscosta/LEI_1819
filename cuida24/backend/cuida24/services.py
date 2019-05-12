@@ -240,11 +240,12 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
     for session in request:
         temp = {}
         temp_session = {'pk': session['pk'],
-                'theme': session['topic'],
-                'description': session['description'],
-                'goals': json.loads(session['goal']),
-                'materials': json.loads(session['material'])
-                }
+                        'theme': session['topic'],
+                        'description': session['description'],
+                        'goals': json.loads(session['goal']),
+                        'materials': json.loads(session['material']),
+                        'state': session['state']
+        }
         if session['type'] == 'I':
             temp['individualSession'] = temp_session
         else:
