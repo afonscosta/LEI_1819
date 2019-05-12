@@ -20,7 +20,7 @@
       </b-row>
     </b-container>
     <b-button @click="goToAppointments">Consultas</b-button>
-    <b-button @click="goToGroupSession">Sessões de Grupo</b-button>
+    <b-button @click="goToSessions">Sessões de Grupo</b-button>
   </div>
 </template>
 
@@ -65,17 +65,7 @@ export default {
     }),
     ...mapGetters('calendars', [
       'calendarAppoint'
-    ]),
-    caregiversParsed: function () {
-      return this.caregivers.map(function (i) {
-        return {'text': i.info.name, 'value': i.pk}
-      })
-    },
-    patientsParsed: function () {
-      return this.patients.map(function (i) {
-        return {'text': i.info.name, 'value': i.pk}
-      })
-    }
+    ])
   },
   methods: {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
@@ -92,8 +82,8 @@ export default {
     goToAppointments () {
       this.$router.push({ name: 'appointments' })
     },
-    goToGroupSession () {
-      this.$router.push({ name: 'groupSession' })
+    goToSessions () {
+      this.$router.push({ name: 'sessions' })
     }
     // weekSpanOfMonth (dt) {
     //   // month_number is in the range 1..12

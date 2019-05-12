@@ -33,31 +33,37 @@ const mutations = {
 }
 
 const actions = {
+  setAppointments ({ commit }, appointments) {
+    console.log('set appointments', appointments)
+    commit('setAppointments', appointments)
+    this.dispatch('events/addEvents', appointments)
+  },
   getAppointments ({ commit }, payload) {
     appointmentService.fetchAppointments(payload)
       .then(appointments => {
+        console.log('getAppointments', appointments)
         commit('setAppointments', appointments)
-        this.dispatch('calendar/setEvents', appointments)
+        this.dispatch('events/setEvents', appointments)
       })
   },
   addAppointment ({ commit }, appointment) {
     appointmentService.postAppointment(appointment)
       .then(newAppointment => {
         commit('addAppointment', newAppointment)
-        this.dispatch('calendar/addEvent', newAppointment.event)
+        this.dispatch('events/addEvent', newAppointment.event)
       })
   },
   updateAppointment ({ commit }, appointment) {
     appointmentService.putAppointment(appointment)
       .then(() => {
         commit('updateAppointment', appointment)
-        this.dispatch('calendar/updateEvent', appointment.event)
+        this.dispatch('events/updateEvent', appointment.event)
       })
   },
   deleteAppointment ({ commit }, appointment) {
     appointmentService.deleteAppointment(appointment.appointmentPK)
     commit('deleteAppointment', appointment.appointmentPK)
-    this.dispatch('calendar/deleteEvent', appointment.event.id)
+    this.dispatch('events/deleteEvent', appointment.event.id)
   }
 }
 

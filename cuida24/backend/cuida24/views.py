@@ -45,10 +45,10 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     def list(self, request,*args, **kwargs):
         logger.info("GET EVENT")
-        #logger.info(request.GET)
-        #data = json.loads(dict(request.GET)['users'][0])
-        logger.info(request.data)
-        data = request.data['users']
+        logger.info(request.GET)
+        data = json.loads(dict(request.GET)['users'][0])
+        #logger.info(request.data)
+        #data = request.data['users']
         is_patient = False
         sent_data = {'appointments': [], 'sessions': []}
         participants = []

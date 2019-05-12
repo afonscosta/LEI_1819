@@ -1,4 +1,5 @@
 import { Calendar, Schedule, Event } from 'dayspan'
+import eventsService from '@/services/eventsService'
 
 const state = {
   calendar: Calendar.months(undefined, undefined, undefined, {
@@ -30,6 +31,19 @@ const mutations = {
     cal.addEvents(newEvents)
     state.calendar = cal
   },
+  addEvents (state, events) {
+    var newEvents = events.map(function (ev) {
+      return new Event(
+        new Schedule(ev['event']['schedule']),
+        ev['event']['data'],
+        ev['event']['id'],
+        true
+      )
+    })
+    let cal = Calendar.fromInput(state.calendar)
+    cal.addEvents(newEvents)
+    state.calendar = cal
+  },
   addEvent (state, event) {
     let sched = new Schedule(event['schedule'])
     let cal = Calendar.fromInput(state.calendar)
@@ -57,16 +71,27 @@ const actions = {
   setEvents ({ commit }, events) {
     commit('setEvents', events)
   },
+  addEvents ({ commit }, events) {
+    commit('addEvents', events)
+  },
   addEvent ({ commit }, event) {
     console.log('Novo evento enviado pelo vue', event)
     commit('addEvent', event)
   },
   updateEvent ({ commit }, event) {
-    console.log('Evento enviado pelo vue para ser atualizado', event)
     commit('updateEvent', event)
   },
   deleteEvent ({ commit }, eventID) {
     commit('deleteEvent', eventID)
+  },
+  getEvents ({ commit }, payload) {
+    eventsService.fetchEvents(payload)
+      .then(events => {
+        console.log('sessions/appointments recebidas do django', events)
+        commit('setEvents', [])
+        this.dispatch('appointments/setAppointments', events.appointments[0])
+        this.dispatch('sessions/setSessions', events.sessions[0])
+      })
   }
 }
 
