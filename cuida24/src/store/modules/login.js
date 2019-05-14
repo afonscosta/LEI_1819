@@ -22,8 +22,8 @@ const actions = {
     loginService.getToken(credencials)
       .then(response => {
         commit('setToken', response)
+        console.log('teste de receção token na action ' + state.accesstoken)
       })
-    console.log('teste de receção token na action ' + state.accesstoken)
   }
 }
 

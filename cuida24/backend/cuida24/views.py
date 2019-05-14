@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import permission_required
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
@@ -32,10 +33,17 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
-
 class DefActivityViewSet(viewsets.ModelViewSet):
     queryset = DefActivity.objects.all()
     serializer_class = DefActivitySerializer
+
+    """
+        Get method 
+        """
+    def list(self, request, *args, **kwargs):
+        sent_data = []
+        logger.info(request.user.username)
+        return Response(sent_data, status=status.HTTP_200_OK)
 
 
 class FixAnAppointmentPermssion(permissions.BasePermission):
