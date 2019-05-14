@@ -78,8 +78,8 @@
 <script>
 import { mapState } from 'vuex'
 import * as moment from 'moment'
-import notification from './Notification.vue'
-import calendarApp from './CalendarApp.vue'
+import notification from '@/components/Notification'
+import calendarApp from '@/components/Calendar/CalendarApp'
 
 export default {
 
@@ -94,12 +94,14 @@ export default {
   },
 
   computed: mapState({
-    calendar: state => state.calendar.calendar,
+    calendar: state => state.events.calendar,
     usersActive: state => state.users.usersActive
   }),
 
   created () {
-    this.$store.dispatch('calendar/getEvents', this.usersActive)
+    // if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
+    //   this.$store.dispatch('appointments/getAppointments', this.usersActive)
+    // }
   },
 
   methods:

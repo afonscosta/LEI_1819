@@ -39,10 +39,12 @@ const actions = {
   getUsers ({ commit }) {
     usersService.fetchCaregivers()
       .then(caregivers => {
+        console.log('caregivers', caregivers)
         commit('setCaregivers', caregivers)
       })
     usersService.fetchPatients()
       .then(patients => {
+        console.log('patients', patients)
         commit('setPatients', patients)
       })
   },

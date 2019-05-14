@@ -27,33 +27,43 @@ const mutations = {
     state.appointments = state.appointments.filter(a => a.pk !== appointment.pk)
     state.appointments.push(appointment)
   },
-  deleteEvent (state, appointmentID) {
-    state.appointments = state.appointments.filter(a => a.pk !== appointmentID)
+  deleteAppointment (state, appointmentID) {
+    state.appointments = state.appointments.filter(a => a.appointmentPK !== appointmentID)
   }
 }
 
 const actions = {
+  setAppointments ({ commit }, appointments) {
+    console.log('set appointments', appointments)
+    commit('setAppointments', appointments)
+    this.dispatch('events/addEvents', appointments)
+  },
   getAppointments ({ commit }, payload) {
     appointmentService.fetchAppointments(payload)
       .then(appointments => {
+        console.log('getAppointments', appointments)
         commit('setAppointments', appointments)
+        this.dispatch('events/setEvents', appointments)
       })
   },
   addAppointment ({ commit }, appointment) {
     appointmentService.postAppointment(appointment)
       .then(newAppointment => {
         commit('addAppointment', newAppointment)
+        this.dispatch('events/addEvent', newAppointment.event)
       })
   },
   updateAppointment ({ commit }, appointment) {
-    appointmentService.postAppointment(appointment)
+    appointmentService.putAppointment(appointment)
       .then(() => {
         commit('updateAppointment', appointment)
+        this.dispatch('events/updateEvent', appointment.event)
       })
   },
   deleteAppointment ({ commit }, appointment) {
-    appointmentService.deleteAppointment(appointment.id)
-    commit('deleteAppointment', appointment.id)
+    appointmentService.deleteAppointment(appointment.appointmentPK)
+    commit('deleteAppointment', appointment.appointmentPK)
+    this.dispatch('events/deleteEvent', appointment.event.id)
   }
 }
 

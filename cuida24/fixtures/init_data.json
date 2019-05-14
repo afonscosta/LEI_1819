@@ -18,6 +18,24 @@
     }
   },
   {
+    "model": "cuida24.Calendar",
+    "pk": 3,
+    "fields": {
+       "calendar": "Sessões de Grupo",
+       "color": "#4CAF50",
+       "forecolor": "#ffffff"
+    }
+  },
+  {
+    "model": "cuida24.Calendar",
+    "pk": 4,
+    "fields": {
+       "calendar": "Sessões Individuais",
+       "color": "#FFC107",
+       "forecolor": "#ffffff"
+    }
+  },
+  {
     "model": "cuida24.User",
     "pk": 1,
     "fields": {
@@ -26,9 +44,37 @@
   },
   {
     "model": "cuida24.User",
+    "pk": 4,
+    "fields": {
+        "name": "cuidador2"
+    }
+  },
+  {
+    "model": "cuida24.User",
+    "pk": 5,
+    "fields": {
+        "name": "cuidador3"
+    }
+  },
+  {
+    "model": "cuida24.User",
     "pk": 2,
     "fields": {
        "name": "utente1"
+    }
+  },
+  {
+    "model": "cuida24.User",
+    "pk": 6,
+    "fields": {
+       "name": "utente2"
+    }
+  },
+  {
+    "model": "cuida24.User",
+    "pk": 7,
+    "fields": {
+       "name": "utente3"
     }
   },
   {
@@ -46,11 +92,41 @@
     }
   },
   {
+    "model": "cuida24.Caregiver",
+    "pk": 2,
+    "fields": {
+       "info": "4"
+    }
+  },
+  {
+    "model": "cuida24.Caregiver",
+    "pk": 3,
+    "fields": {
+       "info": "5"
+    }
+  },
+  {
     "model": "cuida24.Patient",
     "pk": 1,
     "fields": {
        "info": "2",
        "caregiver": "1"
+    }
+  },
+  {
+    "model": "cuida24.Patient",
+    "pk": 2,
+    "fields": {
+       "info": "6",
+       "caregiver": "2"
+    }
+  },
+  {
+    "model": "cuida24.Patient",
+    "pk": 3,
+    "fields": {
+       "info": "7",
+       "caregiver": "3"
     }
   },
   {

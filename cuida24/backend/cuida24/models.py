@@ -321,7 +321,7 @@ class Event(models.Model):
     year = models.IntegerField()
     location = models.TextField()
     description = models.TextField()
-    calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
+    calendar = models.ForeignKey(Calendar, on_delete=models.DO_NOTHING)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
@@ -338,41 +338,55 @@ class EventSerializer(serializers.ModelSerializer):
         depth = 1
 
     def update(self, instance, validated_data):
-        logger.info("UPDATE SERIALIZER EVENT")
-        calendar_data = validated_data.pop("calendar")
+        request = self.context.get("request")
+        calendar_data = request['details']['calendar']
         schedule_data = validated_data.pop("schedule")
         calendar = instance.calendar
         schedule = instance.schedule
 
         # update event fields
         instance.title = validated_data.get("title", instance.title)
-        instance.save()
+        instance.dayOfMonth = validated_data.get("dayOfMonth", instance.dayOfMonth)
+        instance.month = validated_data.get("month", instance.month)
+        instance.year = validated_data.get("year", instance.year)
+        instance.location = validated_data.get("location", instance.location)
+        instance.description = validated_data.get("description", instance.description)
 
         # update calendar fields
         calendar.calendar = calendar_data.get("calendar", calendar.calendar)
+        calendar.color = calendar_data.get("color", calendar.color)
+        calendar.forecolor = calendar_data.get("forecolor", calendar.forecolor)
         calendar.save()
 
         # update schedule fields
         schedule.duration = schedule_data.get("duration", schedule.duration)
+        schedule.durationInDays = schedule_data.get("durationInDays", schedule.durationInDays)
+        schedule.durationUnit = schedule_data.get("durationUnit", schedule.durationUnit)
+        schedule.dayOfWeek = schedule_data.get("dayOfWeek", schedule.dayOfWeek)
+        schedule.dayOfMonth = schedule_data.get("dayOfMonth", schedule.dayOfMonth)
+        schedule.month = schedule_data.get("month", schedule.month)
+        schedule.times = schedule_data.get("times", schedule.times)
+        schedule.year = schedule_data.get("year", schedule.year)
         schedule.save()
 
+        instance.save()
         return instance
 
 
 class Notification(models.Model):
     dateTime = models.TextField()
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    event = EventSerializer(required=False)
+    event = EventSerializer(read_only=True)
 
     class Meta:
         model = Notification
         fields = ('dateTime', 'event', 'pk')
 
-
 # Appointment
+
 
 class Appointment(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
@@ -390,8 +404,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        logger.info("VALIDATED_DATA")
-        logger.info(validated_data)
 
         # Details(event) of appointment
         calendar = get_object_or_404(Calendar, pk=request['details']['calendar']['pk'])
@@ -417,11 +429,25 @@ class AppointmentSerializer(serializers.ModelSerializer):
         return appointment
 
     def update(self, instance, validated_data):
-        logger.info("UPDATE SERIALIZER")
         request = self.context.get("request")
-        logger.info(request)
-        logger.info("VALIDATED_DATA")
-        logger.info(validated_data)
+        event = get_object_or_404(Event, pk=request['details']['pk'])
+        event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
+        if event_serializer.is_valid(raise_exception=False):
+            event_serializer.save()
+
+        notifications = Notification.objects.filter(event=event)
+        actual_number_notification = len(notifications)
+        actual_index_change = 0
+        for income_notification in request['notification']:
+            if actual_index_change < actual_number_notification:
+                notification = notifications[actual_index_change]
+                notification.dateTime = income_notification
+                notification.save()
+                actual_index_change += 1
+            else:
+                notification_req_data = {'dateTime': income_notification,  'event': event}
+                Notification.objects.create(**notification_req_data)
+        return instance
 
 
 
@@ -513,16 +539,86 @@ class Session(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
     state = models.CharField(max_length=1, choices=STATE)
     # Relação many-to-many só tem que estar num model
-    participants = models.ManyToManyField(Caregiver)
+    participants = models.ManyToManyField(User)
 
 
-class SessaoSerializer(serializers.ModelSerializer):
+class SessionSerializer(serializers.ModelSerializer):
     # Relação many-to-many
-    participants = CaregiverSerializer(many=True)
+    participants = UserSerializer(many=True, read_only=True)
+    details = EventSerializer()
 
     class Meta:
         model = Session
         fields = ('topic', 'type', 'description', 'goal', 'material', 'details', 'state', 'participants', 'pk')
+
+    def create(self, validated_data):
+        request = self.context.get("request")
+        logger.info("VALIDATED DATA POST SESSION")
+        logger.info(validated_data)
+        # Details(event) of session
+        calendar = get_object_or_404(Calendar, pk=request['details']['calendar']['pk'])
+        schedule_data = validated_data['details'].pop('schedule')
+        event_data = validated_data.pop('details')
+        schedule = Schedule.objects.create(**schedule_data)
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **event_data)
+
+        # Notification associate to event
+        for notification in request['notification']:
+            notification_req_data = {'dateTime': notification, 'event': event}
+            Notification.objects.create(**notification_req_data)
+
+        # Create appointment with user and event
+        session = Session.objects.create(details=event, **validated_data)
+        participants = []
+        for user in request['participants']['caregivers']:
+            participants.append(get_object_or_404(Caregiver, pk=user).info)
+
+        for user in request['participants']['patients']:
+            participants.append(get_object_or_404(Patient, pk=user).info)
+        logger.info(participants)
+        session.participants.set(participants)
+        return session
+
+    def update(self, instance, validated_data):
+        logger.info("UPDATE SESSION")
+        logger.info("VALIDATED DATA POST SESSION")
+        logger.info(validated_data)
+        request = self.context.get("request")
+        event = get_object_or_404(Event, pk=request['details']['pk'])
+        event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
+        if event_serializer.is_valid(raise_exception=False):
+            event_serializer.save()
+
+        notifications = Notification.objects.filter(event=event)
+        actual_number_notification = len(notifications)
+        actual_index_change = 0
+        for income_notification in request['notification']:
+            if actual_index_change < actual_number_notification:
+                notification = notifications[actual_index_change]
+                notification.dateTime = income_notification
+                notification.save()
+                actual_index_change += 1
+            else:
+                notification_req_data = {'dateTime': income_notification, 'event': event}
+                Notification.objects.create(**notification_req_data)
+
+        # update instance
+        instance.topic = validated_data.get("topic", instance.topic)
+        instance.type = validated_data.get("type", instance.type)
+        instance.description = validated_data.get("description", instance.description)
+        instance.goal = validated_data.get("goal", instance.goal)
+        instance.material = validated_data.get("material", instance.material)
+        instance.state = validated_data.get("state", instance.state)
+        participants = []
+        for user in request['participants']['caregivers']:
+            participants.append(get_object_or_404(Caregiver, pk=user).info)
+
+        for user in request['participants']['patients']:
+            participants.append(get_object_or_404(Patient, pk=user).info)
+        instance.participants.set(participants)
+        instance.save()
+
+        return instance
 
 
 class Evaluation(models.Model):

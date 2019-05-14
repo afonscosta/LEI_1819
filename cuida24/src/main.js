@@ -25,6 +25,8 @@ import Datetime from 'vue-datetime'
 import 'vue-datetime/dist/vue-datetime.css'
 import { Settings } from 'luxon'
 
+import Notifications from 'vue-notification'
+
 import setupNotifications from '@/assets/firebase_notifications.js'
 Vue.prototype.$messaging = setupNotifications.initFirebase()
 
@@ -36,6 +38,7 @@ Settings.defaultLocale = 'pt'
 Vue.use(Datetime)
 Vue.use(BootstrapVue)
 Vue.use(Vuetify)
+Vue.use(Notifications)
 Vue.use(DaySpanVuetify, {
   data:
   {

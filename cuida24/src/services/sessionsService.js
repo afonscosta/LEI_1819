@@ -2,32 +2,29 @@ import cuida24 from '@/services/cuida24'
 import store from '@/store/modules/login'
 
 export default {
-  fetchEvents (payload) {
-    return cuida24.get(`appointments/`, {
-      headers: {
-        Authorization: 'Token ' + store.state.accesstoken
-      },
+  fetchSessions (payload) {
+    return cuida24.get(`sessions/`, {
       params: {
         users: payload
       }
     }).then(response => response.data)
   },
-  postEvent (payload) {
-    return cuida24.post(`appointments/`, payload, {
+  postSession (payload) {
+    return cuida24.post(`sessions/`, payload, {
       headers: {
         Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
-  putEvent (payload) {
-    return cuida24.put(`appointments/`, payload, {
+  putSession (payload) {
+    return cuida24.put(`sessions/`, payload, {
       headers: {
         Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
-  deleteEvent (eventId) {
-    return cuida24.delete(`events/${eventId}`, {
+  deleteSession (sId) {
+    return cuida24.delete(`sessions/${sId}`, {
       headers: {
         Authorization: 'Token ' + store.state.accesstoken
       }
