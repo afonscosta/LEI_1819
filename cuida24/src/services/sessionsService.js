@@ -2,8 +2,8 @@ import cuida24 from '@/services/cuida24'
 import store from '@/store/modules/login'
 
 export default {
-  fetchGroupSessions (payload) {
-    return cuida24.get(`groupSessions/`, {
+  fetchSessions (payload) {
+    return cuida24.get(`sessions/`, {
       params: {
         users: payload
       }
@@ -13,22 +13,22 @@ export default {
       }
     }).then(response => response.data)
   },
-  postGroupSession (payload) {
-    return cuida24.post(`groupSessions/`, payload, {
+  postSession (payload) {
+    return cuida24.post(`sessions/`, payload, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
-  putGroupSession (payload) {
-    return cuida24.put(`groupSessions/`, payload, {
+  putSession (payload) {
+    return cuida24.put(`sessions/`, payload, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
-  deleteGroupSession (gsId) {
-    return cuida24.delete(`groupSessions/${gsId}`, {
+  deleteSession (sId) {
+    return cuida24.delete(`sessions/${sId}`, {
       headers: {
         Authorization: 'Bearer ' + store.state.accesstoken
       }

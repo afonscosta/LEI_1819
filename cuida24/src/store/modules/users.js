@@ -12,6 +12,12 @@ const state = {
 }
 
 const getters = {
+  getCaregiverByInfoId: (state) => (id) => {
+    return state.users.caregivers.find(u => u.info.pk === id)
+  },
+  getPatientByInfoId: (state) => (id) => {
+    return state.users.patients.find(u => u.info.pk === id)
+  },
   users: state => {
     return state.users
   },
@@ -39,10 +45,12 @@ const actions = {
   getUsers ({ commit }) {
     usersService.fetchCaregivers()
       .then(caregivers => {
+        console.log('caregivers', caregivers)
         commit('setCaregivers', caregivers)
       })
     usersService.fetchPatients()
       .then(patients => {
+        console.log('patients', patients)
         commit('setPatients', patients)
       })
   },

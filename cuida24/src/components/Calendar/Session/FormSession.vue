@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <h3 
       v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0"
     >Não foi selecionado nenhum utilizador.</h3>
@@ -8,13 +7,13 @@
       v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0"
     >Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
 
-    <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
+    <b-container>
       <b-row sm="auto">
         <b-col md="6" sm="12">
           <b-form @submit.prevent="onSubmit">
             <b-form-input
               id="theme"
-              v-model="groupSession.theme"
+              v-model="session.theme"
               required
               placeholder="Introduza o tema da sessão de grupo"
             ></b-form-input>
@@ -69,7 +68,7 @@
 
             <b-form-textarea
               id="description"
-              v-model="groupSession.description"
+              v-model="session.description"
               required
               rows="3"
               max-rows="6"
@@ -78,7 +77,7 @@
 
             <b-list-group>
               <b-list-group-item
-                v-for="g in groupSession.goals"
+                v-for="g in session.goals"
                 :key="g"
               >{{ g }}</b-list-group-item>
             </b-list-group>
@@ -91,7 +90,7 @@
 
             <b-list-group>
               <b-list-group-item
-                v-for="m in groupSession.material"
+                v-for="m in session.materials"
                 :key="m"
               >{{ m }}</b-list-group-item>
             </b-list-group>
@@ -114,7 +113,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import { DateTime as LuxonDateTime } from 'luxon'
 import notification from '@/components/Notification.vue'
 import schedule from '@/components/Schedule'
@@ -122,14 +121,14 @@ import calReadOnly from '@/components/Calendar/CalendarReadOnly'
 import { format, parse, subDays, subMonths } from 'date-fns'
 
 export default {
-  name: 'formGroupSession',
+  name: 'formSession',
   components: {
     notification,
     schedule,
     calReadOnly
   },
   props: {
-    groupSessionData: {
+    sessionData: {
       default: null,
       type: Object
     },
@@ -173,12 +172,24 @@ export default {
     }
   },
   data: () => ({
-    groupSession: {
+    session: {
       theme: '',
       description: '',
       goals: [],
-      material: [],
-      state: 'waiting'
+      materials: [],
+      state: 'E',
+      pk: null
+    },
+    form: {
+      dateValue: '',
+      timeValue: '',
+      allDay: true,
+      duration: 0,
+      durationUnit: '',
+      local: '',
+      notify: [],
+      sched: null,
+      id: null
     },
     item: '',
     goal: '',
@@ -193,41 +204,40 @@ export default {
       { text: 'dia', value: 'days' },
       { text: 'semana', value: 'weeks' },
       { text: 'mês', value: 'months' }
-    ],
-    show: true,
-    form: {
-      dateValue: '',
-      timeValue: '',
-      allDay: true,
-      duration: 0,
-      durationUnit: '',
-      local: '',
-      notify: [],
-      sched: null,
-      id: null
-    }
+    ]
   }),
   created () {
-    if (this.groupSessionData) {
-      this.groupSession = this.groupSessionData
+    if (this.sessionData) {
+      this.session = this.sessionData
       this.form = this.formData
+      console.log('dentro')
     }
+    console.log('fora')
   },
   computed: {
     ...mapState({
       usersActive: state => state.users.usersActive
     }),
     ...mapGetters('calendars', [
-      'calendarGroupSession'
+      'calendarGroupSession',
+      'calendarIndivSession'
     ])
   },
   methods: {
+    ...mapActions('sessions', [
+      'addGroupSession',
+      'updateGroupSession',
+      'deleteGroupSession',
+      'addIndivSession',
+      'updateIndivSession',
+      'deleteIndivSession'
+    ]),
     addToMaterial () {
-      this.groupSession.material.push(this.item)
+      this.session.materials.push(this.item)
       this.item = ''
     },
     addToGoals () {
-      this.groupSession.goals.push(this.goal)
+      this.session.goals.push(this.goal)
       this.goal = ''
     },
     onSubmit (evt) {
@@ -235,22 +245,44 @@ export default {
       let payload = {}
       if ((this.usersActive.caregivers.length + this.usersActive.patients.length) === 1) {
         payload = {
-          'individualSession': this.groupSession,
+          'individualSession': this.session,
           'event': eventData
         }
+        payload.event.data.calendar = this.calendarIndivSession.pk
+        payload.event.data.color = this.calendarIndivSession.color
+        payload.event.data.forecolor = this.calendarIndivSession.forecolor
+        payload.event.data.title = 'Sessão Individual'
       } else {
         payload = {
-          'groupSession': this.groupSession,
+          'groupSession': this.session,
           'event': eventData
         }
       }
-      this.$emit('returnGroupSession', payload)
-      this.groupSession = {
+      if (payload.groupSession && payload.event.id) {
+        this.updateGroupSession(payload)
+        this.$emit('groupSessionUpdated', payload.event.occurrenceDate)
+      } else if (payload.individualSession && payload.event.id) {
+        this.updateIndivSession(payload)
+        this.$emit('indivSessionUpdated', payload.event.occurrenceDate)
+      } else if (payload.groupSession) {
+        this.addGroupSession(payload)
+        this.$notify({
+          title: 'A sessão de grupo foi adicionada com sucesso.',
+          duration: 3000
+        })
+      } else if (payload.individualSession) {
+        this.addIndivSession(payload)
+        this.$notify({
+          title: 'A sessão individual foi adicionada com sucesso.',
+          duration: 3000
+        })
+      }
+      this.session = {
         theme: '',
         description: '',
         goals: [],
-        material: [],
-        state: 'waiting'
+        materials: [],
+        state: 'E'
       }
       this.form = {
         dateValue: '',
@@ -311,11 +343,11 @@ export default {
       let data = {
         'calendar': this.calendarGroupSession.pk,
         'color': this.calendarGroupSession.color,
-        'description': this.groupSession.theme + ' - ' + this.groupSession.description,
+        'description': this.session.theme + ' - ' + this.session.description,
         'forecolor': this.calendarGroupSession.forecolor,
         'location': this.form.local,
         'notify': this.form.notify,
-        'title': 'Sessão de grupo'
+        'title': 'Sessão de Grupo'
       }
       if (!this.form.sched) {
         let dt = LuxonDateTime.fromISO(this.form.dateValue)

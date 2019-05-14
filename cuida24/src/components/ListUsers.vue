@@ -1,12 +1,10 @@
 <template>
   <div>
     <b-table
-      selectable
-      select-mode="multi"
-      selectedVariant="success"
       :items="users"
       :fields="fields"
-      @row-selected="rowSelected"
+      :tbody-tr-class="rowClass"
+      @row-clicked="rowClicked"
     ></b-table>
   </div>
 </template>
@@ -22,26 +20,37 @@
       users: {
         required: true,
         type: Array
+      },
+      selected: {
+        required: true,
+        type: Array
+      },
+      readOnly: {
+        required: true,
+        type: Boolean
       }
     },
     data: () => ({
       allSelected: false,
-      selected: [],
       fields: {
         'info.name': {
           'label': 'Nome'
         }
       }
     }),
-    watch: {
-      selected: function (checked) {
-        this.$emit('updateSelected', checked)
-      }
-    },
     methods: {
-      rowSelected (users) {
-        this.selected = users
-        this.$emit('updateSelected', users)
+      rowClicked (user) {
+        if (!this.readOnly) {
+          if (this.selected.find(u => u.pk === user.pk)) {
+            this.$emit('removeSelected', user.pk)
+          } else {
+            this.$emit('addSelected', user)
+          }
+        }
+      },
+      rowClass (user, type) {
+        if (!user) return
+        if (this.selected.find(u => u.info.pk === user.info.pk)) return 'table-success'
       }
     }
   }

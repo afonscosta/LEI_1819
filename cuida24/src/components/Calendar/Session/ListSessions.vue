@@ -1,0 +1,411 @@
+<template>
+  <div>
+    <b-modal 
+      ref="modal-group"
+      hide-footer title="Eliminação de sessão de grupo"
+    >
+      <div class="d-block text-center">
+        <h3>Tem a certeza que pretende eliminar a sessão de grupo?</h3>
+      </div>
+      <b-button class="mt-2" variant="success" block @click="confirme('group', false)">Não</b-button>
+      <b-button class="mt-3" variant="danger" block @click="confirme('group', true)">Sim</b-button>
+    </b-modal>
+
+    <b-modal 
+      ref="modal-indiv"
+      hide-footer title="Eliminação de sessão individual"
+    >
+      <div class="d-block text-center">
+        <h3>Tem a certeza que pretende eliminar a sessão individual?</h3>
+      </div>
+      <b-button class="mt-2" variant="success" block @click="confirme('indiv', false)">Não</b-button>
+      <b-button class="mt-3" variant="danger" block @click="confirme('indiv', true)">Sim</b-button>
+    </b-modal>
+
+    <b-modal 
+      ref="modal-participants"
+      hide-footer centered
+      title="Participantes da Sessão"
+    >
+      <b-container>
+        <b-row>
+          <b-col>
+            <p>Os utilizadores a <b><span style="color: #5FBA7D">verde</span></b> encontram-se inscritos na sessão de grupo.</p>
+            <p v-if="(participantsCaregivers.length + participantsPatients.length) === 2" style="color: #E01325">Mínimo de participantes para a sessão de grupo foi atingido. Não pode ser removido mais nenhum utilizador.</p><br>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <h5><b>Cuidadores</b></h5>
+            <ListUsers 
+              :listName="'Cuidadores'"
+              :users="caregivers"
+              :selected="participantsCaregivers"
+              :readOnly="!editingPartiMode"
+              @removeSelected="removeSelectedCaregiver"
+              @addSelected="addSelectedCaregiver"
+            ></ListUsers>
+          </b-col>
+          <b-col>
+            <h5><b>Utentes</b></h5>
+            <ListUsers 
+              :listName="'Utentes'"
+              :users="patients"
+              :selected="participantsPatients"
+              :readOnly="!editingPartiMode"
+              @removeSelected="removeSelectedPatient"
+              @addSelected="addSelectedPatient"
+            ></ListUsers>
+          </b-col>
+        </b-row>
+      </b-container>
+      <b-button
+        v-if="!editingPartiMode"
+        class="mt-2"
+        block
+        @click="editingPartiMode = true"
+      >Editar</b-button>
+      <b-button v-if="editingPartiMode" class="mt-2" variant="success" block @click="confirme('part', false)">Não</b-button>
+      <b-button v-if="editingPartiMode" class="mt-3" variant="danger" block @click="confirme('part', true)">Sim</b-button>
+    </b-modal>
+
+    <b-container>
+      <b-row class="justify-content-md-center">
+        <b-col xl="8" lg="8" md="8" sm="12" cols="12">
+          <b-button 
+            @click="goToFormSession"
+            v-if="(usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0) && (usersActive.caregivers.length + usersActive.patients.length) === 1"
+          >Adicionar Sessão Individual</b-button>
+          <b-button 
+            @click="goToFormSession"
+            v-if="(usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0) && (usersActive.caregivers.length + usersActive.patients.length) > 1"
+          >Adicionar Sessão de Grupo</b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+
+    <b-container
+      v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0"
+    >
+      <b-row class="justify-content-md-center">
+        <b-col xl="8" lg="8" md="8" sm="12" cols="12">
+          <h3 v-if="groupSessions.length === 0 && indivSessions.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões para os utilizadores selecionados.</h3>
+
+          <h3 v-if="groupSessions.length === 0 && indivSessions.length !== 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões de grupo para os utilizadores selecionados.</h3>
+
+          <b-card
+            v-for="gs in groupSessions"
+            :key="gs.pk"
+            border-variant="dark"
+            header="Sessão de Grupo"
+          >
+            <b-container>
+              <b-row align-v="center" class="justify-content-md-center">
+                <b-col md="7" cols="12">
+                  <b-card-text align="left"><b>Tema:</b> {{ gs.groupSession.theme }}</b-card-text>
+                  <b-card-text align="left"><b>Descrição:</b> {{ gs.groupSession.description }}</b-card-text>
+                  <b-card-text align="left"><b>Objetivos:</b>
+                    <ul>
+                      <li v-for="(goal, idx) in gs.groupSession.goals">
+                        {{ goal }}
+                      </li>
+                    </ul>
+                  </b-card-text>
+                  <b-card-text align="left"><b>Material necessário:</b> 
+                    <ul>
+                      <li v-for="(item, idx) in gs.groupSession.materials">
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </b-card-text>
+                  <b-card-text align="left"><b>Estado:</b> {{ gs.groupSession.state }}</b-card-text>
+                </b-col>
+                <b-col md="5" cols="12">
+                  <b-card-text align="left"><b>Data:</b> {{ gs.event.occurrenceDate.dayOfMonth + '/' + gs.event.occurrenceDate.month + '/' + gs.event.occurrenceDate.year }}</b-card-text>
+                  <b-card-text v-if="gs.event.schedule.times" align="left">
+                    <b>Hora:</b> {{ gs.event.schedule.times[0] }}
+                  </b-card-text>
+                  <b-card-text v-if="!gs.event.schedule.times" align="left">
+                    <b>Duração:</b> Todo o dia
+                  </b-card-text>
+                  <b-card-text v-if="gs.event.schedule.duration" align="left">
+                    <b>Duração:</b> {{ appt.event.schedule.duration + " " + durationUnitTranslated(appt.event.schedule.durationUnit) }}
+                  </b-card-text>
+                  <b-card-text align="left">
+                    <b>Localização:</b> {{ gs.event.data.location }}
+                  </b-card-text>
+                </b-col>
+              </b-row>
+            </b-container>
+            <b-button variant="danger" @click="removeGroupSession(gs.pk)">Eliminar</b-button>
+            <b-button @click="editGroupSession(gs)">Editar</b-button>
+            <b-button @click="editParticipants(gs)">Participantes</b-button>
+          </b-card>
+
+          <h3 v-if="groupSessions.length !== 0 && indivSessions.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões individuais para o(s) utilizador(es) selecionado(s).</h3>
+
+          <b-card
+            v-for="is in indivSessions"
+            :key="is.pk"
+            border-variant="dark"
+            header="Sessão Individual"
+          >
+            <b-container>
+              <b-row align-v="center" class="justify-content-md-center">
+                <b-col md="7" cols="12">
+                  <b-card-text align="left"><b>Tema:</b> {{ is.individualSession.theme }}</b-card-text>
+                  <b-card-text align="left"><b>Descrição:</b> {{ is.individualSession.description }}</b-card-text>
+                  <b-card-text align="left"><b>Objetivos:</b>
+                    <ul>
+                      <li v-for="(goal, idx) in is.individualSession.goals">
+                        {{ goal }}
+                      </li>
+                    </ul>
+                  </b-card-text>
+                  <b-card-text align="left"><b>Material necessário:</b> 
+                    <ul>
+                      <li v-for="(item, idx) in is.individualSession.materials">
+                        {{ item }}
+                      </li>
+                    </ul>
+                  </b-card-text>
+                  <b-card-text align="left"><b>Estado:</b> {{ is.individualSession.state }}</b-card-text>
+                </b-col>
+                <b-col md="5" cols="12">
+                  <b-card-text align="left"><b>Data:</b> {{ is.event.occurrenceDate.dayOfMonth + '/' + is.event.occurrenceDate.month + '/' + is.event.occurrenceDate.year }}</b-card-text>
+                  <b-card-text v-if="is.event.schedule.times" align="left">
+                    <b>Hora:</b> {{ is.event.schedule.times[0] }}
+                  </b-card-text>
+                  <b-card-text v-if="!is.event.schedule.times" align="left">
+                    <b>Duração:</b> Todo o dia
+                  </b-card-text>
+                  <b-card-text v-if="is.event.schedule.duration" align="left">
+                    <b>Duração:</b> {{ appt.event.schedule.duration + " " + durationUnitTranslated(appt.event.schedule.durationUnit) }}
+                  </b-card-text>
+                  <b-card-text align="left">
+                    <b>Localização:</b> {{ is.event.data.location }}
+                  </b-card-text>
+                  <b-card-text align="left">
+                    <b>Participante:</b> {{ is.event.participants[0].name }}
+                  </b-card-text>
+                </b-col>
+              </b-row>
+            </b-container>
+            <b-button variant="danger" @click="removeIndivSession(is.pk)">Eliminar</b-button>
+            <b-button @click="editIndivSession(is)">Editar</b-button>
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-container>
+  </div>
+</template>
+
+<script>
+import { mapGetters, mapActions, mapState } from 'vuex'
+import FormSession from './FormSession'
+import ListUsers from '@/components/ListUsers'
+
+export default {
+  name: 'listSessions',
+  components: {
+    FormSession,
+    ListUsers
+  },
+  props: {
+  },
+  data: () => ({
+    groupSessionToRemove: null,
+    updateGSParticipants: null,
+    indivSessionToRemove: null,
+    participantsCaregivers: [],
+    participantsPatients: [],
+    editingPartiMode: false
+  }),
+  created () {
+    if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
+      this.$store.dispatch('events/getEvents', this.usersActive)
+    }
+  },
+  computed: {
+    ...mapState({
+      groupSessions: state => state.sessions.groupSessions,
+      indivSessions: state => state.sessions.indivSessions,
+      usersActive: state => state.users.usersActive,
+      caregivers: state => state.users.users.caregivers,
+      patients: state => state.users.users.patients
+    }),
+    ...mapGetters('users', [
+      'getCaregiverByInfoId',
+      'getPatientByInfoId'
+    ])
+  },
+  watch: {
+    editingPartiMode: function (val) {
+      if (this.editingPartiMode) {
+        this.participantsCaregivers = this.updateGSParticipants.event.participants
+          .filter(p => this.isCaregiver(p.pk))
+          .map(p => this.getCaregiverByInfoId(p.pk))
+
+        this.participantsPatients = this.updateGSParticipants.event.participants
+          .filter(p => this.isPatient(p.pk))
+          .map(p => this.getPatientByInfoId(p.pk))
+      } else {
+        this.participantsCaregivers = []
+        this.participantsPatients = []
+      }
+    }
+  },
+  methods: {
+    ...mapActions('sessions', [
+      'updateIndivSession',
+      'deleteIndivSession',
+      'updateGroupSession',
+      'deleteGroupSession',
+      'dontShowGroupSession'
+    ]),
+    log (info) {
+      console.log(info)
+    },
+    editGroupSession (gs) {
+      this.$emit('editGroupSession', gs)
+    },
+    removeGroupSession (groupSessionPK) {
+      this.groupSessionToRemove = groupSessionPK
+      this.showModal('modal-group')
+    },
+    editParticipants (gs) {
+      console.log(gs.event.participants)
+
+      this.participantsCaregivers = gs.event.participants
+        .filter(p => this.isCaregiver(p.pk))
+        .map(p => this.getCaregiverByInfoId(p.pk))
+
+      this.participantsPatients = gs.event.participants
+        .filter(p => this.isPatient(p.pk))
+        .map(p => this.getPatientByInfoId(p.pk))
+
+      // this.participants = gs.event.participants.map((p) => {
+      //   return this.getUserByInfoId(p.pk)
+      // })
+      this.participantsCaregivers = this.participantsCaregivers.filter(p => p !== null)
+      console.log('this pateints', this.participantsPatients)
+      this.participantsPatients = this.participantsPatients.filter(p => p !== null)
+      console.log('this caregivers', this.participantsCaregivers)
+      this.updateGSParticipants = gs
+      this.showModal('modal-participants')
+    },
+    editIndivSession (is) {
+      this.$emit('editIndivSession', is)
+    },
+    removeIndivSession (indivSessionPK) {
+      this.indivSessionToRemove = indivSessionPK
+      this.showModal('modal-indiv')
+    },
+    showModal (type) {
+      this.$refs[type].show()
+    },
+    confirme (type, bool) {
+      if (type === 'group') {
+        if (bool === true) {
+          console.log('deleting groupSession with PK =', this.groupSessionToRemove)
+          this.deleteSession(this.groupSessionToRemove)
+        }
+        this.groupSessionToRemove = null
+        this.$refs['modal-group'].hide()
+      } else if (type === 'indiv') {
+        if (bool === true) {
+          console.log('deleting indivSession with PK =', this.indivSessionToRemove)
+          this.deleteSession(this.indivSessionToRemove)
+        }
+        this.indivSessionToRemove = null
+        this.$refs['modal-indiv'].hide()
+      } else if (type === 'part') {
+        if (bool === true) {
+          console.log('updating participants of group session with PK =', this.updateGSParticipants.groupSession.pk)
+          let gs = JSON.parse(JSON.stringify(this.updateGSParticipants))
+          delete this.updateGSParticipants.event.participants
+          this.updateGSParticipants.event.users = {
+            caregivers: this.participantsCaregivers.map(u => u.pk),
+            patients: this.participantsPatients.map(u => u.pk)
+          }
+          gs.event.participants = []
+          gs.event.participants.push(...this.participantsCaregivers.map(u => ({ name: u.info.name, pk: u.info.pk })))
+          gs.event.participants.push(...this.participantsPatients.map(u => ({ name: u.info.name, pk: u.info.pk })))
+          let remove = true
+          console.log('partCare', this.participantsCaregivers)
+          console.log('partPat', this.participantsPatients)
+          console.log('caregivers', this.usersActive.caregivers)
+          for (let i in this.usersActive.caregivers) {
+            if (this.participantsCaregivers.find(p => p.pk === this.usersActive.caregivers[i])) {
+              remove = false
+              break
+            }
+          }
+          if (remove) {
+            for (let i in this.usersActive.patients) {
+              if (this.participantsPatients.find(p => p.pk === this.usersActive.patients[i])) {
+                remove = false
+                break
+              }
+            }
+          }
+          if (remove) {
+            console.log('enter remove')
+            this.dontShowGroupSession(gs)
+            this.updateGroupSession({ send: this.updateGSParticipants, stay: null })
+          } else {
+            console.log('stay', gs)
+            console.log('send', this.updateGSParticipants)
+            this.updateGroupSession({ send: this.updateGSParticipants, stay: gs })
+            this.$emit('groupSessionUpdated', this.updateGSParticipants.event.occurrenceDate)
+          }
+        }
+        this.updateGSParticipants = null
+        this.editingPartiMode = false
+        this.$refs['modal-participants'].hide()
+      }
+    },
+    beforeUpdateGroupSession (gs) {
+      this.editingGroupSession = null
+      this.updateGroupSession(gs)
+    },
+    beforeUpdateIndivSession (is) {
+      this.editingIndivSession = null
+      this.updateIndivSession(is)
+    },
+    removeSelectedCaregiver (userPK) {
+      if ((this.participantsCaregivers.length + this.participantsPatients.length) > 2) {
+        this.participantsCaregivers = this.participantsCaregivers.filter(u => u.pk !== userPK)
+      }
+    },
+    addSelectedCaregiver (user) {
+      this.participantsCaregivers.push(user)
+    },
+    removeSelectedPatient (userPK) {
+      if ((this.participantsCaregivers.length + this.participantsPatients.length) > 2) {
+        this.participantsPatients = this.participantsPatients.filter(u => u.pk !== userPK)
+      }
+    },
+    addSelectedPatient (user) {
+      this.participantsPatients.push(user)
+    },
+    goToFormSession () {
+      this.$router.push({ name: 'formSession' })
+    },
+    isCaregiver (id) {
+      if (this.caregivers.find(u => u.info.pk === id)) {
+        console.log('is caregiver', id)
+        return true
+      }
+      return false
+    },
+    isPatient (id) {
+      if (this.patients.find(u => u.info.pk === id)) {
+        console.log('is patient', id)
+        return true
+      }
+      return false
+    }
+  }
+}
+</script>

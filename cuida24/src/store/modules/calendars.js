@@ -16,6 +16,9 @@ const getters = {
   },
   calendarGroupSession: state => {
     return state.calendars.find(calendar => calendar.pk === 3)
+  },
+  calendarIndivSession: state => {
+    return state.calendars.find(calendar => calendar.pk === 4)
   }
 }
 

@@ -10,7 +10,8 @@ import Calendar from '@/components/Calendar/Calendar'
 import Appointments from '@/components/Calendar/Appointments/Appointments'
 import FormAppoint from '@/components/Calendar/Appointments/FormAppoint'
 import Notes from '@/components/Calendar/Notes/Notes'
-import GroupSession from '@/components/Calendar/GroupSession/GroupSession'
+import Session from '@/components/Calendar/Session/Session'
+import FormSession from '@/components/Calendar/Session/FormSession'
 
 // Medication
 import Medicacao from '@/components/Medication/Medicacao'
@@ -58,7 +59,7 @@ export default new Router({
       component: Appointments
     },
     {
-      path: '/menuCalendar/formAppoint',
+      path: '/menuCalendar/appointments/formAppoint',
       name: 'formAppoint',
       component: FormAppoint
     },
@@ -68,9 +69,14 @@ export default new Router({
       component: Notes
     },
     {
-      path: '/menuCalendar/groupSession',
-      name: 'groupSession',
-      component: GroupSession
+      path: '/menuCalendar/sessions',
+      name: 'sessions',
+      component: Session
+    },
+    {
+      path: '/menuCalendar/sessions/formSession',
+      name: 'formSession',
+      component: FormSession
     },
 
     // Medication
