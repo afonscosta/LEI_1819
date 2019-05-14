@@ -53,28 +53,6 @@ class FixAnAppointmentPermssion(permissions.BasePermission):
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-<<<<<<< HEAD
-    """
-    Post method
-
-    def create(self, request, *args, **kwargs):
-        logger.info("POST")
-        logger.info(request.data)
-        req_data = EventFrontToBackJSON(request.data)
-        serializer = EventSerializer(data=req_data['event'], context={'request': req_data})
-        logger.info("DATA SENT")
-        logger.info(req_data)
-        if serializer.is_valid(raise_exception=False):
-            serializer.save()
-            logger.info("SERIALIZER RETURN DATA")
-            logger.info(serializer.data)
-            sent_data = EventBackTofrontJSON(request.data, serializer.data)
-            logger.info(sent_data)
-            return Response(sent_data, status=status.HTTP_200_OK)
-        logger.info(serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-=======
->>>>>>> 2eccc6336ca6fed3a54baf1234407ff86e48c126
 
     """
        Get method by user id 
