@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
@@ -157,8 +158,18 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
+    """
+    Delete method
+    
+    def destroy(self, request, *args, **kwargs):
+        logger.info("DELETE APPOINTMENT")
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    """
 class AppointmentNoteViewSet(viewsets.ModelViewSet):
     queryset = AppointmentNote.objects.all()
     serializer_class = AppointmentNoteSerializer

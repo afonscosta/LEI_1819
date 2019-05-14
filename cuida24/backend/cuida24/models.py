@@ -294,11 +294,16 @@ class Event(models.Model):
     year = models.IntegerField()
     location = models.TextField()
     description = models.TextField()
-    calendar = models.ForeignKey(Calendar, on_delete=models.DO_NOTHING)
+    calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
+
+    def delete(self, using=None, keep_parents=False):
+        self.schedule.delete()
+        super(Event, self).delete()
+        Notification.objects.filter(event=self).delete()
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -348,7 +353,7 @@ class EventSerializer(serializers.ModelSerializer):
 
 class Notification(models.Model):
     dateTime = models.TextField()
-    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -365,6 +370,10 @@ class Appointment(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    def delete(self, using=None, keep_parents=False):
+        self.details.delete()
+        AppointmentNote.objects.filter(appointment=self).delete()
+        super(Appointment, self).delete()
 
 class AppointmentSerializer(serializers.ModelSerializer):
     details = EventSerializer()
@@ -513,6 +522,11 @@ class Session(models.Model):
     state = models.CharField(max_length=1, choices=STATE)
     # Relação many-to-many só tem que estar num model
     participants = models.ManyToManyField(User)
+
+    def delete(self, using=None, keep_parents=False):
+        self.details.delete()
+        # Falta o evaluation
+        super(Session, self).delete()
 
 
 class SessionSerializer(serializers.ModelSerializer):
