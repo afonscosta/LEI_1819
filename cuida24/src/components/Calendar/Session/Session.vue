@@ -16,20 +16,11 @@
       Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.
     </h3>
 
-    <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
-      <b-row class="justify-content-md-center">
-        <b-col xl="8" lg="8" md="8" sm="12" cols="12">
-          <b-button 
-            @click="goToFormSession"
-          >Adicionar Sessão</b-button>
-        </b-col>
-      </b-row>
-    </b-container>
-
     <ListSessions
       v-if="!sessionSel"
       @editGroupSession="editGroupSession"
       @editIndivSession="editIndivSession"
+      @groupSessionUpdated="groupSessionUpdated"
     ></ListSessions>
     <FormSession
       v-if="sessionSel"
@@ -181,9 +172,6 @@ export default {
       }
       return rec
     },
-    goToFormSession () {
-      this.$router.push({ name: 'formSession' })
-    },
     groupSessionUpdated (occurrenceDate) {
       this.sessionSel = false
       this.$notify({
@@ -201,3 +189,31 @@ export default {
   }
 }
 </script>
+
+<style>
+.notif {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #E8F9F0;
+  border: 2px solid #D0F2E1;
+}
+
+.notification-title {
+  letter-spacing: 1px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.v-fade-top-enter-active,
+.v-fade-top-leave-active,
+.v-fade-ltopmove {
+  transition: all .5s;
+}
+.v-fade-top-enter,
+.v-fade-top-leave-to {
+  opacity: 0;
+  transform: translateY(-500px) scale(0.2);
+}
+</style>

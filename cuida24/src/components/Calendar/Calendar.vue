@@ -3,36 +3,41 @@
     <b-container>
       <b-row sm="auto">
         <b-col md="6" cols="6">
-          <listUsers 
+          <ListUsers 
             :listName="'Cuidadores'"
             :users="caregivers"
-            @updateSelected="updateSelectedCaregivers"
-          ></listUsers>
+            :selected="caregiversSelected"
+            :readOnly="false"
+            @removeSelected="removeSelectedCaregiver"
+            @addSelected="addSelectedCaregiver"
+          ></ListUsers>
         </b-col>
         <b-col md="6" cols="6">
-          <listUsers 
+          <ListUsers 
             :listName="'Utentes'"
             :users="patients"
-            :selected="usersActive.patients"
-            @updateSelected="updateSelectedPatients"
-          ></listUsers>
+            :selected="patientsSelected"
+            :readOnly="false"
+            @removeSelected="removeSelectedPatient"
+            @addSelected="addSelectedPatient"
+          ></ListUsers>
         </b-col>
       </b-row>
     </b-container>
     <b-button @click="goToAppointments">Consultas</b-button>
-    <b-button @click="goToSessions">Sessões de Grupo</b-button>
+    <b-button @click="goToSessions">Sessões de Grupo / Individual</b-button>
   </div>
 </template>
 
 <script>
-import listUsers from '@/components/ListUsers'
+import ListUsers from '@/components/ListUsers'
 import { mapState, mapActions, mapGetters } from 'vuex'
 import 'vue-form-wizard/dist/vue-form-wizard.min.css'
 
 export default {
   name: 'MenuCalendar',
   components: {
-    listUsers
+    ListUsers
   },
   data: () => ({
     form: {
@@ -46,7 +51,9 @@ export default {
       notify: [],
       sched: null,
       id: null
-    }
+    },
+    caregiversSelected: [],
+    patientsSelected: []
   }),
   created () {
     this.$store.dispatch('calendars/getCalendars')
@@ -69,15 +76,21 @@ export default {
   },
   methods: {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    updateSelectedCaregivers (checked) {
-      this.usersActive.caregivers = checked.map(function (c) {
-        return c.pk
-      })
+    removeSelectedCaregiver (userPK) {
+      this.caregiversSelected = this.caregiversSelected.filter(u => u.pk !== userPK)
+      this.usersActive.caregivers = this.usersActive.caregivers.filter(pk => pk !== userPK)
     },
-    updateSelectedPatients (checked) {
-      this.usersActive.patients = checked.map(function (p) {
-        return p.pk
-      })
+    addSelectedCaregiver (user) {
+      this.caregiversSelected.push(user)
+      this.usersActive.caregivers.push(user.pk)
+    },
+    removeSelectedPatient (userPK) {
+      this.patientsSelected = this.patientsSelected.filter(u => u.pk !== userPK)
+      this.usersActive.patients = this.usersActive.patients.filter(pk => pk !== userPK)
+    },
+    addSelectedPatient (user) {
+      this.patientsSelected.push(user)
+      this.usersActive.patients.push(user.pk)
     },
     goToAppointments () {
       this.$router.push({ name: 'appointments' })
