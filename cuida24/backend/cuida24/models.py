@@ -89,7 +89,7 @@ class IndividualLeisureSerializer(serializers.ModelSerializer):
         fields = ('description', 'activity', 'pk')
 
 
-# Users
+# User
 
 #class User(models.Model):
 #    name = models.CharField(max_length=200)
@@ -539,7 +539,7 @@ class Session(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
     state = models.CharField(max_length=1, choices=STATE)
     # Relação many-to-many só tem que estar num model
-    participants = models.ManyToManyField(User)
+    participants = models.ManyToManyField(UserAuth)
 
 
 class SessionSerializer(serializers.ModelSerializer):
