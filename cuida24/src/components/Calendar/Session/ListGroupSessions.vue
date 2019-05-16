@@ -3,14 +3,15 @@
     <h3 v-if="groupSessions.length === 0 && indivSessions.length !== 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões de grupo para os utilizadores selecionados.</h3>
 
     <b-card
-      v-for="gs in groupSessions"
+      v-for="gs in groupSessionsFilter"
       :key="gs.pk"
       border-variant="dark"
       header="Sessão de Grupo"
+      no-body
     >
       <b-container>
-        <b-row align-v="center" class="justify-content-md-center">
-          <b-col md="7" cols="12">
+        <b-row align-v="center" align-h="start" class="justify-content-md-center">
+          <b-col xl="4" cols="12">
             <b-card-text align="left"><b>Tema:</b> {{ gs.groupSession.theme }}</b-card-text>
             <b-card-text align="left"><b>Descrição:</b> {{ gs.groupSession.description }}</b-card-text>
             <b-card-text align="left"><b>Objetivos:</b>
@@ -27,9 +28,9 @@
                 </li>
               </ul>
             </b-card-text>
-            <b-card-text align="left"><b>Estado:</b> {{ parseState(gs.groupSession.state) }}</b-card-text>
           </b-col>
-          <b-col md="5" cols="12">
+          <b-col xl="5" cols="12">
+            <b-card-text align="left"><b>Estado:</b> {{ parseState(gs.groupSession.state) }}</b-card-text>
             <b-card-text align="left"><b>Data:</b> {{ gs.event.occurrenceDate.dayOfMonth + '/' + gs.event.occurrenceDate.month + '/' + gs.event.occurrenceDate.year }}</b-card-text>
             <b-card-text v-if="gs.event.schedule.times" align="left">
               <b>Hora de início:</b> {{ gs.event.schedule.times[0] }}
@@ -44,11 +45,13 @@
               <b>Localização:</b> {{ gs.event.data.location }}
             </b-card-text>
           </b-col>
+          <b-col xl="3" cols="12">
+            <b-button block class="mt-2" variant="danger" @click="removeGroupSession(gs)">Eliminar</b-button>
+            <b-button block @click="editGroupSession(gs)">Editar</b-button>
+            <b-button block size="sm" variant="primary" @click="editParticipants(gs)">Participantes</b-button>
+          </b-col>
         </b-row>
       </b-container>
-      <b-button variant="danger" @click="removeGroupSession(gs)">Eliminar</b-button>
-      <b-button @click="editGroupSession(gs)">Editar</b-button>
-      <b-button @click="editParticipants(gs)">Participantes</b-button>
     </b-card>
   </div>
 </template>
@@ -58,6 +61,12 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'ListGroupSessions',
+  props: {
+    filters: {
+      required: true,
+      type: Array
+    }
+  },
   computed: {
     ...mapState({
       groupSessions: state => state.sessions.groupSessions,
@@ -91,6 +100,13 @@ export default {
           return 'Já foi realizada'
         }
       }
+    },
+    groupSessionsFilter () {
+      let data = this.groupSessions
+      if (this.filters.length === 0) {
+        return data
+      }
+      return data.filter(gs => this.filters.includes(gs.groupSession.state))
     }
   },
   methods: {
@@ -106,3 +122,11 @@ export default {
   }
 }
 </script>
+
+<style>
+@media (min-width: 576px) {
+  b-button-group {
+    vertical: false;
+  }
+}
+</style>

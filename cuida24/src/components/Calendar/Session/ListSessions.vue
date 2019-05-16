@@ -65,23 +65,41 @@
         block
         @click="editingPartiMode = true"
       >Editar</b-button>
-      <b-button v-if="editingPartiMode" class="mt-2" variant="success" block @click="confirme('part', false)">Não</b-button>
-      <b-button v-if="editingPartiMode" class="mt-3" variant="danger" block @click="confirme('part', true)">Sim</b-button>
+      <b-button v-if="editingPartiMode" class="mt-2" variant="success" block @click="confirme('part', false)">Cancelar</b-button>
+      <b-button v-if="editingPartiMode" class="mt-3" variant="danger" block @click="confirme('part', true)">Guardar</b-button>
     </b-modal>
 
-    <b-container>
+    <b-container
+      v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row class="justify-content-md-center">
         <b-col xl="8" lg="8" md="8" sm="12" cols="12">
+          <b-form-checkbox-group
+            v-model="selectedStateFilters"
+            :options="filterStateOptions"
+            name="stateFilters"
+            buttons
+          ></b-form-checkbox-group>
           <b-button 
             @click="goToFormSession"
-            v-if="(usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0) && (usersActive.caregivers.length + usersActive.patients.length) === 1"
+            v-if="(usersActive.caregivers.length + usersActive.patients.length) === 1"
           >Adicionar Sessão Individual</b-button>
           <b-button 
             @click="goToFormSession"
-            v-if="(usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0) && (usersActive.caregivers.length + usersActive.patients.length) > 1"
+            v-if="(usersActive.caregivers.length + usersActive.patients.length) > 1"
           >Adicionar Sessão de Grupo</b-button>
         </b-col>
       </b-row>
+      <b-row class="justify-content-md-center">
+        <b-col xl="8" lg="8" md="8" sm="12" cols="12">
+          <b-form-checkbox-group
+            v-model="selectedSessionTypes"
+            :options="sessionTypesOptions"
+            name="sessionTypes"
+            buttons
+          ></b-form-checkbox-group>
+        </b-col>
+      </b-row>
+
     </b-container>
 
     <b-container
@@ -89,19 +107,27 @@
     >
       <b-row class="justify-content-md-center">
         <b-col xl="8" lg="8" md="8" sm="12" cols="12">
-          <h3 v-if="groupSessions.length === 0 && indivSessions.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões para os utilizadores selecionados.</h3>
-
+          <h3 v-if="groupSessions.length === 0 && indivSessions.length === 0">
+            Não existem sessões para os utilizadores selecionados.</h3>
+        </b-col>
+      </b-row>
+      <b-row class="justify-content-md-center">
+        <b-col md="6" cols="12">
           <ListGroupSessions
+            v-if="selectedSessionTypes.includes('G') || selectedSessionTypes.length === 0"
+            :filters="selectedStateFilters"
             @removeGroupSession="removeGroupSession"
             @editGroupSession="editGroupSession"
             @editParticipants="editParticipants"
           />
-
+        </b-col>
+        <b-col md="6" cols="12">
           <ListIndivSessions
+            v-if="selectedSessionTypes.includes('I') || selectedSessionTypes.length === 0"
+            :filters="selectedStateFilters"
             @removeIndivSession="removeIndivSession"
             @editIndivSession="editIndivSession"
           />
-
         </b-col>
       </b-row>
     </b-container>
@@ -131,7 +157,19 @@ export default {
     indivSessionToRemove: null,
     participantsCaregivers: [],
     participantsPatients: [],
-    editingPartiMode: false
+    editingPartiMode: false,
+    selectedStateFilters: ['E'],
+    filterStateOptions: [
+      { text: 'Espera', value: 'E' },
+      { text: 'Revisão', value: 'R' },
+      { text: 'Aceite', value: 'A' },
+      { text: 'Concluída', value: 'C' }
+    ],
+    selectedSessionTypes: [],
+    sessionTypesOptions: [
+      { text: 'Sessão de Grupo', value: 'G' },
+      { text: 'Sessão individual', value: 'I' }
+    ]
   }),
   created () {
     if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {

@@ -3,14 +3,15 @@
     <h3 v-if="groupSessions.length !== 0 && indivSessions.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões individuais para o(s) utilizador(es) selecionado(s).</h3>
 
     <b-card
-      v-for="is in indivSessions"
+      v-for="is in indivSessionsFilter"
       :key="is.pk"
       border-variant="dark"
       header="Sessão Individual"
+      no-body
     >
       <b-container>
-        <b-row align-v="center" class="justify-content-md-center">
-          <b-col md="7" cols="12">
+        <b-row align-v="center" align-h="start" class="justify-content-md-center">
+          <b-col xl="4" cols="12">
             <b-card-text align="left"><b>Tema:</b> {{ is.individualSession.theme }}</b-card-text>
             <b-card-text align="left"><b>Descrição:</b> {{ is.individualSession.description }}</b-card-text>
             <b-card-text align="left"><b>Objetivos:</b>
@@ -27,9 +28,9 @@
                 </li>
               </ul>
             </b-card-text>
-            <b-card-text align="left"><b>Estado:</b> {{ parseState(is.individualSession.state) }}</b-card-text>
           </b-col>
-          <b-col md="5" cols="12">
+          <b-col xl="5" cols="12">
+            <b-card-text align="left"><b>Estado:</b> {{ parseState(is.individualSession.state) }}</b-card-text>
             <b-card-text align="left"><b>Data:</b> {{ is.event.occurrenceDate.dayOfMonth + '/' + is.event.occurrenceDate.month + '/' + is.event.occurrenceDate.year }}</b-card-text>
             <b-card-text v-if="is.event.schedule.times" align="left">
               <b>Hora de início:</b> {{ is.event.schedule.times[0] }}
@@ -47,10 +48,12 @@
               <b>Participante:</b> {{ is.event.participants[0].name }}
             </b-card-text>
           </b-col>
+          <b-col xl="3" cols="12">
+            <b-button block class="mt-2" variant="danger" @click="removeIndivSession(is)">Eliminar</b-button>
+            <b-button block @click="editIndivSession(is)">Editar</b-button>
+          </b-col>
         </b-row>
       </b-container>
-      <b-button variant="danger" @click="removeIndivSession(is)">Eliminar</b-button>
-      <b-button @click="editIndivSession(is)">Editar</b-button>
     </b-card>
   </div>
 </template>
@@ -60,6 +63,12 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'ListIndivSessions',
+  props: {
+    filters: {
+      required: true,
+      type: Array
+    }
+  },
   computed: {
     ...mapState({
       groupSessions: state => state.sessions.groupSessions,
@@ -93,6 +102,13 @@ export default {
           return 'Já foi realizada'
         }
       }
+    },
+    indivSessionsFilter () {
+      let data = this.indivSessions
+      if (this.filters.length === 0) {
+        return data
+      }
+      return data.filter(is => this.filters.includes(is.individualSession.state))
     }
   },
   methods: {
