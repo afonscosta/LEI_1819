@@ -70,17 +70,26 @@ const actions = {
   },
   addGroupSession ({ commit }, gs) {
     console.log('adding groupSession', gs)
-    sessionsService.postSession(gs)
+    sessionsService.postSession(gs.send)
       .then(newGS => {
-        commit('addGroupSession', newGS)
+        console.log('newGS', newGS)
+        if (gs.stay) {
+          delete newGS.event.users
+          newGS.event.participants = gs.stay.event.participants
+          commit('addGroupSession', newGS)
+        }
         this.dispatch('events/addEvent', newGS.event)
       })
   },
   addIndivSession ({ commit }, is) {
     console.log('adding indivSession', is)
-    sessionsService.postSession(is)
+    sessionsService.postSession(is.send)
       .then(newIS => {
-        commit('addIndivSession', newIS)
+        if (is.stay) {
+          delete newIS.event.users
+          newIS.event.participants = is.stay.event.participants
+          commit('addIndivSession', newIS)
+        }
         this.dispatch('events/addEvent', newIS.event)
       })
   },

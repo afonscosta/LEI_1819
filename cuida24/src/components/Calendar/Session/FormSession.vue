@@ -227,6 +227,10 @@ export default {
     ...mapGetters('calendars', [
       'calendarGroupSession',
       'calendarIndivSession'
+    ]),
+    ...mapGetters('users', [
+      'getCaregiverById',
+      'getPatientById'
     ])
   },
   methods: {
@@ -277,13 +281,41 @@ export default {
         this.updateIndivSession({ send: payload, stay: is })
         this.$emit('indivSessionUpdated', payload.event.occurrenceDate)
       } else if (payload.groupSession) {
-        this.addGroupSession(payload)
+        let gs = JSON.parse(JSON.stringify(payload))
+        delete gs.event.users
+        gs.event.participants = []
+        gs.event.participants.push(
+          ...this.usersActive.caregivers
+            .map(pk => this.getCaregiverById(pk))
+            .map(c => ({ name: c.info.name, pk: c.info.pk }))
+        )
+        console.log('patients active', this.usersActive)
+        console.log('patients', this.patients)
+        gs.event.participants.push(
+          ...this.usersActive.patients
+            .map(pk => this.getPatientById(pk))
+            .map(p => ({ name: p.info.name, pk: p.info.pk }))
+        )
+        this.addGroupSession({ send: payload, stay: gs })
         this.$notify({
           title: 'A sessão de grupo foi adicionada com sucesso.',
           duration: 3000
         })
       } else if (payload.individualSession) {
-        this.addIndivSession(payload)
+        let is = JSON.parse(JSON.stringify(payload))
+        delete is.event.users
+        is.event.participants = []
+        is.event.participants.push(
+          ...this.usersActive.caregivers
+            .map(pk => this.getCaregiverById(pk))
+            .map(c => ({ name: c.info.name, pk: c.info.pk }))
+        )
+        is.event.participants.push(
+          ...this.usersActive.patients
+            .map(pk => this.getPatientById(pk))
+            .map(p => ({ name: p.info.name, pk: p.info.pk }))
+        )
+        this.addIndivSession({ send: payload, stay: is })
         this.$notify({
           title: 'A sessão individual foi adicionada com sucesso.',
           duration: 3000
