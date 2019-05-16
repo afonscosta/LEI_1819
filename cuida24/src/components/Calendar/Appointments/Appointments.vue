@@ -24,6 +24,7 @@
       v-if="appointmentSel"
       :form="form"
       @appointmentUpdated="appointmentUpdated"
+      @hide="appointmentSel = null"
     ></formAppoint>
   </div>
 </template>

@@ -96,22 +96,25 @@ const actions = {
   },
   updateIndivSession ({ commit }, is) {
     console.log('updating indivSession', is)
-    sessionsService.putSession(is)
+    sessionsService.putSession(is.send)
       .then(() => {
-        commit('updateIndivSession', is)
-        this.dispatch('events/updateEvent', is.event)
+        if (is.stay) {
+          commit('updateIndivSession', is.stay)
+        }
+        this.dispatch('events/updateEvent', is.send.event)
       })
   },
-  deleteGroupSession ({ commit }, gsID) {
-    console.log('deleting groupSession with PK = ', gsID)
-    sessionsService.deleteSession(gsID)
-    commit('deleteGroupSession', gsID)
+  deleteGroupSession ({ commit }, gs) {
+    console.log('deleting groupSession with PK = ', gs.groupSession.pk)
+    sessionsService.deleteSession(gs.groupSession.pk)
+    commit('deleteGroupSession', gs.groupSession.pk)
+    this.dispatch('events/deleteEvent', gs.event.id)
   },
-  deleteIndivSession ({ commit }, isID) {
-    console.log('deleting indivSession with PK = ', isID)
-    sessionsService.deleteSession(isID)
-    commit('deleteSession', isID)
-    // TODO: É preciso fazer delete do evento
+  deleteIndivSession ({ commit }, is) {
+    console.log('deleting indivSession with PK = ', is.individualSession.pk)
+    sessionsService.deleteSession(is.individualSession.pk)
+    commit('deleteIndivSession', is.individualSession.pk)
+    this.dispatch('events/deleteEvent', is.event.id)
   },
   dontShowGroupSession ({ commit }, gs) {
     console.log('not showing groupSession with PK = ', gs.groupSession.pk)

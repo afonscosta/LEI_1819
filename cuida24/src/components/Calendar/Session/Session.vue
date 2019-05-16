@@ -88,6 +88,7 @@ export default {
         local: s.event.data.location,
         notify: s.event.data.notify,
         sched: this.parseScheduleOption(s),
+        participants: s.event.participants,
         id: s.event.id
       }
       this.formData = form
@@ -122,11 +123,11 @@ export default {
         local: s.event.data.location,
         notify: s.event.data.notify,
         sched: this.parseScheduleOption(s),
+        participants: s.event.participants,
         id: s.event.id
       }
       this.formData = form
       this.sessionData = s.individualSession
-      // this.sessionData.state = 'waiting'
       console.log('formData', this.formData)
       console.log('sessionData', this.sessionData)
       console.log('sessionSel', this.sessionSel)

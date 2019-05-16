@@ -7,7 +7,7 @@
       v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0"
     >Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
 
-    <b-container>
+    <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row sm="auto">
         <b-col md="6" sm="12">
           <b-form @submit.prevent="onSubmit">
@@ -165,6 +165,9 @@ export default {
         default: {},
         type: Object
       },
+      participants: {
+        type: Array
+      },
       id: {
         default: null,
         type: Number
@@ -189,6 +192,7 @@ export default {
       local: '',
       notify: [],
       sched: null,
+      participants: [],
       id: null
     },
     item: '',
@@ -216,7 +220,9 @@ export default {
   },
   computed: {
     ...mapState({
-      usersActive: state => state.users.usersActive
+      usersActive: state => state.users.usersActive,
+      caregivers: state => state.users.users.caregivers,
+      patients: state => state.users.users.patients
     }),
     ...mapGetters('calendars', [
       'calendarGroupSession',
@@ -259,10 +265,16 @@ export default {
         }
       }
       if (payload.groupSession && payload.event.id) {
-        this.updateGroupSession(payload)
+        let gs = JSON.parse(JSON.stringify(payload))
+        delete gs.event.users
+        gs.event.participants = this.form.participants
+        this.updateGroupSession({ send: payload, stay: gs })
         this.$emit('groupSessionUpdated', payload.event.occurrenceDate)
       } else if (payload.individualSession && payload.event.id) {
-        this.updateIndivSession(payload)
+        let is = JSON.parse(JSON.stringify(payload))
+        delete is.event.users
+        is.event.participants = this.form.participants
+        this.updateIndivSession({ send: payload, stay: is })
         this.$emit('indivSessionUpdated', payload.event.occurrenceDate)
       } else if (payload.groupSession) {
         this.addGroupSession(payload)
@@ -336,9 +348,17 @@ export default {
       }
     },
     prepareEvent () {
-      const users = {
-        'caregivers': this.usersActive.caregivers,
-        'patients': this.usersActive.patients
+      let users = {}
+      if (this.form.id !== null) {
+        users = {
+          caregivers: this.form.participants.filter(p => this.isCaregiver(p.pk)).map(p => p.pk),
+          patients: this.form.participants.filter(p => this.isPatient(p.pk)).map(p => p.pk)
+        }
+      } else {
+        users = {
+          'caregivers': this.usersActive.caregivers,
+          'patients': this.usersActive.patients
+        }
       }
       let data = {
         'calendar': this.calendarGroupSession.pk,
@@ -388,6 +408,20 @@ export default {
       } else {
         this.form.notify = []
       }
+    },
+    isCaregiver (id) {
+      if (this.caregivers.find(u => u.info.pk === id)) {
+        console.log('is caregiver', id)
+        return true
+      }
+      return false
+    },
+    isPatient (id) {
+      if (this.patients.find(u => u.info.pk === id)) {
+        console.log('is patient', id)
+        return true
+      }
+      return false
     }
   }
 }

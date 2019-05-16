@@ -100,6 +100,8 @@
       </b-row>
       <b-row>
         <b-col>
+          <b-button variant="primary" v-if="formData.id === null" @click="$router.go(-1)">Cancelar</b-button>
+          <b-button variant="primary" v-if="formData.id !== null" @click="hide">Cancelar</b-button>
           <b-button variant="primary" @click="onSubmit">Submeter</b-button>
         </b-col>
       </b-row>
@@ -324,6 +326,9 @@ export default {
       } else {
         this.formData.notify = []
       }
+    },
+    hide () {
+      this.$emit('hide')
     }
   }
 }

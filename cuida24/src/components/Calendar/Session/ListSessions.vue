@@ -91,56 +91,11 @@
         <b-col xl="8" lg="8" md="8" sm="12" cols="12">
           <h3 v-if="groupSessions.length === 0 && indivSessions.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões para os utilizadores selecionados.</h3>
 
-          <h3 v-if="groupSessions.length === 0 && indivSessions.length !== 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões de grupo para os utilizadores selecionados.</h3>
-
-          <b-card
-            v-for="gs in groupSessions"
-            :key="gs.pk"
-            border-variant="dark"
-            header="Sessão de Grupo"
-          >
-            <b-container>
-              <b-row align-v="center" class="justify-content-md-center">
-                <b-col md="7" cols="12">
-                  <b-card-text align="left"><b>Tema:</b> {{ gs.groupSession.theme }}</b-card-text>
-                  <b-card-text align="left"><b>Descrição:</b> {{ gs.groupSession.description }}</b-card-text>
-                  <b-card-text align="left"><b>Objetivos:</b>
-                    <ul>
-                      <li v-for="(goal, idx) in gs.groupSession.goals">
-                        {{ goal }}
-                      </li>
-                    </ul>
-                  </b-card-text>
-                  <b-card-text align="left"><b>Material necessário:</b> 
-                    <ul>
-                      <li v-for="(item, idx) in gs.groupSession.materials">
-                        {{ item }}
-                      </li>
-                    </ul>
-                  </b-card-text>
-                  <b-card-text align="left"><b>Estado:</b> {{ gs.groupSession.state }}</b-card-text>
-                </b-col>
-                <b-col md="5" cols="12">
-                  <b-card-text align="left"><b>Data:</b> {{ gs.event.occurrenceDate.dayOfMonth + '/' + gs.event.occurrenceDate.month + '/' + gs.event.occurrenceDate.year }}</b-card-text>
-                  <b-card-text v-if="gs.event.schedule.times" align="left">
-                    <b>Hora:</b> {{ gs.event.schedule.times[0] }}
-                  </b-card-text>
-                  <b-card-text v-if="!gs.event.schedule.times" align="left">
-                    <b>Duração:</b> Todo o dia
-                  </b-card-text>
-                  <b-card-text v-if="gs.event.schedule.duration" align="left">
-                    <b>Duração:</b> {{ appt.event.schedule.duration + " " + durationUnitTranslated(appt.event.schedule.durationUnit) }}
-                  </b-card-text>
-                  <b-card-text align="left">
-                    <b>Localização:</b> {{ gs.event.data.location }}
-                  </b-card-text>
-                </b-col>
-              </b-row>
-            </b-container>
-            <b-button variant="danger" @click="removeGroupSession(gs.pk)">Eliminar</b-button>
-            <b-button @click="editGroupSession(gs)">Editar</b-button>
-            <b-button @click="editParticipants(gs)">Participantes</b-button>
-          </b-card>
+          <ListGroupSessions
+            @removeGroupSession="removeGroupSession"
+            @editGroupSession="editGroupSession"
+            @editParticipants="editParticipants"
+          />
 
           <h3 v-if="groupSessions.length !== 0 && indivSessions.length === 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões individuais para o(s) utilizador(es) selecionado(s).</h3>
 
@@ -169,18 +124,18 @@
                       </li>
                     </ul>
                   </b-card-text>
-                  <b-card-text align="left"><b>Estado:</b> {{ is.individualSession.state }}</b-card-text>
+                  <b-card-text align="left"><b>Estado:</b> {{ parseState(is.individualSession.state) }}</b-card-text>
                 </b-col>
                 <b-col md="5" cols="12">
                   <b-card-text align="left"><b>Data:</b> {{ is.event.occurrenceDate.dayOfMonth + '/' + is.event.occurrenceDate.month + '/' + is.event.occurrenceDate.year }}</b-card-text>
                   <b-card-text v-if="is.event.schedule.times" align="left">
-                    <b>Hora:</b> {{ is.event.schedule.times[0] }}
+                    <b>Hora de início:</b> {{ is.event.schedule.times[0] }}
                   </b-card-text>
                   <b-card-text v-if="!is.event.schedule.times" align="left">
                     <b>Duração:</b> Todo o dia
                   </b-card-text>
                   <b-card-text v-if="is.event.schedule.duration" align="left">
-                    <b>Duração:</b> {{ appt.event.schedule.duration + " " + durationUnitTranslated(appt.event.schedule.durationUnit) }}
+                    <b>Duração:</b> {{ is.event.schedule.duration + " " + durationUnitTranslated(is.event.schedule.durationUnit) }}
                   </b-card-text>
                   <b-card-text align="left">
                     <b>Localização:</b> {{ is.event.data.location }}
@@ -191,7 +146,7 @@
                 </b-col>
               </b-row>
             </b-container>
-            <b-button variant="danger" @click="removeIndivSession(is.pk)">Eliminar</b-button>
+            <b-button variant="danger" @click="removeIndivSession(is)">Eliminar</b-button>
             <b-button @click="editIndivSession(is)">Editar</b-button>
           </b-card>
         </b-col>
@@ -203,12 +158,14 @@
 <script>
 import { mapGetters, mapActions, mapState } from 'vuex'
 import FormSession from './FormSession'
+import ListGroupSessions from './ListGroupSessions'
 import ListUsers from '@/components/ListUsers'
 
 export default {
   name: 'listSessions',
   components: {
     FormSession,
+    ListGroupSessions,
     ListUsers
   },
   props: {
@@ -237,7 +194,35 @@ export default {
     ...mapGetters('users', [
       'getCaregiverByInfoId',
       'getPatientByInfoId'
-    ])
+    ]),
+    durationUnitTranslated () {
+      return (durationUnit) => {
+        if (durationUnit === 'minutes') {
+          return 'minuto(s)'
+        } else if (durationUnit === 'hours') {
+          return 'hora(s)'
+        } else if (durationUnit === 'days') {
+          return 'dia(s)'
+        } else if (durationUnit === 'weeks') {
+          return 'semana(s)'
+        } else if (durationUnit === 'months') {
+          return 'mês(es)'
+        }
+      }
+    },
+    parseState () {
+      return (state) => {
+        if (state === 'E') {
+          return 'À espera de aprovação'
+        } else if (state === 'A') {
+          return 'Aprovada'
+        } else if (state === 'R') {
+          return 'Necessária revisão'
+        } else if (state === 'C') {
+          return 'Já foi realizada'
+        }
+      }
+    }
   },
   watch: {
     editingPartiMode: function (val) {
@@ -263,19 +248,14 @@ export default {
       'deleteGroupSession',
       'dontShowGroupSession'
     ]),
-    log (info) {
-      console.log(info)
-    },
     editGroupSession (gs) {
       this.$emit('editGroupSession', gs)
     },
-    removeGroupSession (groupSessionPK) {
-      this.groupSessionToRemove = groupSessionPK
+    removeGroupSession (gs) {
+      this.groupSessionToRemove = gs
       this.showModal('modal-group')
     },
     editParticipants (gs) {
-      console.log(gs.event.participants)
-
       this.participantsCaregivers = gs.event.participants
         .filter(p => this.isCaregiver(p.pk))
         .map(p => this.getCaregiverByInfoId(p.pk))
@@ -284,21 +264,16 @@ export default {
         .filter(p => this.isPatient(p.pk))
         .map(p => this.getPatientByInfoId(p.pk))
 
-      // this.participants = gs.event.participants.map((p) => {
-      //   return this.getUserByInfoId(p.pk)
-      // })
       this.participantsCaregivers = this.participantsCaregivers.filter(p => p !== null)
-      console.log('this pateints', this.participantsPatients)
       this.participantsPatients = this.participantsPatients.filter(p => p !== null)
-      console.log('this caregivers', this.participantsCaregivers)
       this.updateGSParticipants = gs
       this.showModal('modal-participants')
     },
     editIndivSession (is) {
       this.$emit('editIndivSession', is)
     },
-    removeIndivSession (indivSessionPK) {
-      this.indivSessionToRemove = indivSessionPK
+    removeIndivSession (is) {
+      this.indivSessionToRemove = is
       this.showModal('modal-indiv')
     },
     showModal (type) {
@@ -307,15 +282,15 @@ export default {
     confirme (type, bool) {
       if (type === 'group') {
         if (bool === true) {
-          console.log('deleting groupSession with PK =', this.groupSessionToRemove)
-          this.deleteSession(this.groupSessionToRemove)
+          console.log('deleting groupSession with PK =', this.groupSessionToRemove.groupSession.pk)
+          this.deleteGroupSession(this.groupSessionToRemove)
         }
         this.groupSessionToRemove = null
         this.$refs['modal-group'].hide()
       } else if (type === 'indiv') {
         if (bool === true) {
-          console.log('deleting indivSession with PK =', this.indivSessionToRemove)
-          this.deleteSession(this.indivSessionToRemove)
+          console.log('deleting indivSession with PK =', this.indivSessionToRemove.individualSession.pk)
+          this.deleteIndivSession(this.indivSessionToRemove)
         }
         this.indivSessionToRemove = null
         this.$refs['modal-indiv'].hide()
