@@ -575,7 +575,6 @@ class SessionSerializer(serializers.ModelSerializer):
         event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
         if event_serializer.is_valid(raise_exception=False):
             event_serializer.save()
-
         notifications = Notification.objects.filter(event=event)
         actual_number_notification = len(notifications)
         actual_index_change = 0
@@ -588,7 +587,6 @@ class SessionSerializer(serializers.ModelSerializer):
             else:
                 notification_req_data = {'dateTime': income_notification, 'event': event}
                 Notification.objects.create(**notification_req_data)
-
         # update instance
         instance.topic = validated_data.get("topic", instance.topic)
         instance.type = validated_data.get("type", instance.type)
@@ -597,14 +595,14 @@ class SessionSerializer(serializers.ModelSerializer):
         instance.material = validated_data.get("material", instance.material)
         instance.state = validated_data.get("state", instance.state)
         participants = []
+        # Atenção que estou a receber as pk da tabela User e não Patient e Caregiver
         for user in request['participants']['caregivers']:
-            participants.append(get_object_or_404(Caregiver, pk=user).info)
+            participants.append(get_object_or_404(User, pk=user))
 
         for user in request['participants']['patients']:
-            participants.append(get_object_or_404(Patient, pk=user).info)
+            participants.append(get_object_or_404(User, pk=user))
         instance.participants.set(participants)
         instance.save()
-
         return instance
 
 
