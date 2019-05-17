@@ -595,12 +595,11 @@ class SessionSerializer(serializers.ModelSerializer):
         instance.material = validated_data.get("material", instance.material)
         instance.state = validated_data.get("state", instance.state)
         participants = []
-        # Atenção que estou a receber as pk da tabela User e não Patient e Caregiver
         for user in request['participants']['caregivers']:
-            participants.append(get_object_or_404(User, pk=user))
+            participants.append(get_object_or_404(Caregiver, pk=user).info)
 
         for user in request['participants']['patients']:
-            participants.append(get_object_or_404(User, pk=user))
+            participants.append(get_object_or_404(Patient, pk=user).info)
         instance.participants.set(participants)
         instance.save()
         return instance

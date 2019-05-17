@@ -3,7 +3,7 @@ import logging
 import json
 
 from backend.cuida24.models import Appointment, AppointmentSerializer, Notification, NotificationSerializer, Session, \
-  SessionSerializer
+  SessionSerializer, Caregiver, Patient
 
 logger = logging.getLogger("mylogger")
 
@@ -262,7 +262,6 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
                         },
                         'id': session['details']['pk'],
                         'schedule': scheduleBackToFrontJSON(session['details']['schedule']),
-                        'participants': session['participants'],
                         'occurrenceDate': {
                             'dayOfMonth': session['details']['dayOfMonth'],
                             'month': session['details']['month'],
@@ -270,6 +269,7 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
                           }
                       }
         }
+        temp_event['event'].update(session['participants'])
         temp.update(temp_event)
         req_data.append(temp)
     return req_data
@@ -302,4 +302,15 @@ def getSessions(participants):
         queryset2 = Notification.objects.filter(event=session['details']['pk']).values('dateTime')
         serializer_notification = NotificationSerializer(queryset2, many=True)
         session['details']['notification'] = serializer_notification.data
+        users = {'users': {}}
+        users['users']['patients'] = []
+        users['users']['caregivers'] = []
+        for user in session['participants']:
+            try:
+                caregiver = Caregiver.objects.get(info_id=user['pk'])
+                users['users']['caregivers'].append(caregiver.pk)
+            except Caregiver.DoesNotExist:
+                patient = Patient.objects.get(info_id=user['pk'])
+                users['users']['patients'].append(patient.pk)
+        session['participants'] = users
     return serializer_session.data
