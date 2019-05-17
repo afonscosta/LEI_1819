@@ -99,7 +99,6 @@
           ></b-form-checkbox-group>
         </b-col>
       </b-row>
-
     </b-container>
 
     <b-container
@@ -112,6 +111,22 @@
         </b-col>
       </b-row>
       <b-row class="justify-content-md-center">
+        <b-col xl="8" lg="8" md="8" sm="12" cols="12">
+          <ReviewGroupSession
+            v-if="reviewGroupSession !== null"
+            :gs="reviewGroupSession"
+            @addComment="changeGSToReviewState"
+            @cancel="cancelReviewGroupSession"
+          />
+          <ReviewIndivSession
+            v-if="reviewIndivSession !== null"
+            :indivS="reviewIndivSession"
+            @addComment="changeISToReviewState"
+            @cancel="cancelReviewIndivSession"
+          />
+        </b-col>
+      </b-row>
+      <b-row v-if="reviewGroupSession === null && reviewIndivSession === null" class="justify-content-md-center">
         <b-col md="6" cols="12">
           <ListGroupSessions
             v-if="selectedSessionTypes.includes('G') || selectedSessionTypes.length === 0"
@@ -119,6 +134,7 @@
             @removeGroupSession="removeGroupSession"
             @editGroupSession="editGroupSession"
             @editParticipants="editParticipants"
+            @reviewSession="startReviewGroupSession"
           />
         </b-col>
         <b-col md="6" cols="12">
@@ -127,6 +143,7 @@
             :filters="selectedStateFilters"
             @removeIndivSession="removeIndivSession"
             @editIndivSession="editIndivSession"
+            @reviewSession="startReviewIndivSession"
           />
         </b-col>
       </b-row>
@@ -139,6 +156,8 @@ import { mapGetters, mapActions, mapState } from 'vuex'
 import FormSession from './FormSession'
 import ListGroupSessions from './ListGroupSessions'
 import ListIndivSessions from './ListIndivSessions'
+import ReviewGroupSession from './ReviewGroupSession'
+import ReviewIndivSession from './ReviewIndivSession'
 import ListUsers from '@/components/ListUsers'
 
 export default {
@@ -147,11 +166,15 @@ export default {
     FormSession,
     ListGroupSessions,
     ListIndivSessions,
+    ReviewGroupSession,
+    ReviewIndivSession,
     ListUsers
   },
   props: {
   },
   data: () => ({
+    reviewGroupSession: null,
+    reviewIndivSession: null,
     groupSessionToRemove: null,
     updateGSParticipants: null,
     indivSessionToRemove: null,
@@ -373,6 +396,32 @@ export default {
         return true
       }
       return false
+    },
+    changeGSToReviewState (comment) {
+      this.reviewGroupSession.groupSession.comment = comment
+      this.reviewGroupSession.groupSession.state = 'R'
+      // fazer update
+      console.log('reviewGroupSession', this.reviewGroupSession)
+      this.reviewGroupSession = null
+    },
+    changeISToReviewState (comment) {
+      this.reviewIndivSession.individualSession.comment = comment
+      this.reviewIndivSession.individualSession.state = 'R'
+      // fazer update
+      console.log('reviewIndivSession', this.reviewIndivSession)
+      this.reviewIndivSession = null
+    },
+    startReviewGroupSession (gs) {
+      this.reviewGroupSession = gs
+    },
+    startReviewIndivSession (is) {
+      this.reviewIndivSession = is
+    },
+    cancelReviewGroupSession () {
+      this.reviewGroupSession = null
+    },
+    cancelReviewIndivSession () {
+      this.reviewIndivSession = null
     }
   }
 }

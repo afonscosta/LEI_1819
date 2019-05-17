@@ -51,6 +51,18 @@
           <b-col xl="3" cols="12">
             <b-button block class="mt-2" variant="danger" @click="removeIndivSession(is)">Eliminar</b-button>
             <b-button block @click="editIndivSession(is)">Editar</b-button>
+            <b-button block 
+              v-if="is.individualSession.state === 'E'"
+              size="sm" 
+              variant="primary" 
+              @click="approveSession(is)"
+            >Aprovar sessão</b-button>
+            <b-button block 
+              v-if="is.individualSession.state === 'E'"
+              size="sm" 
+              variant="primary" 
+              @click="reviewSession(is)"
+            >Rever sessão</b-button>
           </b-col>
         </b-row>
       </b-container>
@@ -117,6 +129,12 @@ export default {
     },
     editIndivSession (is) {
       this.$emit('editIndivSession', is)
+    },
+    approveSession (is) {
+      console.log('approve indiv Session', is)
+    },
+    reviewSession (is) {
+      this.$emit('reviewSession', is)
     }
   }
 }

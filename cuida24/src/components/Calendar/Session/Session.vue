@@ -28,6 +28,7 @@
       :sessionData="sessionData"
       @groupSessionUpdated="groupSessionUpdated"
       @indivSessionUpdated="indivSessionUpdated"
+      @hide="sessionSel = null"
     ></FormSession>
   </div>
 </template>

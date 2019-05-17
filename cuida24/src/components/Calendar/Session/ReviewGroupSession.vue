@@ -1,10 +1,23 @@
 <template>
   <div>
-    <h3 v-if="groupSessions.length === 0 && indivSessions.length !== 0 && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">Não existem sessões de grupo para os utilizadores selecionados.</h3>
+    <b-modal 
+      ref="modal-comment"
+      hide-footer title="Comentário para revisão da sessão"
+    >
+      <b-form @submit.prevent="onSubmit">
+        <b-form-textarea
+          id="textarea"
+          v-model="comment"
+          placeholder="Insira um comentário..."
+          rows="3"
+          max-rows="6"
+        ></b-form-textarea>
+        <b-button class="mt-2" block type="submit" variant="primary">Submit</b-button>
+      </b-form>
+      <b-button class="mt-2" block @click="$refs['modal-comment'].hide()">Cancelar</b-button>
+    </b-modal>
 
     <b-card
-      v-for="gs in groupSessionsFilter"
-      :key="gs.pk"
       border-variant="dark"
       header="Sessão de Grupo"
       no-body
@@ -46,21 +59,16 @@
             </b-card-text>
           </b-col>
           <b-col xl="3" cols="12">
-            <b-button block class="mt-2" variant="danger" @click="removeGroupSession(gs)">Eliminar</b-button>
-            <b-button block @click="editGroupSession(gs)">Editar</b-button>
-            <b-button block size="sm" variant="primary" @click="editParticipants(gs)">Participantes</b-button>
+            <b-button block 
+              variant="primary" 
+              @click="cancel"
+            >Cancelar</b-button>
             <b-button block 
               v-if="gs.groupSession.state === 'E'"
               size="sm" 
               variant="primary" 
-              @click="approveSession(gs)"
-            >Aprovar sessão</b-button>
-            <b-button block 
-              v-if="gs.groupSession.state === 'E'"
-              size="sm" 
-              variant="primary" 
-              @click="reviewSession(gs)"
-            >Rever sessão</b-button>
+              @click="$refs['modal-comment'].show()"
+            >Pedir revisão</b-button>
           </b-col>
         </b-row>
       </b-container>
@@ -69,28 +77,18 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapState } from 'vuex'
-
 export default {
-  name: 'ListGroupSessions',
+  name: 'ReviewGroupSession',
   props: {
-    filters: {
+    gs: {
       required: true,
-      type: Array
+      type: Object
     }
   },
+  data: () => ({
+    comment: ''
+  }),
   computed: {
-    ...mapState({
-      groupSessions: state => state.sessions.groupSessions,
-      indivSessions: state => state.sessions.indivSessions,
-      usersActive: state => state.users.usersActive,
-      caregivers: state => state.users.users.caregivers,
-      patients: state => state.users.users.patients
-    }),
-    ...mapGetters('users', [
-      'getCaregiverByInfoId',
-      'getPatientByInfoId'
-    ]),
     durationUnitTranslated () {
       return (durationUnit) => {
         if (durationUnit === 'minutes') {
@@ -118,74 +116,16 @@ export default {
           return 'Já foi realizada'
         }
       }
-    },
-    groupSessionsFilter () {
-      let data = this.groupSessions
-      if (this.filters.length === 0) {
-        return data
-      }
-      return data.filter(gs => this.filters.includes(gs.groupSession.state))
     }
   },
   methods: {
-    ...mapActions('sessions', [
-      'updateGroupSession'
-    ]),
-    removeGroupSession (gs) {
-      this.$emit('removeGroupSession', gs)
+    onSubmit () {
+      this.$emit('addComment', this.comment)
+      this.$refs['modal-comment'].hide()
     },
-    editGroupSession (gs) {
-      this.$emit('editGroupSession', gs)
-    },
-    editParticipants (gs) {
-      this.$emit('editParticipants', gs)
-    },
-    approveSession (gs) {
-      gs.groupSession.state = 'A'
-      let gsSend = JSON.parse(JSON.stringify(gs))
-      delete gsSend.event.participants
-      gsSend.event.users = {
-        caregivers: [],
-        patients: []
-      }
-      gsSend.event.users.caregivers.push(...gs.event.participants
-        .filter(p => this.isCaregiver(p.pk))
-        .map(p => this.getCaregiverByInfoId(p.pk))
-        .map(c => c.pk))
-      gsSend.event.users.patients.push(...gs.event.participants
-        .filter(p => this.isPatient(p.pk))
-        .map(p => this.getPatientByInfoId(p.pk))
-        .map(p => p.pk))
-
-      console.log('stay', gs)
-      console.log('send', gsSend)
-      this.updateGroupSession({ send: gsSend, stay: gs })
-    },
-    reviewSession (gs) {
-      this.$emit('reviewSession', gs)
-    },
-    isCaregiver (id) {
-      if (this.caregivers.find(u => u.info.pk === id)) {
-        console.log('is caregiver', id)
-        return true
-      }
-      return false
-    },
-    isPatient (id) {
-      if (this.patients.find(u => u.info.pk === id)) {
-        console.log('is patient', id)
-        return true
-      }
-      return false
+    cancel () {
+      this.$emit('cancel')
     }
   }
 }
 </script>
-
-<style>
-@media (min-width: 576px) {
-  b-button-group {
-    vertical: false;
-  }
-}
-</style>

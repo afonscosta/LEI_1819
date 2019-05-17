@@ -101,6 +101,8 @@
             ></b-form-input>
             <b-button @click="addToMaterial">Adicionar item</b-button>
 
+            <b-button variant="primary" v-if="form.id === null" @click="$router.go(-1)">Cancelar</b-button>
+            <b-button variant="primary" v-if="form.id !== null" @click="hide">Cancelar</b-button>
             <b-button type="submit" variant="primary">Submit</b-button>
           </b-form>
         </b-col>
@@ -454,6 +456,9 @@ export default {
         return true
       }
       return false
+    },
+    hide () {
+      this.$emit('hide')
     }
   }
 }
