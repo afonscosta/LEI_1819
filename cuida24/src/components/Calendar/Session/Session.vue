@@ -89,7 +89,7 @@ export default {
         local: s.event.data.location,
         notify: s.event.data.notify,
         sched: this.parseScheduleOption(s),
-        participants: s.event.participants,
+        users: s.event.users,
         id: s.event.id
       }
       this.formData = form
@@ -124,7 +124,7 @@ export default {
         local: s.event.data.location,
         notify: s.event.data.notify,
         sched: this.parseScheduleOption(s),
-        participants: s.event.participants,
+        users: s.event.users,
         id: s.event.id
       }
       this.formData = form

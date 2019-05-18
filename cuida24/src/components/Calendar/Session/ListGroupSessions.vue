@@ -69,7 +69,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions, mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'ListGroupSessions',
@@ -87,10 +87,6 @@ export default {
       caregivers: state => state.users.users.caregivers,
       patients: state => state.users.users.patients
     }),
-    ...mapGetters('users', [
-      'getCaregiverByInfoId',
-      'getPatientByInfoId'
-    ]),
     durationUnitTranslated () {
       return (durationUnit) => {
         if (durationUnit === 'minutes') {
@@ -142,41 +138,10 @@ export default {
     },
     approveSession (gs) {
       gs.groupSession.state = 'A'
-      let gsSend = JSON.parse(JSON.stringify(gs))
-      delete gsSend.event.participants
-      gsSend.event.users = {
-        caregivers: [],
-        patients: []
-      }
-      gsSend.event.users.caregivers.push(...gs.event.participants
-        .filter(p => this.isCaregiver(p.pk))
-        .map(p => this.getCaregiverByInfoId(p.pk))
-        .map(c => c.pk))
-      gsSend.event.users.patients.push(...gs.event.participants
-        .filter(p => this.isPatient(p.pk))
-        .map(p => this.getPatientByInfoId(p.pk))
-        .map(p => p.pk))
-
-      console.log('stay', gs)
-      console.log('send', gsSend)
-      this.updateGroupSession({ send: gsSend, stay: gs })
+      this.updateGroupSession(gs)
     },
     reviewSession (gs) {
       this.$emit('reviewSession', gs)
-    },
-    isCaregiver (id) {
-      if (this.caregivers.find(u => u.info.pk === id)) {
-        console.log('is caregiver', id)
-        return true
-      }
-      return false
-    },
-    isPatient (id) {
-      if (this.patients.find(u => u.info.pk === id)) {
-        console.log('is patient', id)
-        return true
-      }
-      return false
     }
   }
 }

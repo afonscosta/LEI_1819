@@ -167,8 +167,8 @@ export default {
         default: {},
         type: Object
       },
-      participants: {
-        type: Array
+      users: {
+        type: Object
       },
       id: {
         default: null,
@@ -194,7 +194,7 @@ export default {
       local: '',
       notify: [],
       sched: null,
-      participants: [],
+      users: {},
       id: null
     },
     item: '',
@@ -271,53 +271,19 @@ export default {
         }
       }
       if (payload.groupSession && payload.event.id) {
-        let gs = JSON.parse(JSON.stringify(payload))
-        delete gs.event.users
-        gs.event.participants = this.form.participants
-        this.updateGroupSession({ send: payload, stay: gs })
+        this.updateGroupSession(payload)
         this.$emit('groupSessionUpdated', payload.event.occurrenceDate)
       } else if (payload.individualSession && payload.event.id) {
-        let is = JSON.parse(JSON.stringify(payload))
-        delete is.event.users
-        is.event.participants = this.form.participants
-        this.updateIndivSession({ send: payload, stay: is })
+        this.updateIndivSession(payload)
         this.$emit('indivSessionUpdated', payload.event.occurrenceDate)
       } else if (payload.groupSession) {
-        let gs = JSON.parse(JSON.stringify(payload))
-        delete gs.event.users
-        gs.event.participants = []
-        gs.event.participants.push(
-          ...this.usersActive.caregivers
-            .map(pk => this.getCaregiverById(pk))
-            .map(c => ({ name: c.info.name, pk: c.info.pk }))
-        )
-        console.log('patients active', this.usersActive)
-        console.log('patients', this.patients)
-        gs.event.participants.push(
-          ...this.usersActive.patients
-            .map(pk => this.getPatientById(pk))
-            .map(p => ({ name: p.info.name, pk: p.info.pk }))
-        )
-        this.addGroupSession({ send: payload, stay: gs })
+        this.addGroupSession(payload)
         this.$notify({
           title: 'A sessão de grupo foi adicionada com sucesso.',
           duration: 3000
         })
       } else if (payload.individualSession) {
-        let is = JSON.parse(JSON.stringify(payload))
-        delete is.event.users
-        is.event.participants = []
-        is.event.participants.push(
-          ...this.usersActive.caregivers
-            .map(pk => this.getCaregiverById(pk))
-            .map(c => ({ name: c.info.name, pk: c.info.pk }))
-        )
-        is.event.participants.push(
-          ...this.usersActive.patients
-            .map(pk => this.getPatientById(pk))
-            .map(p => ({ name: p.info.name, pk: p.info.pk }))
-        )
-        this.addIndivSession({ send: payload, stay: is })
+        this.addIndivSession(payload)
         this.$notify({
           title: 'A sessão individual foi adicionada com sucesso.',
           duration: 3000
@@ -340,6 +306,7 @@ export default {
         specialty: '',
         notify: [],
         sched: null,
+        users: {},
         id: null
       }
     },
@@ -384,10 +351,7 @@ export default {
     prepareEvent () {
       let users = {}
       if (this.form.id !== null) {
-        users = {
-          caregivers: this.form.participants.filter(p => this.isCaregiver(p.pk)).map(p => p.pk),
-          patients: this.form.participants.filter(p => this.isPatient(p.pk)).map(p => p.pk)
-        }
+        users = this.form.users
       } else {
         users = {
           'caregivers': this.usersActive.caregivers,

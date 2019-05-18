@@ -33,12 +33,8 @@ const mutations = {
     state.indivSessions.push(is)
   },
   updateGroupSession (state, gs) {
-    console.log('gsid', gs.groupSession.pk)
-    console.log('antes', state.groupSessions)
     state.groupSessions = state.groupSessions.filter(s => s.groupSession.pk !== gs.groupSession.pk)
-    console.log('depois', state.groupSessions)
     state.groupSessions.push(gs)
-    console.log('depois', state.groupSessions)
   },
   updateIndivSession (state, is) {
     state.indivSessions = state.indivSessions.filter(s => s.individualSession.pk !== is.individualSession.pk)
@@ -70,47 +66,34 @@ const actions = {
   },
   addGroupSession ({ commit }, gs) {
     console.log('adding groupSession', gs)
-    sessionsService.postSession(gs.send)
+    sessionsService.postSession(gs)
       .then(newGS => {
-        console.log('newGS', newGS)
-        if (gs.stay) {
-          delete newGS.event.users
-          newGS.event.participants = gs.stay.event.participants
-          commit('addGroupSession', newGS)
-        }
+        commit('addGroupSession', newGS)
         this.dispatch('events/addEvent', newGS.event)
       })
   },
   addIndivSession ({ commit }, is) {
     console.log('adding indivSession', is)
-    sessionsService.postSession(is.send)
+    sessionsService.postSession(is)
       .then(newIS => {
-        if (is.stay) {
-          delete newIS.event.users
-          newIS.event.participants = is.stay.event.participants
-          commit('addIndivSession', newIS)
-        }
+        commit('addIndivSession', newIS)
         this.dispatch('events/addEvent', newIS.event)
       })
   },
   updateGroupSession ({ commit }, gs) {
     console.log('updating groupSession', gs)
-    sessionsService.putSession(gs.send)
+    sessionsService.putSession(gs)
       .then(() => {
-        if (gs.stay) {
-          commit('updateGroupSession', gs.stay)
-        }
-        this.dispatch('events/updateEvent', gs.send.event)
+        commit('updateGroupSession', gs)
+        this.dispatch('events/updateEvent', gs.event)
       })
   },
   updateIndivSession ({ commit }, is) {
     console.log('updating indivSession', is)
-    sessionsService.putSession(is.send)
+    sessionsService.putSession(is)
       .then(() => {
-        if (is.stay) {
-          commit('updateIndivSession', is.stay)
-        }
-        this.dispatch('events/updateEvent', is.send.event)
+        commit('updateIndivSession', is)
+        this.dispatch('events/updateEvent', is.event)
       })
   },
   deleteGroupSession ({ commit }, gs) {

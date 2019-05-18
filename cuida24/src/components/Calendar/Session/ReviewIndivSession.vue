@@ -58,7 +58,7 @@
               <b>Localização:</b> {{ indivS.event.data.location }}
             </b-card-text>
             <b-card-text align="left">
-              <b>Participante:</b> {{ indivS.event.participants[0].name }}
+              <b>Participante:</b> {{ userName(indivS) }}
             </b-card-text>
           </b-col>
           <b-col xl="3" cols="12">
@@ -80,6 +80,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'ReviewIndivSession',
   props: {
@@ -92,6 +94,10 @@ export default {
     comment: ''
   }),
   computed: {
+    ...mapGetters('users', [
+      'getCaregiverByInfoId',
+      'getPatientByInfoId'
+    ]),
     durationUnitTranslated () {
       return (durationUnit) => {
         if (durationUnit === 'minutes') {
@@ -128,6 +134,13 @@ export default {
     },
     cancel () {
       this.$emit('cancel')
+    },
+    userName (is) {
+      if (is.event.users.caregivers.length > 0) {
+        return this.getCaregiverByInfoId(is.event.users.caregivers[0]).info.name
+      } else if (is.event.users.patients.length > 0) {
+        return this.getPatientByInfoId(is.event.users.patients[0]).info.name
+      }
     }
   }
 }

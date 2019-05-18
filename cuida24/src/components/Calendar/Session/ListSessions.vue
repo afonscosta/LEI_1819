@@ -208,8 +208,8 @@ export default {
       patients: state => state.users.users.patients
     }),
     ...mapGetters('users', [
-      'getCaregiverByInfoId',
-      'getPatientByInfoId'
+      'getCaregiverById',
+      'getPatientById'
     ]),
     durationUnitTranslated () {
       return (durationUnit) => {
@@ -243,13 +243,11 @@ export default {
   watch: {
     editingPartiMode: function (val) {
       if (this.editingPartiMode) {
-        this.participantsCaregivers = this.updateGSParticipants.event.participants
-          .filter(p => this.isCaregiver(p.pk))
-          .map(p => this.getCaregiverByInfoId(p.pk))
+        this.participantsCaregivers = this.updateGSParticipants.event.users.caregivers
+          .map(pk => this.getCaregiverById(pk))
 
-        this.participantsPatients = this.updateGSParticipants.event.participants
-          .filter(p => this.isPatient(p.pk))
-          .map(p => this.getPatientByInfoId(p.pk))
+        this.participantsPatients = this.updateGSParticipants.event.users.patients
+          .map(pk => this.getPatientById(pk))
       } else {
         this.participantsCaregivers = []
         this.participantsPatients = []
@@ -272,16 +270,11 @@ export default {
       this.showModal('modal-group')
     },
     editParticipants (gs) {
-      this.participantsCaregivers = gs.event.participants
-        .filter(p => this.isCaregiver(p.pk))
-        .map(p => this.getCaregiverByInfoId(p.pk))
+      this.participantsCaregivers = gs.event.users.caregivers
+        .map(pk => this.getCaregiverById(pk))
 
-      this.participantsPatients = gs.event.participants
-        .filter(p => this.isPatient(p.pk))
-        .map(p => this.getPatientByInfoId(p.pk))
-
-      this.participantsCaregivers = this.participantsCaregivers.filter(p => p !== null)
-      this.participantsPatients = this.participantsPatients.filter(p => p !== null)
+      this.participantsPatients = gs.event.users.patients
+        .map(pk => this.getPatientById(pk))
       this.updateGSParticipants = gs
       this.showModal('modal-participants')
     },
@@ -312,16 +305,11 @@ export default {
         this.$refs['modal-indiv'].hide()
       } else if (type === 'part') {
         if (bool === true) {
-          console.log('updating participants of group session with PK =', this.updateGSParticipants.groupSession.pk)
-          let gs = JSON.parse(JSON.stringify(this.updateGSParticipants))
-          delete this.updateGSParticipants.event.participants
+          console.log('updating users of group session with PK =', this.updateGSParticipants.groupSession.pk)
           this.updateGSParticipants.event.users = {
             caregivers: this.participantsCaregivers.map(u => u.pk),
             patients: this.participantsPatients.map(u => u.pk)
           }
-          gs.event.participants = []
-          gs.event.participants.push(...this.participantsCaregivers.map(u => ({ name: u.info.name, pk: u.info.pk })))
-          gs.event.participants.push(...this.participantsPatients.map(u => ({ name: u.info.name, pk: u.info.pk })))
           let remove = true
           console.log('partCare', this.participantsCaregivers)
           console.log('partPat', this.participantsPatients)
@@ -342,12 +330,11 @@ export default {
           }
           if (remove) {
             console.log('enter remove')
-            this.dontShowGroupSession(gs)
-            this.updateGroupSession({ send: this.updateGSParticipants, stay: null })
+            this.dontShowGroupSession(this.updateGSParticipants)
+            this.updateGroupSession(this.updateGSParticipants)
           } else {
-            console.log('stay', gs)
-            console.log('send', this.updateGSParticipants)
-            this.updateGroupSession({ send: this.updateGSParticipants, stay: gs })
+            console.log('updateGroupSession', this.updateGSParticipants)
+            this.updateGroupSession(this.updateGSParticipants)
             this.$emit('groupSessionUpdated', this.updateGSParticipants.event.occurrenceDate)
           }
         }
@@ -383,31 +370,17 @@ export default {
     goToFormSession () {
       this.$router.push({ name: 'formSession' })
     },
-    isCaregiver (id) {
-      if (this.caregivers.find(u => u.info.pk === id)) {
-        console.log('is caregiver', id)
-        return true
-      }
-      return false
-    },
-    isPatient (id) {
-      if (this.patients.find(u => u.info.pk === id)) {
-        console.log('is patient', id)
-        return true
-      }
-      return false
-    },
     changeGSToReviewState (comment) {
       this.reviewGroupSession.groupSession.comment = comment
       this.reviewGroupSession.groupSession.state = 'R'
-      // fazer update
+      this.updateGroupSession(this.reviewGroupSession)
       console.log('reviewGroupSession', this.reviewGroupSession)
       this.reviewGroupSession = null
     },
     changeISToReviewState (comment) {
       this.reviewIndivSession.individualSession.comment = comment
       this.reviewIndivSession.individualSession.state = 'R'
-      // fazer update
+      this.updateIndivSession(this.reviewIndivSession)
       console.log('reviewIndivSession', this.reviewIndivSession)
       this.reviewIndivSession = null
     },

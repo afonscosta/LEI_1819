@@ -45,7 +45,7 @@
               <b>Localização:</b> {{ is.event.data.location }}
             </b-card-text>
             <b-card-text align="left">
-              <b>Participante:</b> {{ is.event.participants[0].name }}
+              <b>Participante:</b> {{ userName(is) }}
             </b-card-text>
           </b-col>
           <b-col xl="3" cols="12">
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'ListIndivSessions',
@@ -87,6 +87,10 @@ export default {
       indivSessions: state => state.sessions.indivSessions,
       usersActive: state => state.users.usersActive
     }),
+    ...mapGetters('users', [
+      'getCaregiverById',
+      'getPatientById'
+    ]),
     durationUnitTranslated () {
       return (durationUnit) => {
         if (durationUnit === 'minutes') {
@@ -124,6 +128,9 @@ export default {
     }
   },
   methods: {
+    ...mapActions('sessions', [
+      'updateIndivSession'
+    ]),
     removeIndivSession (is) {
       this.$emit('removeIndivSession', is)
     },
@@ -131,10 +138,18 @@ export default {
       this.$emit('editIndivSession', is)
     },
     approveSession (is) {
-      console.log('approve indiv Session', is)
+      is.individualSession.state = 'A'
+      this.updateIndivSession(is)
     },
     reviewSession (is) {
       this.$emit('reviewSession', is)
+    },
+    userName (is) {
+      if (is.event.users.caregivers.length > 0) {
+        return this.getCaregiverById(is.event.users.caregivers[0]).info.name
+      } else if (is.event.users.patients.length > 0) {
+        return this.getPatientById(is.event.users.patients[0]).info.name
+      }
     }
   }
 }
