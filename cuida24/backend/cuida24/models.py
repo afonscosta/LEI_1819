@@ -526,7 +526,7 @@ class Session(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         self.details.delete()
-        # Falta o evaluation
+        Evaluation.objects.filter(session=self).delete()
         super(Session, self).delete()
 
 
@@ -610,11 +610,11 @@ class SessionSerializer(serializers.ModelSerializer):
 
 class Evaluation(models.Model):
     comment = models.TextField()
-    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+    participant = models.ForeignKey(User, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
 
 
 class EvaluationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evaluation
-        fields = ('comment', 'caregiver', 'session', 'pk')
+        fields = ('comment', 'participant', 'session', 'pk')

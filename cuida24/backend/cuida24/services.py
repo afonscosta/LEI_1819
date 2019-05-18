@@ -2,6 +2,8 @@ import copy
 import logging
 import json
 
+from django.shortcuts import get_object_or_404
+
 from backend.cuida24.models import Appointment, AppointmentSerializer, Notification, NotificationSerializer, Session, \
   SessionSerializer, Caregiver, Patient
 
@@ -324,3 +326,42 @@ def getSessions(participants):
                 users['users']['patients'].append(patient.pk)
         session['participants'] = users
     return serializer_session.data
+
+
+def evaluationFrontToBackJSON(request_param):
+    request = copy.deepcopy(request_param)
+    req_data = {'comment': request['comment'], 'session': request['sessionPK']}
+    if 'patientPK' in request:
+        req_data['participant'] = get_object_or_404(Patient, pk=request['patientPK']).info_id
+    else:
+        req_data['participant'] = get_object_or_404(Caregiver, pk=request['caregiverPK']).info_id
+    if 'pk' in request:
+        req_data['pk'] = request['pk']
+    return req_data
+
+def evaluationBackToFrontJSON(request_param, serializer_data):
+    request = copy.deepcopy(request_param)
+    sent_data = request
+    sent_data['pk'] = serializer_data['pk']
+    try:
+        caregiver = Caregiver.objects.get(info_id=serializer_data['participant']).pk
+        sent_data['caregiverPK'] = caregiver
+    except Caregiver.DoesNotExist:
+        patient = Patient.objects.get(info_id=serializer_data['participant']).pk
+        sent_data['patientPK'] = patient
+    return sent_data
+
+
+'''
+JSON return on Get method. Here is necessary to create all fields in JSON     
+'''
+def getEvaluationBackToFrontJSON(serializer_data):
+    request = copy.deepcopy(serializer_data)
+    req_data = {'comment': request['comment'], 'sessionPK': request['session']}
+    try:
+        caregiver = Caregiver.objects.get(info_id=serializer_data['participant']).pk
+        req_data['caregiverPK'] = caregiver
+    except Caregiver.DoesNotExist:
+        patient = Patient.objects.get(info_id=serializer_data['participant']).pk
+        req_data['patientPK'] = patient
+    return req_data
