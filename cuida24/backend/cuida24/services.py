@@ -170,6 +170,11 @@ def sessionFrontToBackJSON(request_param):
         req_data['goal'] = json.dumps(request['groupSession']['goals'])
         req_data['material'] = json.dumps(request['groupSession']['materials'])
         req_data['topic'] = request['groupSession']['theme']
+        req_data['state'] = request['groupSession']['state']
+        if 'comment' in request['groupSession']:
+            req_data['comment'] = request['groupSession']['comment']
+        else:
+            req_data['comment'] = None
         if 'pk' in request['groupSession']:
             req_data['pk'] = request['groupSession']['pk']
     else:
@@ -178,10 +183,14 @@ def sessionFrontToBackJSON(request_param):
         req_data['goal'] = json.dumps(request['individualSession']['goals'])
         req_data['material'] = json.dumps(request['individualSession']['materials'])
         req_data['topic'] = request['individualSession']['theme']
+        req_data['state'] = request['individualSession']['state']
+        if 'comment' in request['individualSession']:
+            req_data['comment'] = request['individualSession']['comment']
+        else:
+            req_data['comment'] = None
         if 'pk' in request['individualSession']:
             req_data['pk'] = request['individualSession']['pk']
 
-    req_data['state'] = 'E'
 
     calendar_pk = req_data['details']['calendar']
     req_data['details']['calendar'] = {}
@@ -244,7 +253,8 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
                         'description': session['description'],
                         'goals': json.loads(session['goal']),
                         'materials': json.loads(session['material']),
-                        'state': session['state']
+                        'state': session['state'],
+                        'comment': session['comment']
         }
         if session['type'] == 'I':
             temp['individualSession'] = temp_session

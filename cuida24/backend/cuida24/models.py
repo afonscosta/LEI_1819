@@ -517,7 +517,8 @@ class Session(models.Model):
     type = models.CharField(max_length=1, choices=TYPE)
     description = models.TextField()
     goal = models.TextField()
-    material = models.TextField()
+    material = models.TextField(blank=True, null=True)
+    comment = models.TextField(blank=True, null=True)
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
     state = models.CharField(max_length=1, choices=STATE)
     # Relação many-to-many só tem que estar num model
@@ -536,7 +537,8 @@ class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        fields = ('topic', 'type', 'description', 'goal', 'material', 'details', 'state', 'participants', 'pk')
+        fields = ('topic', 'type', 'description', 'goal', 'material', 'details', 'state', 'comment', 'participants',
+                  'pk')
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -594,6 +596,7 @@ class SessionSerializer(serializers.ModelSerializer):
         instance.goal = validated_data.get("goal", instance.goal)
         instance.material = validated_data.get("material", instance.material)
         instance.state = validated_data.get("state", instance.state)
+        instance.comment = validated_data.get('comment', instance.comment)
         participants = []
         for user in request['participants']['caregivers']:
             participants.append(get_object_or_404(Caregiver, pk=user).info)

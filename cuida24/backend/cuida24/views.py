@@ -216,9 +216,9 @@ class SessionsViewSet(viewsets.ModelViewSet):
         req_data = sessionFrontToBackJSON(request.data)
         session = get_object_or_404(Session, pk=req_data['pk'])
         logger.info(session.topic)
-        serializer = SessionSerializer(data=req_data, instance=session, context={'request': req_data})
         logger.info("DATA SENT")
         logger.info(req_data)
+        serializer = SessionSerializer(data=req_data, instance=session, context={'request': req_data})
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
