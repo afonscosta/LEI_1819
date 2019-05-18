@@ -55,12 +55,6 @@
               v-if="is.individualSession.state === 'E'"
               size="sm" 
               variant="primary" 
-              @click="approveSession(is)"
-            >Aprovar sessão</b-button>
-            <b-button block 
-              v-if="is.individualSession.state === 'E'"
-              size="sm" 
-              variant="primary" 
               @click="reviewSession(is)"
             >Rever sessão</b-button>
           </b-col>
@@ -136,10 +130,6 @@ export default {
     },
     editIndivSession (is) {
       this.$emit('editIndivSession', is)
-    },
-    approveSession (is) {
-      is.individualSession.state = 'A'
-      this.updateIndivSession(is)
     },
     reviewSession (is) {
       this.$emit('reviewSession', is)

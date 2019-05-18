@@ -53,12 +53,6 @@
               v-if="gs.groupSession.state === 'E'"
               size="sm" 
               variant="primary" 
-              @click="approveSession(gs)"
-            >Aprovar sessão</b-button>
-            <b-button block 
-              v-if="gs.groupSession.state === 'E'"
-              size="sm" 
-              variant="primary" 
               @click="reviewSession(gs)"
             >Rever sessão</b-button>
           </b-col>
@@ -135,10 +129,6 @@ export default {
     },
     editParticipants (gs) {
       this.$emit('editParticipants', gs)
-    },
-    approveSession (gs) {
-      gs.groupSession.state = 'A'
-      this.updateGroupSession(gs)
     },
     reviewSession (gs) {
       this.$emit('reviewSession', gs)

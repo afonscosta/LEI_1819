@@ -20,14 +20,13 @@
       v-if="!sessionSel"
       @editGroupSession="editGroupSession"
       @editIndivSession="editIndivSession"
-      @groupSessionUpdated="groupSessionUpdated"
     ></ListSessions>
     <FormSession
       v-if="sessionSel"
       :formData="formData"
       :sessionData="sessionData"
-      @groupSessionUpdated="groupSessionUpdated"
-      @indivSessionUpdated="indivSessionUpdated"
+      @groupSessionUpdated="sessionSel = !sessionSel"
+      @indivSessionUpdated="sessionSel = !sessionSel"
       @hide="sessionSel = null"
     ></FormSession>
   </div>
@@ -94,7 +93,6 @@ export default {
       }
       this.formData = form
       this.sessionData = s.groupSession
-      // this.sessionData.state = 'waiting'
       console.log('formData', this.formData)
       console.log('sessionData', this.sessionData)
       console.log('sessionSel', this.sessionSel)
@@ -173,20 +171,6 @@ export default {
         rec = 'yearly'
       }
       return rec
-    },
-    groupSessionUpdated (occurrenceDate) {
-      this.sessionSel = false
-      this.$notify({
-        title: 'A sessão de grupo foi atualizada com sucesso.',
-        duration: 3000
-      })
-    },
-    indivSessionUpdated (occurrenceDate) {
-      this.sessionSel = false
-      this.$notify({
-        title: 'A sessão individual foi atualizada com sucesso.',
-        duration: 3000
-      })
     }
   }
 }

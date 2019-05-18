@@ -7,21 +7,27 @@
       :width="450"
       animation-name="v-fade-top"
     />
-    <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Não foi selecionado nenhum utilizador.</h3>
-    <h3 v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
+
+    <div v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">
+      <h3>Não foi selecionado nenhum utilizador.</h3>
+      <h3>Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
+    </div>
+
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
-      <b-row sm="auto">
+      <b-row>
         <b-col md="6" sm="12">
           <b-form>
-
-            <b-form-group id="input-group-1" label="Especialidade:" label-for="input-1">
-              <b-form-input
-                id="input-1"
-                v-model="formData.specialty"
-                required
-                placeholder="Introduza a especialidade da consulta"
-              ></b-form-input>
-            </b-form-group>
+            <b-row align-h="start">
+              <b-col align-self="start">
+                <label class="mt-2"><b>Especialidade:</b></label>
+                <b-form-input
+                  id="input-1"
+                  v-model="formData.specialty"
+                  required
+                  placeholder="Introduza a especialidade da consulta"
+                ></b-form-input>
+              </b-col>
+            </b-row>
 
             <b-form-group
               id="input-group-2"
@@ -98,6 +104,7 @@
           <calReadOnly></calReadOnly>
         </b-col>
       </b-row>
+
       <b-row>
         <b-col>
           <b-button variant="primary" v-if="formData.id === null" @click="$router.go(-1)">Cancelar</b-button>
@@ -105,7 +112,6 @@
           <b-button variant="primary" @click="onSubmit">Submeter</b-button>
         </b-col>
       </b-row>
-
     </b-container>
   </div>
 </template>

@@ -69,6 +69,12 @@
               variant="primary" 
               @click="$refs['modal-comment'].show()"
             >Pedir revisão</b-button>
+            <b-button block 
+              v-if="gs.groupSession.state === 'E'"
+              size="sm" 
+              variant="primary" 
+              @click="approveSession(gs)"
+            >Aprovar sessão</b-button>
           </b-col>
         </b-row>
       </b-container>
@@ -125,6 +131,9 @@ export default {
     },
     cancel () {
       this.$emit('cancel')
+    },
+    approveSession (gs) {
+      this.$emit('approveSession', gs)
     }
   }
 }
