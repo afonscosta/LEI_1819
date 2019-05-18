@@ -1,11 +1,15 @@
 <template>
   <div>
-    <h3 
-      v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0"
-    >Não foi selecionado nenhum utilizador.</h3>
-    <h3 
-      v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0"
-    >Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
+    <div v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">
+      <h3>Não foi selecionado nenhum utilizador.</h3>
+      <h3>Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
+    </div>
+
+    <b-card v-if="session.comment !== null" title="Comentário associado ao pedido de revisão">
+      <b-card-text>
+        {{ session.comment }}
+      </b-card-text>
+    </b-card>
 
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row sm="auto">
@@ -183,6 +187,7 @@ export default {
       goals: [],
       materials: [],
       state: 'E',
+      comment: null,
       pk: null
     },
     form: {
@@ -270,13 +275,38 @@ export default {
           'event': eventData
         }
       }
-      if (payload.groupSession && payload.event.id) {
+      // If has id and state equals 'R' then is revision
+      if (payload.groupSession && payload.event.id && payload.groupSession.state === 'R') {
+        payload.groupSession.state = 'E'
         this.updateGroupSession(payload)
-        this.$emit('groupSessionUpdated', payload.event.occurrenceDate)
+        this.$notify({
+          title: 'A sessão de grupo revista foi atualizada com sucesso.',
+          duration: 3000
+        })
+        this.$emit('groupSessionUpdated')
+      } else if (payload.individualSession && payload.event.id && payload.individualSession.state === 'R') {
+        payload.individualSession.state = 'E'
+        this.updateIndivSession(payload)
+        this.$notify({
+          title: 'A sessão individual revista foi atualizada com sucesso.',
+          duration: 3000
+        })
+        this.$emit('indivSessionUpdated')
+      } else if (payload.groupSession && payload.event.id) { // If has id then is a simple update
+        this.updateGroupSession(payload)
+        this.$notify({
+          title: 'A sessão de grupo foi atualizada com sucesso.',
+          duration: 3000
+        })
+        this.$emit('groupSessionUpdated')
       } else if (payload.individualSession && payload.event.id) {
         this.updateIndivSession(payload)
-        this.$emit('indivSessionUpdated', payload.event.occurrenceDate)
-      } else if (payload.groupSession) {
+        this.$notify({
+          title: 'A sessão individual foi atualizada com sucesso.',
+          duration: 3000
+        })
+        this.$emit('indivSessionUpdated')
+      } else if (payload.groupSession) { // If doesn't have id then is a new session
         this.addGroupSession(payload)
         this.$notify({
           title: 'A sessão de grupo foi adicionada com sucesso.',
@@ -294,7 +324,9 @@ export default {
         description: '',
         goals: [],
         materials: [],
-        state: 'E'
+        state: 'E',
+        comment: null,
+        pk: null
       }
       this.form = {
         dateValue: '',

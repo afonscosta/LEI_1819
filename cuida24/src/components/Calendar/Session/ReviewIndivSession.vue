@@ -72,6 +72,12 @@
               variant="primary" 
               @click="$refs['modal-comment'].show()"
             >Pedir revisão</b-button>
+            <b-button block 
+              v-if="indivS.individualSession.state === 'E'"
+              size="sm" 
+              variant="primary" 
+              @click="approveSession(indivS)"
+            >Aprovar sessão</b-button>
           </b-col>
         </b-row>
       </b-container>
@@ -141,6 +147,9 @@ export default {
       } else if (is.event.users.patients.length > 0) {
         return this.getPatientByInfoId(is.event.users.patients[0]).info.name
       }
+    },
+    approveSession (is) {
+      this.$emit('approveSession', is)
     }
   }
 }

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--Modal delete group session-->
     <b-modal 
       ref="modal-group"
       hide-footer title="Eliminação de sessão de grupo"
@@ -11,6 +12,7 @@
       <b-button class="mt-3" variant="danger" block @click="confirme('group', true)">Sim</b-button>
     </b-modal>
 
+    <!--Modal delete individual session-->
     <b-modal 
       ref="modal-indiv"
       hide-footer title="Eliminação de sessão individual"
@@ -22,6 +24,7 @@
       <b-button class="mt-3" variant="danger" block @click="confirme('indiv', true)">Sim</b-button>
     </b-modal>
 
+    <!--Modal edit participants-->
     <b-modal 
       ref="modal-participants"
       hide-footer centered
@@ -69,6 +72,7 @@
       <b-button v-if="editingPartiMode" class="mt-3" variant="danger" block @click="confirme('part', true)">Guardar</b-button>
     </b-modal>
 
+    <!--Filter options + Button to add new session-->
     <b-container
       v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row class="justify-content-md-center">
@@ -101,6 +105,7 @@
       </b-row>
     </b-container>
 
+    <!--List/Reviews of group/indiv sessions-->
     <b-container
       v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0"
     >
@@ -116,12 +121,14 @@
             v-if="reviewGroupSession !== null"
             :gs="reviewGroupSession"
             @addComment="changeGSToReviewState"
+            @approveSession="approveGroupSession"
             @cancel="cancelReviewGroupSession"
           />
           <ReviewIndivSession
             v-if="reviewIndivSession !== null"
             :indivS="reviewIndivSession"
             @addComment="changeISToReviewState"
+            @approveSession="approveIndivSession"
             @cancel="cancelReviewIndivSession"
           />
         </b-col>
@@ -181,7 +188,7 @@ export default {
     participantsCaregivers: [],
     participantsPatients: [],
     editingPartiMode: false,
-    selectedStateFilters: ['E'],
+    selectedStateFilters: [],
     filterStateOptions: [
       { text: 'Espera', value: 'E' },
       { text: 'Revisão', value: 'R' },
@@ -293,6 +300,10 @@ export default {
         if (bool === true) {
           console.log('deleting groupSession with PK =', this.groupSessionToRemove.groupSession.pk)
           this.deleteGroupSession(this.groupSessionToRemove)
+          this.$notify({
+            title: 'A sessão de grupo foi eliminada com sucesso.',
+            duration: 3000
+          })
         }
         this.groupSessionToRemove = null
         this.$refs['modal-group'].hide()
@@ -300,6 +311,10 @@ export default {
         if (bool === true) {
           console.log('deleting indivSession with PK =', this.indivSessionToRemove.individualSession.pk)
           this.deleteIndivSession(this.indivSessionToRemove)
+          this.$notify({
+            title: 'A sessão individual foi eliminada com sucesso.',
+            duration: 3000
+          })
         }
         this.indivSessionToRemove = null
         this.$refs['modal-indiv'].hide()
@@ -335,8 +350,11 @@ export default {
           } else {
             console.log('updateGroupSession', this.updateGSParticipants)
             this.updateGroupSession(this.updateGSParticipants)
-            this.$emit('groupSessionUpdated', this.updateGSParticipants.event.occurrenceDate)
           }
+          this.$notify({
+            title: 'Os participantes da sessão de grupo foram atualizados com sucesso.',
+            duration: 3000
+          })
         }
         this.updateGSParticipants = null
         this.editingPartiMode = false
@@ -346,10 +364,18 @@ export default {
     beforeUpdateGroupSession (gs) {
       this.editingGroupSession = null
       this.updateGroupSession(gs)
+      this.$notify({
+        title: 'A sessão de grupo foi atualizada com sucesso.',
+        duration: 3000
+      })
     },
     beforeUpdateIndivSession (is) {
       this.editingIndivSession = null
       this.updateIndivSession(is)
+      this.$notify({
+        title: 'A sessão individual foi atualizada com sucesso.',
+        duration: 3000
+      })
     },
     removeSelectedCaregiver (userPK) {
       if ((this.participantsCaregivers.length + this.participantsPatients.length) > 2) {
@@ -374,14 +400,20 @@ export default {
       this.reviewGroupSession.groupSession.comment = comment
       this.reviewGroupSession.groupSession.state = 'R'
       this.updateGroupSession(this.reviewGroupSession)
-      console.log('reviewGroupSession', this.reviewGroupSession)
+      this.$notify({
+        title: 'A revisão da sessão de grupo foi submetida com sucesso.',
+        duration: 3000
+      })
       this.reviewGroupSession = null
     },
     changeISToReviewState (comment) {
       this.reviewIndivSession.individualSession.comment = comment
       this.reviewIndivSession.individualSession.state = 'R'
       this.updateIndivSession(this.reviewIndivSession)
-      console.log('reviewIndivSession', this.reviewIndivSession)
+      this.$notify({
+        title: 'A revisão da sessão individual foi submetida com sucesso.',
+        duration: 3000
+      })
       this.reviewIndivSession = null
     },
     startReviewGroupSession (gs) {
@@ -394,6 +426,24 @@ export default {
       this.reviewGroupSession = null
     },
     cancelReviewIndivSession () {
+      this.reviewIndivSession = null
+    },
+    approveGroupSession (gs) {
+      gs.groupSession.state = 'A'
+      this.updateGroupSession(gs)
+      this.$notify({
+        title: 'A sessão de grupo foi aprovada com sucesso.',
+        duration: 3000
+      })
+      this.reviewGroupSession = null
+    },
+    approveIndivSession (is) {
+      is.individualSession.state = 'A'
+      this.updateIndivSession(is)
+      this.$notify({
+        title: 'A sessão individual foi aprovada com sucesso.',
+        duration: 3000
+      })
       this.reviewIndivSession = null
     }
   }
