@@ -14,101 +14,205 @@
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row sm="auto">
         <b-col md="6" sm="12">
-          <b-form @submit.prevent="onSubmit">
-            <b-form-input
-              id="theme"
-              v-model="session.theme"
-              required
-              placeholder="Introduza o tema da sessão de grupo"
-            ></b-form-input>
+          <b-card bg-variant="light">
+            <b-form align="left" @submit.prevent="onSubmit">
+              <b-form-group
+                id="input-group-1"
+                label="Tema"
+                label-for="theme"
+              >
+                <b-form-input
+                  id="theme"
+                  v-model="session.theme"
+                  required
+                  placeholder="Introduza o tema da sessão de grupo"
+                ></b-form-input>
+              </b-form-group>
 
-            <datetime 
-              type="date" 
-              v-model="form.dateValue"
-              :phrases="datetime.phrases"
-              :week-start="datetime['week-start']"
-              :min-datetime="datetime.minDatetime"
-              @close="updateNotify"
-            ></datetime>
+              <b-form-group
+                id="input-group-2"
+                label="Data"
+                label-for="theme"
+              >
+                <datetime 
+                  class="form-control"
+                  type="date" 
+                  v-model="form.dateValue"
+                  :phrases="datetime.phrases"
+                  :week-start="datetime['week-start']"
+                  :min-datetime="datetime.minDatetime"
+                  @close="updateNotify"
+                ></datetime>
+              </b-form-group>
 
-            <schedule
-              @throwEvent="parseScheduleOption"
-            ></schedule>
+              <b-form-group
+                id="input-group-3"
+                label="Repetição"
+                label-for="input-3"
+              >
+                <b-form-select
+                  v-model="selectedSchedule"
+                  :options="optionsSchedule"
+                ></b-form-select>
+              </b-form-group>
 
-            <b-form-checkbox-group v-model="form.allDay" id="checkboxes-3">
-              <b-form-checkbox value="true">Dia inteiro</b-form-checkbox>
-            </b-form-checkbox-group>
+              <b-form-checkbox-group
+                class="mt-3 mb-3"
+                v-model="form.allDay"
+                id="checkboxes-3">
+                <b-form-checkbox value="true">Dia inteiro</b-form-checkbox>
+              </b-form-checkbox-group>
 
-            <datetime 
-              type="time"
-              v-if="!form.allDay"
-              v-model="form.timeValue"
-            ></datetime>
-            <b-form-input
-              v-if="!form.allDay"
-              id="input-3"
-              v-model="form.duration"
-              required
-              placeholder="Duração"
-            ></b-form-input>
-            <b-form-select
-              v-if="!form.allDay"
-              id="input-4"
-              v-model="form.durationUnit"
-              :options="durations"
-              required
-            ></b-form-select>
-            
-            <b-form-input
-              id="input-5"
-              v-model="form.local"
-              required
-              placeholder="Introduza localização"
-            ></b-form-input>
+              <b-container 
+                class="m-0 p-0"
+                v-if="!form.allDay"
+              >
+                <b-row class="m-0 p-0">
+                  <b-col cols="6" class="p-0 pr-3">
+                    <b-form-group
+                      id="input-group-4"
+                      label="Hora"
+                      label-for="input-4"
+                    >
+                      <datetime 
+                        class="form-control"
+                        type="time"
+                        v-model="form.timeValue"
+                      ></datetime>
+                    </b-form-group>
+                  </b-col>
+                  <b-col cols="6" class="p-0">
+                    <b-form-group
+                      id="input-group-7"
+                      label="Duração"
+                      label-for="input-7"
+                    >
+                      <b-row>
+                        <b-col cols="4" class="pr-1">
+                          <b-form-input
+                            width="100%"
+                            id="input-7"
+                            v-model="form.duration"
+                            required
+                            placeholder="Introduza uma duração"
+                          ></b-form-input>
+                        </b-col>
+                        <b-col cols="8" class="pl-0">
+                          <b-form-select
+                            width="100%"
+                            id="input-8"
+                            v-model="form.durationUnit"
+                            :options="durations"
+                            required
+                          ></b-form-select>
+                        </b-col>
+                      </b-row>
+                    </b-form-group>
+                  </b-col>
+                </b-row>
+              </b-container>
+              
+              <b-form-group id="input-group-5" label="Localização" label-for="input-5">
+                <b-form-input
+                  id="input-5"
+                  v-model="form.local"
+                  required
+                  placeholder="Introduza localização"
+                ></b-form-input>
+              </b-form-group>
 
-            <notification
-              :notify="form.notify"
-            ></notification>
+              <b-form-group
+                id="input-group-6"
+                label="Notificações"
+                label-for="input-6"
+              >
+                <notification
+                  :notify="form.notify"
+                ></notification>
+              </b-form-group>
 
-            <b-form-textarea
-              id="description"
-              v-model="session.description"
-              required
-              rows="3"
-              max-rows="6"
-              placeholder="Insira a descrição da sessão de grupo aqui"
-            ></b-form-textarea>
+              <b-form-group
+                id="input-group-6"
+                label="Descrição"
+                label-for="input-6"
+              >
+                <b-form-textarea
+                  id="description"
+                  v-model="session.description"
+                  required
+                  rows="3"
+                  max-rows="6"
+                  placeholder="Insira a descrição da sessão de grupo aqui"
+                ></b-form-textarea>
+              </b-form-group>
 
-            <b-list-group>
-              <b-list-group-item
-                v-for="g in session.goals"
-                :key="g"
-              >{{ g }}</b-list-group-item>
-            </b-list-group>
-            <b-form-input
-              id="goal"
-              v-model="goal"
-              placeholder="Adicione um objetivo..."
-            ></b-form-input>
-            <b-button @click="addToGoals">Adicionar objetivo</b-button>
+              <b-form-group
+                id="input-group-7"
+                label="Objetivos"
+                label-for="input-7"
+              >
+                <b-row v-for="(g,idx) in session.goals" :key="g" align-v="center" align-h="between">
+                  <b-col cols="10" class="pr-0">
+                    <p class="form-control m-0 mb-1">{{ g }}</p>
+                  </b-col>
+                  <b-col cols="2" class="pr-0">
+                    <b-button class="p-0 ml-2" variant="danger" @click="removeGoal(idx)"><v-icon>delete</v-icon></b-button>
+                  </b-col>
+                </b-row>
+                <b-row align-v="center" align-h="between">
+                  <b-col cols="10" class="pr-0">
+                    <b-form-input
+                      id="goal"
+                      v-model="goal"
+                      placeholder="Adicione um objetivo..."
+                      v-on:keydown.enter.prevent="addToGoals"
+                    ></b-form-input>
+                  </b-col>
+                  <b-col cols="2" align-self="center" class="pr-0">
+                    <b-button class="p-0 ml-2" variant="light" @click="addToGoals"><v-icon>add_circle</v-icon></b-button>
+                  </b-col>
+                </b-row>
+              </b-form-group>
 
-            <b-list-group>
-              <b-list-group-item
-                v-for="m in session.materials"
-                :key="m"
-              >{{ m }}</b-list-group-item>
-            </b-list-group>
-            <b-form-input
-              id="item"
-              v-model="item"
-              placeholder="Adicione um item..."
-            ></b-form-input>
-            <b-button @click="addToMaterial">Adicionar item</b-button>
+              <b-form-group
+                id="input-group-8"
+                label="Material necessário"
+                label-for="input-8"
+              >
+                <b-row v-for="(m,idx) in session.materials" :key="m" align-v="center" align-h="between">
+                  <b-col cols="10" class="pr-0">
+                    <p class="form-control m-0 mb-1">{{ m }}</p>
+                  </b-col>
+                  <b-col cols="2" class="pr-0">
+                    <b-button class="p-0 ml-2" variant="danger" @click="removeMaterial(idx)"><v-icon>delete</v-icon></b-button>
+                  </b-col>
+                </b-row>
+                <b-row align-v="center" align-h="between">
+                  <b-col cols="10" class="pr-0">
+                    <b-form-input
+                      id="item"
+                      v-model="item"
+                      placeholder="Adicione um item..."
+                      v-on:keydown.enter.prevent="addToMaterials"
+                    ></b-form-input>
+                  </b-col>
+                  <b-col cols="2" align-self="center" class="pr-0">
+                    <b-button class="p-0 ml-2" variant="light" @click="addToMaterials"><v-icon>add_circle</v-icon></b-button>
+                  </b-col>
+                </b-row>
+              </b-form-group>
 
-            <b-button variant="primary" v-if="form.id === null" @click="$router.go(-1)">Cancelar</b-button>
-            <b-button variant="primary" v-if="form.id !== null" @click="hide">Cancelar</b-button>
-            <b-button type="submit" variant="primary">Submit</b-button>
-          </b-form>
+              <b-row>
+                <b-col>
+                  <b-button block variant="primary" v-if="form.id === null" @click="$router.go(-1)">Cancelar</b-button>
+                  <b-button block variant="primary" v-if="form.id !== null" @click="hide">Cancelar</b-button>
+                </b-col>
+                <b-col>
+                  <b-button block type="submit" variant="success">Submit</b-button>
+                </b-col>
+              </b-row>
+            </b-form>
+          </b-card>
         </b-col>
         <b-col md="6" sm="12">
           <calReadOnly></calReadOnly>
@@ -202,6 +306,14 @@ export default {
       users: {},
       id: null
     },
+    selectedSchedule: 'none',
+    optionsSchedule: [
+      { value: 'none', text: 'Não se repete' },
+      { value: 'daily', text: 'Todos os dias' },
+      { value: 'weekly', text: 'Semanalmente' },
+      { value: 'monthly', text: 'Mensalmente' },
+      { value: 'annually', text: 'Anualmente' }
+    ],
     item: '',
     goal: '',
     datetime: {
@@ -238,7 +350,10 @@ export default {
     ...mapGetters('users', [
       'getCaregiverById',
       'getPatientById'
-    ])
+    ]),
+    scheduleChosen () {
+      return this.parseScheduleOption(this.selectedSchedule)
+    }
   },
   methods: {
     ...mapActions('sessions', [
@@ -249,7 +364,7 @@ export default {
       'updateIndivSession',
       'deleteIndivSession'
     ]),
-    addToMaterial () {
+    addToMaterials () {
       this.session.materials.push(this.item)
       this.item = ''
     },
@@ -343,42 +458,44 @@ export default {
       }
     },
     parseScheduleOption (option) {
+      let result = {}
       console.log('OPTION', option)
-      let dt = LuxonDateTime.fromISO(this.formData.dateValue)
+      let dt = LuxonDateTime.fromISO(this.form.dateValue)
       // let wsom = this.weekSpanOfMonth(dt)
       let dow = dt.weekday % 7
       dt.c.month = dt.c.month - 1
       switch (option) {
         case 'daily':
-          this.formData.sched = {
+          result = {
             'duration': 1,
             'durationInDays': 0,
             'durationUnit': 'days'
           }
           break
         case 'weekly':
-          this.formData.sched = {
+          result = {
             'dayOfWeek': [dow]
           }
           break
         case 'monthly':
-          this.formData.sched = {
+          result = {
             'dayOfMonth': [dt.c.day]
           }
           break
         case 'annually':
-          this.formData.sched = {
+          result = {
             'dayOfMonth': [dt.c.day],
             'month': [dt.c.month]
           }
           break
         default:
-          this.formData.sched = {
+          result = {
             'dayOfMonth': [dt.c.day],
             'month': [dt.c.month],
             'year': [dt.c.year]
           }
       }
+      return result
     },
     prepareEvent () {
       let users = {}
@@ -399,6 +516,7 @@ export default {
         'notify': this.form.notify,
         'title': 'Sessão de Grupo'
       }
+      this.form.sched = this.scheduleChosen
       if (!this.form.sched) {
         let dt = LuxonDateTime.fromISO(this.form.dateValue)
         dt.c.month = dt.c.month - 1
@@ -455,6 +573,12 @@ export default {
     },
     hide () {
       this.$emit('hide')
+    },
+    removeGoal (index) {
+      this.session.goals.splice(index, 1)
+    },
+    removeMaterial (index) {
+      this.session.materials.splice(index, 1)
     }
   }
 }
