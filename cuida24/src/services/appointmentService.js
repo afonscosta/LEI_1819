@@ -22,7 +22,7 @@ export default {
   putAppointment (payload) {
     return cuida24.put(`appointments/`, payload, {
       headers: {
-        Authorization: 'Bearer ' + store.state.accesstoken
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
