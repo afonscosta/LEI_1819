@@ -49,7 +49,7 @@
             <b-button block class="mt-2" variant="danger" @click="removeGroupSession(gs)">Eliminar</b-button>
             <b-button block @click="editGroupSession(gs)">Editar</b-button>
             <b-button block size="sm" variant="primary" @click="editParticipants(gs)">Participantes</b-button>
-            <b-button block size="sm" variant="primary" @click="goToEvaluation(gs)">Avaliar Participantes</b-button>
+            <b-button block size="sm" variant="primary" @click="goToEvaluation(gs)">Avaliar participantes</b-button>
             <b-button block 
               v-if="gs.groupSession.state === 'E'"
               size="sm" 
@@ -80,8 +80,7 @@ export default {
       indivSessions: state => state.sessions.indivSessions,
       usersActive: state => state.users.usersActive,
       caregivers: state => state.users.users.caregivers,
-      patients: state => state.users.users.patients,
-      session: state => state.evaluations.session
+      patients: state => state.users.users.patients
     }),
     durationUnitTranslated () {
       return (durationUnit) => {

@@ -2,15 +2,19 @@ import evaluationsService from '../../services/evaluationsService'
 
 const state = {
   session: {},
-  evaluations: []
+  caregiversEvaluations: [],
+  patientsEvaluations: []
 }
 
 const getters = {
   session: state => {
     return state.session
   },
-  evaluations: state => {
-    return state.evaluations
+  caregiversEvaluations: state => {
+    return state.caregiversEvaluations
+  },
+  patientsEvaluations: state => {
+    return state.patientsEvaluations
   },
   getCaregiversInfo (state, getters, rootState, rootGetters) {
     let users = []
@@ -29,17 +33,28 @@ const mutations = {
     state.session = s
   },
   setEvaluations (state, es) {
-    state.evaluations = es
+    state.caregiversEvaluations = es.filter(e => e.hasOwnProperty('caregiverPK'))
+    state.patientsEvaluations = es.filter(e => e.hasOwnProperty('patientPK'))
   },
-  addEvaluation (state, e) {
-    state.evaluations.push(e)
+  addCaregiverEvaluation (state, e) {
+    state.caregiversEvaluations.push(e)
   },
-  updateEvaluation (state, newE) {
-    state.evaluations = state.evaluations.filter(e => e.pk !== newE.pk)
-    state.evaluations.push(newE)
+  addPatientEvaluation (state, e) {
+    state.patientsEvaluations.push(e)
   },
-  deleteEvaluation (state, ePK) {
-    state.evaluations = state.evaluations.filter(e => e.pk !== ePK)
+  updateCaregiverEvaluation (state, newE) {
+    state.caregiversEvaluations = state.caregiversEvaluations.filter(e => e.pk !== newE.pk)
+    state.caregiversEvaluations.push(newE)
+  },
+  updatePatientEvaluation (state, newE) {
+    state.patientsEvaluations = state.patientsEvaluations.filter(e => e.pk !== newE.pk)
+    state.patientsEvaluations.push(newE)
+  },
+  deleteCaregiverEvaluation (state, ePK) {
+    state.caregiversEvaluations = state.caregiversEvaluations.filter(e => e.pk !== ePK)
+  },
+  deletePatientEvaluation (state, ePK) {
+    state.patientsEvaluations = state.patientsEvaluations.filter(e => e.pk !== ePK)
   }
 }
 
@@ -55,24 +70,43 @@ const actions = {
         commit('setEvaluations', es)
       })
   },
-  addEvaluation ({ commit }, e) {
+  addCaregiverEvaluation ({ commit }, e) {
     console.log('adding evaluation', e)
     evaluationsService.postEvaluation(e)
       .then(newE => {
-        commit('addEvaluation', newE)
+        commit('addCaregiverEvaluation', newE)
       })
   },
-  updateEvaluation ({ commit }, e) {
+  addPatientEvaluation ({ commit }, e) {
+    console.log('adding evaluation', e)
+    evaluationsService.postEvaluation(e)
+      .then(newE => {
+        commit('addPatientEvaluation', newE)
+      })
+  },
+  updateCaregiverEvaluation ({ commit }, e) {
     console.log('updating evaluation', e)
     evaluationsService.putEvaluation(e)
       .then(() => {
-        commit('updateEvaluation', e)
+        commit('updateCaregiverEvaluation', e)
       })
   },
-  deleteEvaluation ({ commit }, e) {
-    console.log('deleting evaluation with PK = ', e.pk)
-    evaluationsService.deleteEvaluation(e.pk)
-    commit('deleteEvaluation', e.pk)
+  updatePatientEvaluation ({ commit }, e) {
+    console.log('updating evaluation', e)
+    evaluationsService.putEvaluation(e)
+      .then(() => {
+        commit('updatePatientEvaluation', e)
+      })
+  },
+  deleteCaregiverEvaluation ({ commit }, ePK) {
+    console.log('deleting evaluation with PK = ', ePK)
+    evaluationsService.deleteEvaluation(ePK)
+    commit('deleteCaregiverEvaluation', ePK)
+  },
+  deletePatientEvaluation ({ commit }, ePK) {
+    console.log('deleting evaluation with PK = ', ePK)
+    evaluationsService.deleteEvaluation(ePK)
+    commit('deletePatientEvaluation', ePK)
   }
 }
 
