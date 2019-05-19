@@ -49,7 +49,7 @@
             <b-button block class="mt-2" variant="danger" @click="removeGroupSession(gs)">Eliminar</b-button>
             <b-button block @click="editGroupSession(gs)">Editar</b-button>
             <b-button block size="sm" variant="primary" @click="editParticipants(gs)">Participantes</b-button>
-            <b-button block size="sm" variant="primary" @click="goToEvaluation(gs)">Avaliar participantes</b-button>
+            <b-button block v-if="isToday(gs)" size="sm" variant="primary" @click="goToEvaluation(gs)">Avaliar participantes</b-button>
             <b-button block 
               v-if="gs.groupSession.state === 'E'"
               size="sm" 
@@ -140,6 +140,20 @@ export default {
     goToEvaluation (gs) {
       this.setSession(gs)
       this.$router.push({ name: 'evaluation' })
+    },
+    isToday (gs) {
+      console.log('event', gs.event.occurrenceDate)
+      var event = new Date(
+        gs.event.occurrenceDate.year,
+        gs.event.occurrenceDate.month - 1,
+        gs.event.occurrenceDate.dayOfMonth
+      )
+      var today = new Date()
+      if (event <= today) {
+        return true
+      } else {
+        return false
+      }
     }
   }
 }
