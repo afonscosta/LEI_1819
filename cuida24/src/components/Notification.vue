@@ -1,25 +1,33 @@
 <template>
-
   <div class="notification">
-    <h3>Notificações</h3>
-    <div v-for="(notif, index) in notify">
+    <b-container class="p-0">
+      <b-row class="mb-1" align-v="center" align-h="around" v-for="(notif, index) in notify">
+        <b-col cols="10" class="pr-0">
+          <datetime type="datetime" 
+            class="form-control"
+            v-model="notify[index]"
+            :phrases="datetime.phrases"
+            :week-start="datetime['week-start']"
+            :min-datetime="datetime.minDatetime"
+          ></datetime>
+        </b-col>
+        <b-col cols="2" class="pr-0">
+          <b-button class="p-0 ml-2" variant="danger" @click="removeNotification(index)"><v-icon>delete</v-icon></b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+
+    <div class="mt-2 new-notify">
       <datetime type="datetime" 
-        v-model="notify[index]"
+        class="form-control"
+        v-model="datetime.datetime"
         :phrases="datetime.phrases"
         :week-start="datetime['week-start']"
         :min-datetime="datetime.minDatetime"
+        placeholder="Adicionar notificação"
+        @input="addNotification"
       ></datetime>
-      <b-button @click="removeNotification(index)"></b-button>
     </div>
-
-    <h3>Nova notificação</h3>
-		<datetime type="datetime" 
-			v-model="datetime.datetime"
-			:phrases="datetime.phrases"
-      :week-start="datetime['week-start']"
-      :min-datetime="datetime.minDatetime"
-      @input="addNotification"
-		></datetime>
   </div>
 
 </template>
@@ -63,6 +71,7 @@ export default {
     addNotification (notif) {
       if (notif) {
         this.notify.push(notif)
+        this.datetime.datetime = null
       }
     },
     removeNotification (index) {
@@ -73,4 +82,21 @@ export default {
 </script>
 
 <style>
+.vdatetime-input {
+  width: 100%;
+}
+
+div.new-notify .vdatetime-input {
+  cursor: pointer;
+}
+
+div.new-notify ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 1; /* Firefox */
+  text-align: center;
+}
+
+div.new-notify .vdatetime {
+  background-color: #6c757d;
+}
 </style>

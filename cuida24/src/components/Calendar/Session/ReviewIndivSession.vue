@@ -101,8 +101,8 @@ export default {
   }),
   computed: {
     ...mapGetters('users', [
-      'getCaregiverByInfoId',
-      'getPatientByInfoId'
+      'getCaregiverById',
+      'getPatientById'
     ]),
     durationUnitTranslated () {
       return (durationUnit) => {
@@ -143,9 +143,9 @@ export default {
     },
     userName (is) {
       if (is.event.users.caregivers.length > 0) {
-        return this.getCaregiverByInfoId(is.event.users.caregivers[0]).info.name
+        return this.getCaregiverById(is.event.users.caregivers[0]).info.name
       } else if (is.event.users.patients.length > 0) {
-        return this.getPatientByInfoId(is.event.users.patients[0]).info.name
+        return this.getPatientById(is.event.users.patients[0]).info.name
       }
     },
     approveSession (is) {
