@@ -36,52 +36,80 @@
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 1,
     "fields": {
-        "name": "cuidador1"
+        "first_name": "cuidador1",
+        "last_name": "cuidador1",
+        "password": "password",
+        "username": "12345@gmail.com",
+        "email": "12345@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 4,
     "fields": {
-        "name": "cuidador2"
+        "first_name": "cuidador2",
+        "last_name": "cuidadorTESTEultimo",
+        "password": "password",
+        "username": "12344@gmail.com",
+        "email": "12344@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 5,
     "fields": {
-        "name": "cuidador3"
+        "first_name": "cuidador3",
+        "last_name": "cuidadorTESTEultimo",
+        "password": "password",
+        "username": "12343@gmail.com",
+        "email": "12343@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 2,
     "fields": {
-       "name": "utente1"
+        "first_name": "utente1",
+        "last_name": "utenteTESTEultimo",
+        "password": "password",
+        "username": "12342@gmail.com",
+        "email": "12342@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 6,
     "fields": {
-       "name": "utente2"
+        "first_name": "utente2",
+        "last_name": "utenteTESTEultimo",
+        "password": "password",
+        "username": "12341@gmail.com",
+        "email": "12341@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 7,
     "fields": {
-       "name": "utente3"
+        "first_name": "utente3",
+        "last_name": "utenteTESTEultimo",
+        "password": "password",
+        "username": "12340@gmail.com",
+        "email": "12340@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 3,
     "fields": {
-       "name": "coordenador1"
+        "first_name": "coordenador",
+        "last_name": "coordenadorTESTEultimo",
+        "password": "password",
+        "username": "12329@gmail.com",
+        "email": "12339@gmail.com"
     }
   },
   {
