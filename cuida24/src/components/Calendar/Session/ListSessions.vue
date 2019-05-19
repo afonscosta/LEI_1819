@@ -34,7 +34,7 @@
         <b-row>
           <b-col>
             <p>Os utilizadores a <b><span style="color: #5FBA7D">verde</span></b> encontram-se inscritos na sessão de grupo.</p>
-            <p v-if="(participantsCaregivers.length + participantsPatients.length) === 2" style="color: #E01325">Mínimo de participantes para a sessão de grupo foi atingido. Não pode ser removido mais nenhum utilizador.</p><br>
+            <p v-if="updateGSParticipants !== null && ['E', 'R'].includes(updateGSParticipants.groupSession.state) && (participantsCaregivers.length + participantsPatients.length) === 2" style="color: #E01325">Mínimo de participantes para a sessão de grupo foi atingido. Não pode ser removido mais nenhum utilizador.</p><br>
           </b-col>
         </b-row>
         <b-row>
@@ -63,7 +63,7 @@
         </b-row>
       </b-container>
       <b-button
-        v-if="!editingPartiMode"
+        v-if="!editingPartiMode && updateGSParticipants !== null && ['E', 'R'].includes(updateGSParticipants.groupSession.state)"
         class="mt-2"
         block
         @click="editingPartiMode = true"

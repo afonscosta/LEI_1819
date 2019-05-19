@@ -8,6 +8,7 @@
       border-variant="dark"
       header="Sessão Individual"
       no-body
+      class="mb-3"
     >
       <b-container>
         <b-row align-v="center" align-h="start" class="justify-content-md-center">
@@ -49,15 +50,31 @@
             </b-card-text>
           </b-col>
           <b-col xl="3" cols="12">
-            <b-button block class="mt-2" variant="danger" @click="removeIndivSession(is)">Eliminar</b-button>
-            <b-button block @click="editIndivSession(is)">Editar</b-button>
-            <b-button block v-if="isToday(is)" size="sm" variant="primary" @click="goToEvaluation(is)">Avaliar participante</b-button>
+            <b-button block 
+              v-if="['E', 'R'].includes(is.individualSession.state)" 
+              class="mt-2" 
+              variant="danger"
+              @click="removeIndivSession(is)"
+              >Eliminar</b-button>
+            <b-button block 
+              v-if="['E', 'R'].includes(is.individualSession.state)" 
+              class="mt-2" 
+              @click="editIndivSession(is)"
+              >Editar</b-button>
+            <b-button block 
+              v-if="isToday(is) && ['A', 'C'].includes(is.individualSession.state)" 
+              class="mt-2" 
+              size="sm" 
+              variant="primary" 
+              @click="goToEvaluation(is)"
+              >Avaliar participante</b-button>
             <b-button block 
               v-if="is.individualSession.state === 'E'"
+              class="mt-2" 
               size="sm" 
               variant="primary" 
               @click="reviewSession(is)"
-            >Rever sessão</b-button>
+              >Rever sessão</b-button>
           </b-col>
         </b-row>
       </b-container>

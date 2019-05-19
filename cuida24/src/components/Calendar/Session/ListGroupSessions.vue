@@ -8,6 +8,7 @@
       border-variant="dark"
       header="Sessão de Grupo"
       no-body
+      class="mb-3"
     >
       <b-container>
         <b-row align-v="center" align-h="start" class="justify-content-md-center">
@@ -46,16 +47,37 @@
             </b-card-text>
           </b-col>
           <b-col xl="3" cols="12">
-            <b-button block class="mt-2" variant="danger" @click="removeGroupSession(gs)">Eliminar</b-button>
-            <b-button block @click="editGroupSession(gs)">Editar</b-button>
-            <b-button block size="sm" variant="primary" @click="editParticipants(gs)">Participantes</b-button>
-            <b-button block v-if="isToday(gs)" size="sm" variant="primary" @click="goToEvaluation(gs)">Avaliar participantes</b-button>
+            <b-button block 
+              v-if="['E', 'R'].includes(gs.groupSession.state)" 
+              class="mt-2" 
+              variant="danger" 
+              @click="removeGroupSession(gs)"
+              >Eliminar</b-button>
+            <b-button block 
+              v-if="['E', 'R'].includes(gs.groupSession.state)" 
+              class="mt-2" 
+              @click="editGroupSession(gs)"
+              >Editar</b-button>
+            <b-button block 
+              class="mt-2" 
+              size="sm" 
+              variant="primary" 
+              @click="editParticipants(gs)"
+              >Participantes</b-button>
+            <b-button block 
+              v-if="isToday(gs) && ['A', 'C'].includes(gs.groupSession.state)" 
+              class="mt-2" 
+              size="sm" 
+              variant="primary" 
+              @click="goToEvaluation(gs)"
+              >Avaliar participantes</b-button>
             <b-button block 
               v-if="gs.groupSession.state === 'E'"
+              class="mt-2" 
               size="sm" 
               variant="primary" 
               @click="reviewSession(gs)"
-            >Rever sessão</b-button>
+              >Rever sessão</b-button>
           </b-col>
         </b-row>
       </b-container>
