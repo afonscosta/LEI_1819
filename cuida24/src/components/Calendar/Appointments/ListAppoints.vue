@@ -68,7 +68,7 @@ export default {
   }),
   created () {
     if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
-      this.$store.dispatch('appointments/getAppointments', this.usersActive)
+      this.$store.dispatch('events/getEvents', this.usersActive)
     }
   },
   computed: {

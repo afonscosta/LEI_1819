@@ -7,6 +7,7 @@ import calendars from './modules/calendars'
 import appointments from './modules/appointments.js'
 import notes from './modules/notes.js'
 import sessions from './modules/sessions.js'
+import evaluations from './modules/evaluations.js'
 import login from './modules/login'
 import register from './modules/register'
 
@@ -22,6 +23,7 @@ export default new Vuex.Store({
     notes,
     sessions,
     login,
-    register
+    register,
+    evaluations
   }
 })

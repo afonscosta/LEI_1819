@@ -4,13 +4,13 @@ body {
 }
 
 body {
-  padding-top: 56px;
+  padding-top: 54px;
 }
 
 @media (max-width: 767.98px) {
   .offcanvas-collapse {
     position: fixed;
-    top: 56px; /* Height of navbar */
+    top: 49px; /* Height of navbar */
     bottom: 0;
     width: 100%;
     padding-right: 1rem;
@@ -26,6 +26,28 @@ body {
   .offcanvas-collapse.open {
     -webkit-transform: translateX(-1rem);
     transform: translateX(-1rem); /* Account for horizontal padding on navbar */
+  }
+
+  .navbar-nav {
+    padding-top: 1rem;
+  }
+
+  #navbarsExampleDefault {
+    background-color: #FFD185;
+  }
+
+  .navbar-dark .navbar-nav .nav-link {
+    color: #343F4B;
+  }
+
+  .navbar-dark .navbar-nav .active>.nav-link {
+    background-color: #343F4B;
+    border-radius: 25px;
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    margin-top: 1rem;
   }
 }
 
@@ -78,3 +100,4 @@ body {
 .lh-100 { line-height: 1; }
 .lh-125 { line-height: 1.25; }
 .lh-150 { line-height: 1.5; }
+

@@ -321,11 +321,16 @@ class Event(models.Model):
     year = models.IntegerField()
     location = models.TextField()
     description = models.TextField()
-    calendar = models.ForeignKey(Calendar, on_delete=models.DO_NOTHING)
+    calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.title
+
+    def delete(self, using=None, keep_parents=False):
+        self.schedule.delete()
+        super(Event, self).delete()
+        Notification.objects.filter(event=self).delete()
 
 
 class EventSerializer(serializers.ModelSerializer):
@@ -375,7 +380,7 @@ class EventSerializer(serializers.ModelSerializer):
 
 class Notification(models.Model):
     dateTime = models.TextField()
-    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -392,6 +397,10 @@ class Appointment(models.Model):
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
     user = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
 
+    def delete(self, using=None, keep_parents=False):
+        self.details.delete()
+        AppointmentNote.objects.filter(appointment=self).delete()
+        super(Appointment, self).delete()
 
 class AppointmentSerializer(serializers.ModelSerializer):
     details = EventSerializer()
@@ -535,11 +544,17 @@ class Session(models.Model):
     type = models.CharField(max_length=1, choices=TYPE)
     description = models.TextField()
     goal = models.TextField()
-    material = models.TextField()
+    material = models.TextField(blank=True, null=True)
+    comment = models.TextField(blank=True, null=True)
     details = models.OneToOneField(Event, on_delete=models.CASCADE)
     state = models.CharField(max_length=1, choices=STATE)
     # Relação many-to-many só tem que estar num model
     participants = models.ManyToManyField(UserAuth)
+
+    def delete(self, using=None, keep_parents=False):
+        self.details.delete()
+        Evaluation.objects.filter(session=self).delete()
+        super(Session, self).delete()
 
 
 class SessionSerializer(serializers.ModelSerializer):
@@ -549,7 +564,8 @@ class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        fields = ('topic', 'type', 'description', 'goal', 'material', 'details', 'state', 'participants', 'pk')
+        fields = ('topic', 'type', 'description', 'goal', 'material', 'details', 'state', 'comment', 'participants',
+                  'pk')
 
     def create(self, validated_data):
         request = self.context.get("request")
@@ -588,7 +604,6 @@ class SessionSerializer(serializers.ModelSerializer):
         event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
         if event_serializer.is_valid(raise_exception=False):
             event_serializer.save()
-
         notifications = Notification.objects.filter(event=event)
         actual_number_notification = len(notifications)
         actual_index_change = 0
@@ -601,7 +616,6 @@ class SessionSerializer(serializers.ModelSerializer):
             else:
                 notification_req_data = {'dateTime': income_notification, 'event': event}
                 Notification.objects.create(**notification_req_data)
-
         # update instance
         instance.topic = validated_data.get("topic", instance.topic)
         instance.type = validated_data.get("type", instance.type)
@@ -609,6 +623,7 @@ class SessionSerializer(serializers.ModelSerializer):
         instance.goal = validated_data.get("goal", instance.goal)
         instance.material = validated_data.get("material", instance.material)
         instance.state = validated_data.get("state", instance.state)
+        instance.comment = validated_data.get('comment', instance.comment)
         participants = []
         for user in request['participants']['caregivers']:
             participants.append(get_object_or_404(Caregiver, pk=user).info)
@@ -617,17 +632,16 @@ class SessionSerializer(serializers.ModelSerializer):
             participants.append(get_object_or_404(Patient, pk=user).info)
         instance.participants.set(participants)
         instance.save()
-
         return instance
 
 
 class Evaluation(models.Model):
     comment = models.TextField()
-    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+    participant = models.ForeignKey(User, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
 
 
 class EvaluationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Evaluation
-        fields = ('comment', 'caregiver', 'session', 'pk')
+        fields = ('comment', 'participant', 'session', 'pk')

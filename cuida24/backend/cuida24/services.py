@@ -2,8 +2,10 @@ import copy
 import logging
 import json
 
+from django.shortcuts import get_object_or_404
+
 from backend.cuida24.models import Appointment, AppointmentSerializer, Notification, NotificationSerializer, Session, \
-  SessionSerializer
+  SessionSerializer, Caregiver, Patient
 
 logger = logging.getLogger("mylogger")
 
@@ -170,6 +172,11 @@ def sessionFrontToBackJSON(request_param):
         req_data['goal'] = json.dumps(request['groupSession']['goals'])
         req_data['material'] = json.dumps(request['groupSession']['materials'])
         req_data['topic'] = request['groupSession']['theme']
+        req_data['state'] = request['groupSession']['state']
+        if 'comment' in request['groupSession']:
+            req_data['comment'] = request['groupSession']['comment']
+        else:
+            req_data['comment'] = None
         if 'pk' in request['groupSession']:
             req_data['pk'] = request['groupSession']['pk']
     else:
@@ -178,10 +185,14 @@ def sessionFrontToBackJSON(request_param):
         req_data['goal'] = json.dumps(request['individualSession']['goals'])
         req_data['material'] = json.dumps(request['individualSession']['materials'])
         req_data['topic'] = request['individualSession']['theme']
+        req_data['state'] = request['individualSession']['state']
+        if 'comment' in request['individualSession']:
+            req_data['comment'] = request['individualSession']['comment']
+        else:
+            req_data['comment'] = None
         if 'pk' in request['individualSession']:
             req_data['pk'] = request['individualSession']['pk']
 
-    req_data['state'] = 'E'
 
     calendar_pk = req_data['details']['calendar']
     req_data['details']['calendar'] = {}
@@ -244,7 +255,8 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
                         'description': session['description'],
                         'goals': json.loads(session['goal']),
                         'materials': json.loads(session['material']),
-                        'state': session['state']
+                        'state': session['state'],
+                        'comment': session['comment']
         }
         if session['type'] == 'I':
             temp['individualSession'] = temp_session
@@ -262,7 +274,6 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
                         },
                         'id': session['details']['pk'],
                         'schedule': scheduleBackToFrontJSON(session['details']['schedule']),
-                        'participants': session['participants'],
                         'occurrenceDate': {
                             'dayOfMonth': session['details']['dayOfMonth'],
                             'month': session['details']['month'],
@@ -270,6 +281,7 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
                           }
                       }
         }
+        temp_event['event'].update(session['participants'])
         temp.update(temp_event)
         req_data.append(temp)
     return req_data
@@ -302,4 +314,54 @@ def getSessions(participants):
         queryset2 = Notification.objects.filter(event=session['details']['pk']).values('dateTime')
         serializer_notification = NotificationSerializer(queryset2, many=True)
         session['details']['notification'] = serializer_notification.data
+        users = {'users': {}}
+        users['users']['patients'] = []
+        users['users']['caregivers'] = []
+        for user in session['participants']:
+            try:
+                caregiver = Caregiver.objects.get(info_id=user['pk'])
+                users['users']['caregivers'].append(caregiver.pk)
+            except Caregiver.DoesNotExist:
+                patient = Patient.objects.get(info_id=user['pk'])
+                users['users']['patients'].append(patient.pk)
+        session['participants'] = users
     return serializer_session.data
+
+
+def evaluationFrontToBackJSON(request_param):
+    request = copy.deepcopy(request_param)
+    req_data = {'comment': request['comment'], 'session': request['sessionPK']}
+    if 'patientPK' in request:
+        req_data['participant'] = get_object_or_404(Patient, pk=request['patientPK']).info_id
+    else:
+        req_data['participant'] = get_object_or_404(Caregiver, pk=request['caregiverPK']).info_id
+    if 'pk' in request:
+        req_data['pk'] = request['pk']
+    return req_data
+
+def evaluationBackToFrontJSON(request_param, serializer_data):
+    request = copy.deepcopy(request_param)
+    sent_data = request
+    sent_data['pk'] = serializer_data['pk']
+    try:
+        caregiver = Caregiver.objects.get(info_id=serializer_data['participant']).pk
+        sent_data['caregiverPK'] = caregiver
+    except Caregiver.DoesNotExist:
+        patient = Patient.objects.get(info_id=serializer_data['participant']).pk
+        sent_data['patientPK'] = patient
+    return sent_data
+
+
+'''
+JSON return on Get method. Here is necessary to create all fields in JSON     
+'''
+def getEvaluationBackToFrontJSON(serializer_data):
+    request = copy.deepcopy(serializer_data)
+    req_data = {'comment': request['comment'], 'sessionPK': request['session']}
+    try:
+        caregiver = Caregiver.objects.get(info_id=serializer_data['participant']).pk
+        req_data['caregiverPK'] = caregiver
+    except Caregiver.DoesNotExist:
+        patient = Patient.objects.get(info_id=serializer_data['participant']).pk
+        req_data['patientPK'] = patient
+    return req_data

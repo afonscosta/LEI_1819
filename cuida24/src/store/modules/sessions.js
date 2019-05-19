@@ -33,18 +33,21 @@ const mutations = {
     state.indivSessions.push(is)
   },
   updateGroupSession (state, gs) {
-    state.groupSessions = state.groupSessions.filter(s => s.pk !== gs.pk)
+    state.groupSessions = state.groupSessions.filter(s => s.groupSession.pk !== gs.groupSession.pk)
     state.groupSessions.push(gs)
   },
   updateIndivSession (state, is) {
-    state.indivSessions = state.indivSessions.filter(s => s.pk !== is.pk)
+    state.indivSessions = state.indivSessions.filter(s => s.individualSession.pk !== is.individualSession.pk)
     state.indivSessions.push(is)
   },
   deleteGroupSession (state, gsID) {
-    state.groupSessions = state.groupSessions.filter(s => s.pk !== gsID)
+    console.log('gsid', gsID)
+    console.log('antes', state.groupSessions)
+    state.groupSessions = state.groupSessions.filter(s => s.groupSession.pk !== gsID)
+    console.log('depois', state.groupSessions)
   },
   deleteIndivSession (state, isID) {
-    state.indivSessions = state.indivSessions.filter(s => s.pk !== isID)
+    state.indivSessions = state.indivSessions.filter(s => s.individualSession.pk !== isID)
   }
 }
 
@@ -93,16 +96,22 @@ const actions = {
         this.dispatch('events/updateEvent', is.event)
       })
   },
-  deleteGroupSession ({ commit }, gsID) {
-    console.log('deleting groupSession with PK = ', gsID)
-    sessionsService.deleteSession(gsID)
-    commit('deleteGroupSession', gsID)
+  deleteGroupSession ({ commit }, gs) {
+    console.log('deleting groupSession with PK = ', gs.groupSession.pk)
+    sessionsService.deleteSession(gs.groupSession.pk)
+    commit('deleteGroupSession', gs.groupSession.pk)
+    this.dispatch('events/deleteEvent', gs.event.id)
   },
-  deleteIndivSession ({ commit }, isID) {
-    console.log('deleting indivSession with PK = ', isID)
-    sessionsService.deleteSession(isID)
-    commit('deleteSession', isID)
-    // TODO: É preciso fazer delete do evento
+  deleteIndivSession ({ commit }, is) {
+    console.log('deleting indivSession with PK = ', is.individualSession.pk)
+    sessionsService.deleteSession(is.individualSession.pk)
+    commit('deleteIndivSession', is.individualSession.pk)
+    this.dispatch('events/deleteEvent', is.event.id)
+  },
+  dontShowGroupSession ({ commit }, gs) {
+    console.log('not showing groupSession with PK = ', gs.groupSession.pk)
+    commit('deleteGroupSession', gs.groupSession.pk)
+    this.dispatch('events/deleteEvent', gs.event.id)
   }
 }
 

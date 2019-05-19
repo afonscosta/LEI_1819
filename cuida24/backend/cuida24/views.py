@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import permission_required
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
@@ -6,7 +7,7 @@ from rest_framework.decorators import action, detail_route, permission_classes
 from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 
-from .models import Message, MessageSerializer
+from .models import Message, MessageSerializer, Evaluation, EvaluationSerializer
 from .models import DefActivity, DefActivitySerializer
 from .models import Event, EventSerializer
 from .models import Calendar, CalendarSerializer
@@ -173,7 +174,6 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class AppointmentNoteViewSet(viewsets.ModelViewSet):
     queryset = AppointmentNote.objects.all()
     serializer_class = AppointmentNoteSerializer
@@ -186,7 +186,9 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
         for choice in choices_value:
             enum_values.append(choice[1])
         return Response(enum_values)
-
+    """
+    Get method by appoinment
+    """
     def list(self, request, *args, **kwargs):
         logger.info("GET NOTE APPOINTMENT")
         logger.info(json.loads(dict(request.GET)['appointment'][0]))
@@ -231,9 +233,9 @@ class SessionsViewSet(viewsets.ModelViewSet):
         req_data = sessionFrontToBackJSON(request.data)
         session = get_object_or_404(Session, pk=req_data['pk'])
         logger.info(session.topic)
-        serializer = SessionSerializer(data=req_data, instance=session, context={'request': req_data})
         logger.info("DATA SENT")
         logger.info(req_data)
+        serializer = SessionSerializer(data=req_data, instance=session, context={'request': req_data})
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
@@ -247,7 +249,7 @@ class SessionsViewSet(viewsets.ModelViewSet):
 
 
     """
-      Get method
+      Get method by session participants
     """
     def list(self, request, *args, **kwargs):
         #logger.info(request.data)
@@ -283,3 +285,61 @@ class SessionsViewSet(viewsets.ModelViewSet):
         for choice in choices_value:
             enum_values.append(choice[1])
         return Response(enum_values)
+
+
+class EvaluationViewSet(viewsets.ModelViewSet):
+    queryset = Evaluation.objects.all()
+    serializer_class = EvaluationSerializer
+
+    def create(self, request, *args, **kwargs):
+        logger.info("POST EVALUATION")
+        logger.info(request.data)
+        req_data = evaluationFrontToBackJSON(request.data)
+        serializer = EvaluationSerializer(data=req_data, context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = evaluationBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        logger.info("PUT EVALUATION")
+        logger.info(request.data)
+        req_data = evaluationFrontToBackJSON(request.data)
+        evaluation = get_object_or_404(Evaluation, pk=req_data['pk'])
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        serializer = EvaluationSerializer(data=req_data, instance=evaluation, context={'request': req_data})
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = evaluationBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    Get method by session pk
+    """
+    def list(self, request, *args, **kwargs):
+        #logger.info(request.data)
+        #data = request.data['sessionPK']
+        logger.info(request.GET)
+        data = json.loads(dict(request.GET)['sessionPK'][0])
+        queryset = Evaluation.objects.filter(session=data)
+        serializer_evaluation = EvaluationSerializer(queryset, many=True)
+        sent_data = []
+        for evaluation in serializer_evaluation.data:
+            sent_data.append(getEvaluationBackToFrontJSON(evaluation))
+        return Response(sent_data, status=status.HTTP_200_OK)
+
