@@ -1,37 +1,49 @@
 import React from 'react'
 import { StyleSheet, Text, View, Image, TextInput, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage';
 
 export default class LoginPage extends React.Component {
-  state = {
-    email: '',
-    password: '',
-    base_url: "http://10.0.3.2:8000/cuida24/"
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: '',
+      password: '',
+      base_url: "http://10.0.2.2:8000/cuida24/"
+    }
   }
 
-  onPress = () => {
-    const url = this.state.base_url + "token";
+  onPressLoginButton = () => {
+    const url = this.state.base_url + "token/";
 
+    console.log('pedido enviado!!!!!!!!!!!!!!!!!!!!')
     fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: this.state.email,
-        password: this.state.password,
+        // username: this.state.email,
+        // password: this.state.password,
+        username: 'admin',
+        password: 'admin'
       }),
     }).then(res => res.json())
       .then(res => {
+        console.log(res.token);
         (async () => {
           try {
             await AsyncStorage.setItem(
               '@login:',
               res.token
             );
+            console.log(this.props);
           } catch (error) {
-            console.warn('AsyncStorage - setItem', error);
+            console.warn('Error', error);
           }
         })();
+      })
+      .catch((error) => {
+        console.error(error);
       });
 
   }
@@ -68,7 +80,7 @@ export default class LoginPage extends React.Component {
 
             <TouchableOpacity 
               style={styles.loginbuttoncontainer}
-              onPress={this._onPressButton}
+              onPress={this.onPressLoginButton}
             > 
               <Text style={styles.loginbuttontext}>
                 ENTRAR
