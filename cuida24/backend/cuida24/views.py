@@ -320,10 +320,10 @@ class EvaluationViewSet(viewsets.ModelViewSet):
         #logger.info(request.data)
         #data = request.data['sessionPK']
         logger.info(request.GET)
-        data = json.loads(dict(request.GET)['sessionPK'])
+        data = json.loads(dict(request.GET)['sessionPK'][0])
         queryset = Evaluation.objects.filter(session=data)
         serializer_evaluation = EvaluationSerializer(queryset, many=True)
-        sent_data= []
+        sent_data = []
         for evaluation in serializer_evaluation.data:
             sent_data.append(getEvaluationBackToFrontJSON(evaluation))
         return Response(sent_data, status=status.HTTP_200_OK)

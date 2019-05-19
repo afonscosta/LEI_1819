@@ -12,6 +12,7 @@ import FormAppoint from '@/components/Calendar/Appointments/FormAppoint'
 import Notes from '@/components/Calendar/Notes/Notes'
 import Session from '@/components/Calendar/Session/Session'
 import FormSession from '@/components/Calendar/Session/FormSession'
+import UserEvaluation from '@/components/Calendar/Session/UserEvaluation'
 
 // Medication
 import Medicacao from '@/components/Medication/Medicacao'
@@ -77,6 +78,11 @@ export default new Router({
       path: '/menuCalendar/sessions/formSession',
       name: 'formSession',
       component: FormSession
+    },
+    {
+      path: '/menuCalendar/sessions/evaluation',
+      name: 'evaluation',
+      component: UserEvaluation
     },
 
     // Medication
