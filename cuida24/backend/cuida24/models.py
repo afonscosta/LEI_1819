@@ -637,7 +637,7 @@ class SessionSerializer(serializers.ModelSerializer):
 
 class Evaluation(models.Model):
     comment = models.TextField()
-    participant = models.ForeignKey(User, on_delete=models.CASCADE)
+    participant = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
     session = models.ForeignKey(Session, on_delete=models.CASCADE)
 
 
