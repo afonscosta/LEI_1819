@@ -39,77 +39,77 @@
     "model": "auth.user",
     "pk": 1,
     "fields": {
-        "first_name": "cuidador1",
-        "last_name": "cuidador1",
-        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
-        "username": "12345@gmail.com",
-        "email": "12345@gmail.com"
+        "first_name": "Patricia",
+        "last_name": "Barreira",
+        "password": "123",
+        "username": "p@gmail.com",
+        "email": "p@gmail.com"
     }
   },
   {
     "model": "auth.user",
     "pk": 4,
     "fields": {
-        "first_name": "cuidador2",
-        "last_name": "cuidadorTESTEultimo",
-        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
-        "username": "12344@gmail.com",
-        "email": "12344@gmail.com"
+        "first_name": "Marco",
+        "last_name": "Silva",
+        "password": "123",
+        "username": "m@gmail.com",
+        "email": "m@gmail.com"
     }
   },
   {
     "model": "auth.user",
     "pk": 5,
     "fields": {
-        "first_name": "cuidador3",
-        "last_name": "cuidadorTESTEultimo",
-        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
-        "username": "12343@gmail.com",
-        "email": "12343@gmail.com"
+        "first_name": "Afonso",
+        "last_name": "Costa",
+        "password": "123",
+        "username": "a@gmail.com",
+        "email": "a@gmail.com"
     }
   },
   {
     "model": "auth.user",
     "pk": 2,
     "fields": {
-        "first_name": "utente1",
-        "last_name": "utenteTESTEultimo",
-        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
-        "username": "12342@gmail.com",
-        "email": "12342@gmail.com"
+        "first_name": "Joaquina",
+        "last_name": "Maria",
+        "password": "123",
+        "username": "j@gmail.com",
+        "email": "j@gmail.com"
     }
   },
   {
     "model": "auth.user",
     "pk": 6,
     "fields": {
-        "first_name": "utente2",
-        "last_name": "utenteTESTEultimo",
-        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
-        "username": "12341@gmail.com",
-        "email": "12341@gmail.com"
+        "first_name": "Diana",
+        "last_name": "Siva",
+        "password": "123",
+        "username": "d@gmail.com",
+        "email": "d@gmail.com"
     }
   },
   {
     "model": "auth.user",
     "pk": 7,
     "fields": {
-        "first_name": "utente3",
-        "last_name": "utenteTESTEultimo",
-        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
-        "username": "12340@gmail.com",
-        "email": "12340@gmail.com"
+        "first_name": "Joana",
+        "last_name": "Alexandra",
+        "password": "123",
+        "username": "ja@gmail.com",
+        "email": "ja@gmail.com"
     }
   },
   {
     "model": "auth.user",
     "pk": 3,
     "fields": {
-        "first_name": "coordenador",
-        "last_name": "coordenadorTESTEultimo",
-        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
-        "username": "12329@gmail.com",
-        "email": "12339@gmail.com"
+        "first_name": "laura",
+        "last_name": "crespo",
+        "password": "123",
+        "username": "l@gmail.com",
+        "email": "l@gmail.com"
     }
   },
   {
@@ -162,7 +162,7 @@
     "pk": 1,
     "fields": {
        "info": "3",
-       "type": "ADM"
+       "type": "COR"
     }
   },
   {

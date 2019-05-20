@@ -6,6 +6,9 @@ export default {
     return cuida24.get(`sessions/`, {
       params: {
         users: payload
+      },
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },

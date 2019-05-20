@@ -112,7 +112,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
        model = UserAuth
-       fields = ('password', 'username', 'name', 'last_name', 'email',)
+       fields = ('password', 'username', 'name', 'first_name', 'last_name', 'email', 'pk')
 
     def get_name(self, obj):
         return obj.first_name + " " + obj.last_name

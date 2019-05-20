@@ -6,8 +6,7 @@ export default {
     return cuida24.get(`evaluation/`, {
       params: {
         sessionPK: payload
-      }
-    }, {
+      },
       headers: {
         Authorization: 'Token ' + store.state.accesstoken
       }

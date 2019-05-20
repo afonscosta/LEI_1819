@@ -87,6 +87,7 @@
         } else {
           switch (this.selectedUserType) {
             case 'caregiver':
+              console.log(this.first_name)
               this.$store.dispatch('register/registerCaregiver', {
                 first_name: this.first_name,
                 last_name: this.last_name,
