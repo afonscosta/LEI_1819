@@ -6,10 +6,9 @@ export default {
     return cuida24.get(`events/`, {
       params: {
         users: payload
-      }
-    }, {
+      },
       headers: {
-        Authorization: 'Bearer ' + store.state.accesstoken
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   }

@@ -1,20 +1,11 @@
-from django.http import Http404
-from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
-from rest_framework.decorators import action, detail_route
+from rest_framework.decorators import action, detail_route, permission_classes
 from rest_framework.response import Response
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status, permissions
 
-from .models import Message, MessageSerializer, Evaluation, EvaluationSerializer
-from .models import DefActivity, DefActivitySerializer
-from .models import Event, EventSerializer
-from .models import Calendar, CalendarSerializer
-from .models import Caregiver, CaregiverSerializer
-from .models import Patient, PatientSerializer
-from .models import AppointmentNote, AppointmentNoteSerializer
-from .models import BackofficeUser, BackofficeUserSerializer
-from .models import Medicine, MedicineSerializer
+from backend.cuida24.models import *
+from backend.cuida24.serializers import *
 from .services import *
 import logging
 import json
@@ -32,10 +23,23 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
-
 class DefActivityViewSet(viewsets.ModelViewSet):
     queryset = DefActivity.objects.all()
     serializer_class = DefActivitySerializer
+
+    """
+        Get method 
+        """
+    def list(self, request, *args, **kwargs):
+        sent_data = []
+        logger.info(request.user.username)
+        return Response(sent_data, status=status.HTTP_200_OK)
+
+
+class FixAnAppointmentPermssion(permissions.BasePermission):
+  def has_permission(self, request, view):
+    logger.info('REQUEST PRINT' + request.user.username + str(request.user.id))
+    return True
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -98,6 +102,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     '''
     Post method
     '''
+
     def create(self, request, *args, **kwargs):
         logger.info("POST APPOINTMENTS")
         logger.info(request.data)
@@ -177,6 +182,7 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
     """
     def list(self, request, *args, **kwargs):
         logger.info("GET NOTE APPOINTMENT")
+        logger.info(request.user.id)
         logger.info(json.loads(dict(request.GET)['appointment'][0]))
         data = json.loads(dict(request.GET)['appointment'][0])
         appointment = get_object_or_404(Appointment, pk=data)
@@ -331,8 +337,10 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
 
 class MedicineViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows medicine to be viewed or edited.
-    """
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
+
+
+class MedicationViewSet(viewsets.ModelViewSet):
+    queryset = Medication.objects.all()
+    serializer_class = MedicationSerializer

@@ -11,6 +11,7 @@ import evaluations from './modules/evaluations.js'
 import prescriptions from './modules/prescriptions.js'
 import medicines from './modules/medicines.js'
 import login from './modules/login'
+import register from './modules/register'
 
 Vue.use(Vuex)
 
@@ -23,9 +24,10 @@ export default new Vuex.Store({
     appointments,
     notes,
     sessions,
+    login,
+    register,
     evaluations,
     prescriptions,
-    medicines,
-    login
+    medicines
   }
 })

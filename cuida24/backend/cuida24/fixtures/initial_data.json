@@ -36,52 +36,80 @@
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 1,
     "fields": {
-        "name": "cuidador1"
+        "first_name": "Patricia",
+        "last_name": "Barreira",
+        "password": "123",
+        "username": "p@gmail.com",
+        "email": "p@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 4,
     "fields": {
-        "name": "cuidador2"
+        "first_name": "Marco",
+        "last_name": "Silva",
+        "password": "123",
+        "username": "m@gmail.com",
+        "email": "m@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 5,
     "fields": {
-        "name": "cuidador3"
+        "first_name": "Afonso",
+        "last_name": "Costa",
+        "password": "123",
+        "username": "a@gmail.com",
+        "email": "a@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 2,
     "fields": {
-       "name": "utente1"
+        "first_name": "Joaquina",
+        "last_name": "Maria",
+        "password": "123",
+        "username": "j@gmail.com",
+        "email": "j@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 6,
     "fields": {
-       "name": "utente2"
+        "first_name": "Diana",
+        "last_name": "Siva",
+        "password": "123",
+        "username": "d@gmail.com",
+        "email": "d@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 7,
     "fields": {
-       "name": "utente3"
+        "first_name": "Joana",
+        "last_name": "Alexandra",
+        "password": "123",
+        "username": "ja@gmail.com",
+        "email": "ja@gmail.com"
     }
   },
   {
-    "model": "cuida24.User",
+    "model": "auth.user",
     "pk": 3,
     "fields": {
-       "name": "coordenador1"
+        "first_name": "laura",
+        "last_name": "crespo",
+        "password": "123",
+        "username": "l@gmail.com",
+        "email": "l@gmail.com"
     }
   },
   {
@@ -134,7 +162,7 @@
     "pk": 1,
     "fields": {
        "info": "3",
-       "type": "ADM"
+       "type": "COR"
     }
   },
   {

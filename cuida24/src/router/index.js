@@ -4,6 +4,7 @@ import Router from 'vue-router'
 // Miscellaneous
 import Home from '@/components/Home'
 import Login from '@/components/Login'
+import Registar from '@/components/Registar'
 
 // Calendar
 import Calendar from '@/components/Calendar/Calendar'
@@ -145,6 +146,11 @@ export default new Router({
       path: '/info-apoio',
       name: 'info-apoio',
       component: InfoApoio
+    },
+    {
+      path: '/registar',
+      name: 'registar',
+      component: Registar
     }
   ]
 })

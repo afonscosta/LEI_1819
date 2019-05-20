@@ -5,7 +5,7 @@ export default {
   fetchCalendars () {
     return cuida24.get(`calendars/`, {
       headers: {
-        Authorization: 'Bearer ' + store.state.accesstoken
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   }

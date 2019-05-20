@@ -6,31 +6,30 @@ export default {
     return cuida24.get(`appointmentNotes/`, {
       params: {
         appointment: payload
-      }
-    }, {
+      },
       headers: {
-        Authorization: 'Bearer ' + store.state.accesstoken
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
   postNote (payload) {
     return cuida24.post(`appointmentNotes/`, payload, {
       headers: {
-        Authorization: 'Bearer ' + store.state.accesstoken
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
   putNote (payload) {
     return cuida24.put(`appointmentNotes/`, payload, {
       headers: {
-        Authorization: 'Bearer ' + store.state.accesstoken
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
   deleteNote (noteId) {
     return cuida24.delete(`appointmentNotes/${noteId}`, {
       headers: {
-        Authorization: 'Bearer ' + store.state.accesstoken
+        Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   }

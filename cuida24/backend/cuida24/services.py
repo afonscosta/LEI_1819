@@ -4,8 +4,8 @@ import json
 
 from django.shortcuts import get_object_or_404
 
-from backend.cuida24.models import Appointment, AppointmentSerializer, Notification, NotificationSerializer, Session, \
-  SessionSerializer, Caregiver, Patient
+from backend.cuida24.models import *
+from backend.cuida24.serializers import *
 
 logger = logging.getLogger("mylogger")
 
@@ -72,21 +72,7 @@ def appointmentFrontToBackJSON(request_param):
     req_data['details']['year'] = request['occurrenceDate']['year']
 
     req_data['details']['schedule'] = request['event']['schedule']
-    if 'dayOfWeek' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['dayOfWeek']:
-            req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
-    if 'dayOfMonth' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['dayOfMonth']:
-            req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
-    if 'month' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['month']:
-            req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
-    if 'year' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['year']:
-            req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
-    if 'times' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['times']:
-            req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
+    req_data['details']['schedule'].update(scheduleFrontToBackJSON(req_data['details']['schedule']))
     return req_data
 
 
@@ -159,6 +145,24 @@ def scheduleBackToFrontJSON(schedule_param):
         req_data['times'].append(schedule['times'])
     return req_data
 
+def scheduleFrontToBackJSON(schedule_param):
+    schedule = copy.deepcopy(schedule_param)
+    if 'dayOfWeek' in schedule:
+        if schedule['dayOfWeek']:
+            schedule['dayOfWeek'] = schedule['dayOfWeek'][0]
+    if 'dayOfMonth' in schedule:
+        if schedule['dayOfMonth']:
+            schedule['dayOfMonth'] = schedule['dayOfMonth'][0]
+    if 'month' in schedule:
+        if schedule['month']:
+            schedule['month'] = schedule['month'][0]
+    if 'year' in schedule:
+        if schedule['year']:
+            schedule['year'] = schedule['year'][0]
+    if 'times' in schedule:
+        if schedule['times']:
+            schedule['times'] = schedule['times'][0]
+    return schedule
 
 def sessionFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
@@ -210,21 +214,8 @@ def sessionFrontToBackJSON(request_param):
     req_data['details']['year'] = request['event']['occurrenceDate']['year']
 
     req_data['details']['schedule'] = request['event']['schedule']
-    if 'dayOfWeek' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['dayOfWeek']:
-            req_data['details']['schedule']['dayOfWeek'] = req_data['details']['schedule']['dayOfWeek'][0]
-    if 'dayOfMonth' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['dayOfMonth']:
-            req_data['details']['schedule']['dayOfMonth'] = req_data['details']['schedule']['dayOfMonth'][0]
-    if 'month' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['month']:
-            req_data['details']['schedule']['month'] = req_data['details']['schedule']['month'][0]
-    if 'year' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['year']:
-            req_data['details']['schedule']['year'] = req_data['details']['schedule']['year'][0]
-    if 'times' in req_data['details']['schedule']:
-        if req_data['details']['schedule']['times']:
-            req_data['details']['schedule']['times'] = req_data['details']['schedule']['times'][0]
+    req_data['details']['schedule'].update(scheduleFrontToBackJSON(req_data['details']['schedule']))
+
     return req_data
 
 

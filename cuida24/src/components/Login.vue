@@ -29,16 +29,17 @@ export default {
       this.$store.dispatch('login/getToken', {
         username: this.email,
         password: this.password
+      }).then(() => {
+        // this code is only executed after dispatch
       })
-      console.log('teste de receção token ' + this.$store.state.login.accesstoken)
     }
   }
 }
 </script>
 
 <style scoped>
-form {
-  max-width: 500px;
-  margin: auto;
-}
+  form {
+    max-width: 500px;
+    margin: auto;
+  }
 </style>
