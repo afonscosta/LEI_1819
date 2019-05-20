@@ -135,11 +135,7 @@ export default {
   },
   methods: {
     ...mapActions('notes', ['updateNote', 'deleteNote']),
-    log (info) {
-      console.log(info)
-    },
     edit (notePK) {
-      // console.log('editNote', notePK)
       this.editingNote = notePK
     },
     remove (notePK) {

@@ -54,10 +54,15 @@
               @click="removeGroupSession(gs)"
               >Eliminar</b-button>
             <b-button block 
-              v-if="['E', 'R'].includes(gs.groupSession.state)" 
+              v-if="['E'].includes(gs.groupSession.state)" 
               class="mt-2" 
               @click="editGroupSession(gs)"
               >Editar</b-button>
+            <b-button block 
+              v-if="['R'].includes(gs.groupSession.state)" 
+              class="mt-2" 
+              @click="editGroupSession(gs)"
+              >Corrigir</b-button>
             <b-button block 
               class="mt-2" 
               size="sm" 

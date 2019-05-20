@@ -5,13 +5,16 @@
       <h3>Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
     </div>
 
-    <b-card v-if="session.comment !== null" title="Comentário associado ao pedido de revisão">
-      <b-card-text>
-        {{ session.comment }}
-      </b-card-text>
-    </b-card>
-
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
+      <b-row class="mb-3">
+        <b-col sm="12">
+          <b-card v-if="session.comment !== null" title="Comentário associado ao pedido de revisão">
+            <b-card-text>
+              {{ session.comment }}
+            </b-card-text>
+          </b-card>
+        </b-col>
+      </b-row>
       <b-row sm="auto">
         <b-col md="6" sm="12">
           <b-card bg-variant="light">
