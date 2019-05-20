@@ -373,6 +373,9 @@ def prescriptionFrontToBackJSON(request_param, auth_user):
     del req_data['details']['notify']
 
     req_data['details']['pk'] = request['event']['id']
+    req_data['details']['dayOfMonth'] = request['occurrenceDate']['dayOfMonth']
+    req_data['details']['month'] = request['occurrenceDate']['month']
+    req_data['details']['year'] = request['occurrenceDate']['year']
 
     req_data['details']['schedule'] = request['event']['schedule']
     req_data['details']['schedule'].update(scheduleFrontToBackJSON(req_data['details']['schedule']))
