@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .cuida24.views import index_view, MessageViewSet, DefActivityViewSet, EventViewSet, CalendarViewSet, \
   CaregiverViewSet, PatientViewSet, AppointmentViewSet, AppointmentNoteViewSet, BackofficeUserViewSet, \
-  SessionsViewSet, EvaluationViewSet, MedicineViewSet
+  SessionsViewSet, EvaluationViewSet, MedicineViewSet, MedicationViewSet
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
@@ -26,6 +26,7 @@ router.register('backoffice_user', BackofficeUserViewSet)
 router.register('sessions', SessionsViewSet)
 router.register('evaluation', EvaluationViewSet)
 router.register('medicine', MedicineViewSet)
+router.register('medication', MedicationViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
 urlpatterns = [

@@ -6,7 +6,7 @@ from rest_framework.decorators import action, detail_route
 from rest_framework.response import Response
 from rest_framework import viewsets, status, generics
 
-from .models import Message, MessageSerializer, Evaluation, EvaluationSerializer
+from .models import Message, MessageSerializer, Evaluation, EvaluationSerializer, Medication, MedicationSerializer
 from .models import DefActivity, DefActivitySerializer
 from .models import Event, EventSerializer
 from .models import Calendar, CalendarSerializer
@@ -331,8 +331,10 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
 
 class MedicineViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows medicine to be viewed or edited.
-    """
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
+
+
+class MedicationViewSet(viewsets.ModelViewSet):
+    queryset = Medication.objects.all()
+    serializer_class = MedicationSerializer
