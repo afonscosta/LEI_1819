@@ -7,7 +7,7 @@ from rest_framework.decorators import action, detail_route, permission_classes
 from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 
-from .models import Message, MessageSerializer, Evaluation, EvaluationSerializer
+from .models import Message, MessageSerializer, Evaluation, EvaluationSerializer, Medication, MedicationSerializer
 from .models import DefActivity, DefActivitySerializer
 from .models import Event, EventSerializer
 from .models import Calendar, CalendarSerializer
@@ -15,6 +15,7 @@ from .models import Caregiver, CaregiverSerializer
 from .models import Patient, PatientSerializer
 from .models import AppointmentNote, AppointmentNoteSerializer
 from .models import BackofficeUser, BackofficeUserSerializer
+from .models import Medicine, MedicineSerializer
 from .services import *
 import logging
 import json
@@ -343,3 +344,12 @@ class EvaluationViewSet(viewsets.ModelViewSet):
             sent_data.append(getEvaluationBackToFrontJSON(evaluation))
         return Response(sent_data, status=status.HTTP_200_OK)
 
+
+class MedicineViewSet(viewsets.ModelViewSet):
+    queryset = Medicine.objects.all()
+    serializer_class = MedicineSerializer
+
+
+class MedicationViewSet(viewsets.ModelViewSet):
+    queryset = Medication.objects.all()
+    serializer_class = MedicationSerializer

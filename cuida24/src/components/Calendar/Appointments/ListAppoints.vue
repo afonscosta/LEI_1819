@@ -99,9 +99,6 @@ export default {
   methods: {
     ...mapActions('appointments', ['deleteAppointment']),
     ...mapActions('notes', ['setApptPK']),
-    log (info) {
-      console.log(info)
-    },
     edit (apptPK) {
       this.$emit(
         'editAppointment',
@@ -117,7 +114,6 @@ export default {
     },
     confirme (bool) {
       if (bool === true) {
-        console.log('deleting appt with PK =', this.apptToRemove.appointmentPK)
         this.deleteAppointment(this.apptToRemove)
       }
       this.apptToRemove = null

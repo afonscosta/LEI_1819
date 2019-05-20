@@ -298,7 +298,6 @@ export default {
     confirme (type, bool) {
       if (type === 'group') {
         if (bool === true) {
-          console.log('deleting groupSession with PK =', this.groupSessionToRemove.groupSession.pk)
           this.deleteGroupSession(this.groupSessionToRemove)
           this.$notify({
             title: 'A sessão de grupo foi eliminada com sucesso.',
@@ -309,7 +308,6 @@ export default {
         this.$refs['modal-group'].hide()
       } else if (type === 'indiv') {
         if (bool === true) {
-          console.log('deleting indivSession with PK =', this.indivSessionToRemove.individualSession.pk)
           this.deleteIndivSession(this.indivSessionToRemove)
           this.$notify({
             title: 'A sessão individual foi eliminada com sucesso.',
@@ -320,15 +318,11 @@ export default {
         this.$refs['modal-indiv'].hide()
       } else if (type === 'part') {
         if (bool === true) {
-          console.log('updating users of group session with PK =', this.updateGSParticipants.groupSession.pk)
           this.updateGSParticipants.event.users = {
             caregivers: this.participantsCaregivers.map(u => u.pk),
             patients: this.participantsPatients.map(u => u.pk)
           }
           let remove = true
-          console.log('partCare', this.participantsCaregivers)
-          console.log('partPat', this.participantsPatients)
-          console.log('caregivers', this.usersActive.caregivers)
           for (let i in this.usersActive.caregivers) {
             if (this.participantsCaregivers.find(p => p.pk === this.usersActive.caregivers[i])) {
               remove = false
@@ -344,11 +338,9 @@ export default {
             }
           }
           if (remove) {
-            console.log('enter remove')
             this.dontShowGroupSession(this.updateGSParticipants)
             this.updateGroupSession(this.updateGSParticipants)
           } else {
-            console.log('updateGroupSession', this.updateGSParticipants)
             this.updateGroupSession(this.updateGSParticipants)
           }
           this.$notify({

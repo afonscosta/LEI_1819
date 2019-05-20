@@ -12,7 +12,7 @@
           rows="3"
           max-rows="6"
         ></b-form-textarea>
-        <b-button class="mt-2" block type="submit" variant="primary">Submit</b-button>
+        <b-button class="mt-2" block type="submit" variant="primary">Enviar</b-button>
       </b-form>
       <b-button class="mt-2" block @click="$refs['modal-comment'].hide()">Cancelar</b-button>
     </b-modal>

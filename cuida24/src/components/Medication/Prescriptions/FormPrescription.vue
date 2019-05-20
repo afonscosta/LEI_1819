@@ -10,25 +10,66 @@
 
     <div v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">
       <h3>Não foi selecionado nenhum utilizador.</h3>
-      <h3>Carregue <router-link :to="{ name: 'calendar' }">aqui</router-link> para escolher um.</h3>
+      <h3>Carregue <router-link :to="{ name: 'medication' }">aqui</router-link> para escolher um.</h3>
     </div>
+
+    <b-modal 
+      ref="modal-med"
+      hide-footer centered
+      title="Medicamentos disponíveis"
+      size="lg"
+    >
+      <b-container>
+        <b-row>
+          <b-col>
+            <h5><b>Medicamentos</b></h5>
+            <ListMedicines 
+              :meds="medicines"
+              :selected="medicine"
+              @removeSelected="removeMedicine"
+              @updateSelected="updateMedicine"
+            ></ListMedicines>
+          </b-col>
+        </b-row>
+      </b-container>
+      <b-button class="mt-2" variant="success" block @click="confirme(false)">Cancelar</b-button>
+      <b-button class="mt-3" variant="danger" block @click="confirme(true)">Guardar</b-button>
+    </b-modal>
 
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row>
         <b-col md="6" sm="12">
           <b-card bg-variant="light">
             <b-form align="left">
+
+              <b-button block class="mb-3" @click="$refs['modal-med'].show()">Escolher medicamento</b-button>
+
               <b-form-group
                 id="input-group-1"
-                label="Especialidade"
+                label="Quantidade por toma"
                 label-for="input-1"
               >
                 <b-form-input
                   id="input-1"
-                  v-model="formData.specialty"
+                  v-model="formData.quantity"
                   required
-                  placeholder="Introduza a especialidade da consulta"
+                  placeholder="Introduza a quantidade por toma"
                 ></b-form-input>
+              </b-form-group>
+
+              <b-form-group
+                id="input-group-2"
+                label="Descrição da toma"
+                label-for="input-2"
+              >
+                <b-form-textarea
+                  id="input-2"
+                  v-model="formData.description"
+                  required
+                  rows="3"
+                  max-rows="6"
+                  placeholder="Descreva a forma como o medicamento deve ser tomado"
+                ></b-form-textarea>
               </b-form-group>
 
               <b-form-group
@@ -58,13 +99,6 @@
                   :options="optionsSchedule"
                 ></b-form-select>
               </b-form-group>
-
-              <b-form-checkbox-group
-                class="mt-3 mb-3"
-                v-model="formData.allDay"
-                id="checkboxes-3">
-                <b-form-checkbox value="true">Dia inteiro</b-form-checkbox>
-              </b-form-checkbox-group>
 
               <b-container 
                 class="m-0 p-0"
@@ -115,15 +149,6 @@
                 </b-row>
               </b-container>
 
-              <b-form-group id="input-group-5" label="Localização" label-for="input-5">
-                <b-form-input
-                  id="input-5"
-                  v-model="formData.local"
-                  required
-                  placeholder="Introduza localização"
-                ></b-form-input>
-              </b-form-group>
-
               <b-form-group id="input-group-6" label="Notificações" label-for="input-6">
                 <notification
                   :notify="formData.notify"
@@ -152,18 +177,20 @@
 
 <script>
 import { DateTime as LuxonDateTime } from 'luxon'
+import { mapActions, mapState, mapGetters } from 'vuex'
+import { format, parse, subMinutes } from 'date-fns'
 import notification from '@/components/Notification.vue'
 import schedule from '@/components/Schedule'
 import calReadOnly from '@/components/Calendar/CalendarReadOnly'
-import { mapActions, mapState, mapGetters } from 'vuex'
-import { format, parse, subDays, subMonths } from 'date-fns'
+import ListMedicines from '../ListMedicines'
 
 export default {
-  name: 'addAppoint',
+  name: 'FormPrescription',
   components: {
     notification,
     schedule,
-    calReadOnly
+    calReadOnly,
+    ListMedicines
   },
   props: {
     form: {
@@ -176,22 +203,22 @@ export default {
         type: String
       },
       allDay: {
-        default: true,
+        default: false,
         type: Boolean
       },
       duration: {
-        default: 0,
+        default: 5,
         type: Number
       },
       durationUnit: {
-        default: '',
+        default: 'minutes',
         type: String
       },
       local: {
         default: '',
         type: String
       },
-      specialty: {
+      description: {
         default: '',
         type: String
       },
@@ -234,24 +261,28 @@ export default {
     formData: {
       dateValue: '',
       timeValue: '',
-      allDay: true,
-      duration: 0,
-      durationUnit: '',
+      allDay: false,
+      duration: 5,
+      durationUnit: 'minutes',
       local: '',
-      specialty: '',
+      description: '',
       notify: [],
       sched: null,
-      id: null
-    }
+      id: null,
+      medicine: null
+    },
+    medicine: []
   }),
   created () {
+    this.$store.dispatch('medicines/getMedicines')
     if (this.form) {
       this.formData = this.form
     }
   },
   computed: {
     ...mapState({
-      usersActive: state => state.users.usersActive
+      usersActive: state => state.users.usersActive,
+      medicines: state => state.medicines.medicines
     }),
     ...mapGetters('calendars', [
       'calendarAppoint'
@@ -261,7 +292,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('appointments', ['addAppointment', 'updateAppointment', 'deleteAppointment']),
+    ...mapActions('prescriptions', ['addPrescription', 'updatePrescription', 'deletePrescription']),
     parseScheduleOption (option) {
       let result = {}
       let dt = LuxonDateTime.fromISO(this.formData.dateValue)
@@ -309,7 +340,7 @@ export default {
       let data = {
         'calendar': this.calendarAppoint.pk,
         'color': this.calendarAppoint.color,
-        'description': this.formData.specialty,
+        'description': this.formData.description,
         'forecolor': this.calendarAppoint.forecolor,
         'location': this.formData.local,
         'notify': this.formData.notify,
@@ -347,10 +378,10 @@ export default {
         }
       }
       if (payload.event.id) {
-        this.updateAppointment(payload)
+        this.updatePrescription(payload)
         this.$emit('appointmentUpdated', payload.occurrenceDate)
       } else {
-        this.addAppointment(payload)
+        this.addPrescription(payload)
         this.$notify({
           title: 'A consulta foi adicionada com sucesso.',
           duration: 3000
@@ -358,11 +389,11 @@ export default {
         this.formData = {
           dateValue: '',
           timeValue: '',
-          allDay: true,
-          duration: 0,
-          durationUnit: '',
+          allDay: false,
+          duration: 5,
+          durationUnit: 'minutes',
           local: '',
-          specialty: '',
+          description: '',
           notify: [],
           sched: null,
           id: null
@@ -373,15 +404,32 @@ export default {
     updateNotify () {
       if (this.formData.dateValue) {
         var d = parse(this.formData.dateValue)
-        var prevMonth = format(subMonths(d, 1), 'YYYY-MM-DD') + 'T09:00:00.000Z'
-        var prev3Days = format(subDays(d, 3), 'YYYY-MM-DD') + 'T09:00:00.000Z'
-        this.formData.notify = [prevMonth, prev3Days]
+        var t = parse(this.formData.timeValue)
+        console.log('timeValue', this.formData.timeValue)
+        console.log('time', t)
+        var prev10Min = format(subMinutes(d, 10), 'YYYY-MM-DD') + 'T09:00:00.000Z'
+        this.formData.notify = [prev10Min]
       } else {
         this.formData.notify = []
       }
     },
     hide () {
       this.$emit('hide')
+    },
+    removeMedicine () {
+      this.medicine = []
+    },
+    updateMedicine (med) {
+      this.medicine = [med]
+    },
+    confirme (save) {
+      if (save) {
+        this.formData.medicine = this.medicine.length === 1 ? this.medicine : []
+      } else {
+        this.medicine = this.formData.medicine
+      }
+      this.$refs['modal-med'].hide()
+      console.log(this.formData.medicine)
     }
   }
 }

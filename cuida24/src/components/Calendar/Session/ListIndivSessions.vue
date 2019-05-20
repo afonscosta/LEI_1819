@@ -57,10 +57,15 @@
               @click="removeIndivSession(is)"
               >Eliminar</b-button>
             <b-button block 
-              v-if="['E', 'R'].includes(is.individualSession.state)" 
+              v-if="['E'].includes(is.individualSession.state)" 
               class="mt-2" 
               @click="editIndivSession(is)"
               >Editar</b-button>
+            <b-button block 
+              v-if="['R'].includes(is.individualSession.state)" 
+              class="mt-2" 
+              @click="editIndivSession(is)"
+              >Corrigir</b-button>
             <b-button block 
               v-if="isToday(is) && ['A', 'C'].includes(is.individualSession.state)" 
               class="mt-2" 
@@ -167,7 +172,6 @@ export default {
       this.$router.push({ name: 'evaluation' })
     },
     isToday (is) {
-      console.log('event', is.event.occurrenceDate)
       var event = new Date(
         is.event.occurrenceDate.year,
         is.event.occurrenceDate.month - 1,

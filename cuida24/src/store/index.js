@@ -8,6 +8,8 @@ import appointments from './modules/appointments.js'
 import notes from './modules/notes.js'
 import sessions from './modules/sessions.js'
 import evaluations from './modules/evaluations.js'
+import prescriptions from './modules/prescriptions.js'
+import medicines from './modules/medicines.js'
 import login from './modules/login'
 import register from './modules/register'
 
@@ -24,6 +26,8 @@ export default new Vuex.Store({
     sessions,
     login,
     register,
-    evaluations
+    evaluations,
+    prescriptions,
+    medicines
   }
 })

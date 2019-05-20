@@ -56,9 +56,6 @@ export default {
     })
   },
   methods: {
-    log (info) {
-      console.log(info)
-    },
     parseScheduleOption (appt) {
       var rec = null
       if (appt.event.schedule.duration === 1 &&
@@ -101,7 +98,6 @@ export default {
       return rec
     },
     editAppointment (appt) {
-      console.log('appt', appt)
       this.appointmentSel = appt.appointmentPK
       var time = ''
       if (appt.event.schedule.times) {
@@ -129,8 +125,6 @@ export default {
         id: appt.event.id
       }
       this.form = form
-      console.log('form', this.form)
-      // this.$emit('editAppointment', form)
     },
     appointmentUpdated (occurrenceDate) {
       this.appointmentSel = null

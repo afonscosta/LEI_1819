@@ -11,7 +11,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from .cuida24.views import index_view, MessageViewSet, DefActivityViewSet, EventViewSet, CalendarViewSet, \
   CaregiverViewSet, PatientViewSet, AppointmentViewSet, AppointmentNoteViewSet, BackofficeUserViewSet, \
-  SessionsViewSet, EvaluationViewSet
+  SessionsViewSet, EvaluationViewSet, MedicineViewSet, MedicationViewSet
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
@@ -25,6 +25,8 @@ router.register('appointmentNotes', AppointmentNoteViewSet)
 router.register('backoffice_user', BackofficeUserViewSet)
 router.register('sessions', SessionsViewSet)
 router.register('evaluation', EvaluationViewSet)
+router.register('medicine', MedicineViewSet)
+router.register('medication', MedicationViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
 urlpatterns = [

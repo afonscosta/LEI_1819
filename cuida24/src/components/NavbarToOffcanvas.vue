@@ -20,8 +20,8 @@
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
-        <li class="nav-item" v-bind:class="{ active: medicacaoCurrent }">
-          <router-link class="nav-link" :to="{ name: 'medicacao' }" @click.native="toggleoffcanvas() + currentUpdate('medicacao')">
+        <li class="nav-item" v-bind:class="{ active: medicationCurrent }">
+          <router-link class="nav-link" :to="{ name: 'medication' }" @click.native="toggleoffcanvas() + currentUpdate('medication')">
             Medicação
             <span class="sr-only">(current)</span>
           </router-link>
@@ -74,7 +74,7 @@ export default {
       collapse: false,
       calendarioCurrent: false,
       calendarCurrent: false,
-      medicacaoCurrent: false,
+      medicationCurrent: false,
       habitosCurrent: false,
       chatCurrent: false,
       jogosCurrent: false,
@@ -93,15 +93,15 @@ export default {
     currentUpdate: function (page) {
       this.calendarioCurrent = false
       this.calendarCurrent = false
-      this.medicacaoCurrent = false
+      this.medicationCurrent = false
       this.habitosCurrent = false
       this.chatCurrent = false
       this.jogosCurrent = false
       this.infoCurrent = false
       if (page === 'calendar') {
         this.calendarCurrent = true
-      } else if (page === 'medicacao') {
-        this.medicacaoCurrent = true
+      } else if (page === 'medication') {
+        this.medicationCurrent = true
       } else if (page === 'habitos') {
         this.habitosCurrent = true
       } else if (page === 'chat') {

@@ -41,7 +41,7 @@
           rows="3"
           max-rows="6"
         ></b-form-textarea>
-        <b-button class="mt-2" block type="submit" variant="primary">Submit</b-button>
+        <b-button class="mt-2" block type="submit" variant="primary">Enviar</b-button>
       </b-form>
       <b-button class="mt-2" block @click="$refs['modal-comment-caregiver'].hide()">Cancelar</b-button>
     </b-modal>
@@ -58,7 +58,7 @@
           rows="3"
           max-rows="6"
         ></b-form-textarea>
-        <b-button class="mt-2" block type="submit" variant="primary">Submit</b-button>
+        <b-button class="mt-2" block type="submit" variant="primary">Enviar</b-button>
       </b-form>
       <b-button class="mt-2" block @click="$refs['modal-comment-patient'].hide()">Cancelar</b-button>
     </b-modal>
@@ -246,11 +246,15 @@ export default {
       this.$refs['modal-del-patient'].show()
     },
     confirme (type, bool) {
-      if (type === 'caregiver' && bool === true) {
-        this.deleteCaregiverEvaluation(this.selectedEvaluation.pk)
+      if (type === 'caregiver') {
+        if (bool === true) {
+          this.deleteCaregiverEvaluation(this.selectedEvaluation.pk)
+        }
         this.$refs['modal-del-caregiver'].hide()
-      } else if (type === 'patient' && bool === true) {
-        this.deletePatientEvaluation(this.selectedEvaluation.pk)
+      } else if (type === 'patient') {
+        if (bool === true) {
+          this.deletePatientEvaluation(this.selectedEvaluation.pk)
+        }
         this.$refs['modal-del-patient'].hide()
       }
       this.selectedEvaluation = null
