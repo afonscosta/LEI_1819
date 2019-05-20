@@ -1,7 +1,7 @@
 import calendarsService from '../../services/calendarsService'
 
 const state = {
-  calendars: Array
+  calendars: []
 }
 
 const getters = {

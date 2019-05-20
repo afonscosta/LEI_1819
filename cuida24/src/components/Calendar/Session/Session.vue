@@ -25,8 +25,10 @@
       v-if="sessionSel"
       :formData="formData"
       :sessionData="sessionData"
-      @groupSessionUpdated="sessionSel = !sessionSel"
-      @indivSessionUpdated="sessionSel = !sessionSel"
+      :isGroupSession="isGroupSession"
+      :isIndivSession="isIndivSession"
+      @groupSessionUpdated="sessionSel = !sessionSel; isGroupSession = false; isIndivSession = false"
+      @indivSessionUpdated="sessionSel = !sessionSel; isGroupSession = false; isIndivSession = false"
       @hide="sessionSel = null"
     ></FormSession>
   </div>
@@ -47,7 +49,9 @@ export default {
   data: () => ({
     sessionSel: null,
     formData: null,
-    sessionData: null
+    sessionData: null,
+    isGroupSession: false,
+    isIndivSession: false
   }),
   computed: {
     ...mapState({
@@ -64,7 +68,6 @@ export default {
       }
     },
     editGroupSession (s) {
-      console.log('s', s)
       this.sessionSel = true
       var time = ''
       if (s.event.schedule.times) {
@@ -93,12 +96,10 @@ export default {
       }
       this.formData = form
       this.sessionData = s.groupSession
-      console.log('formData', this.formData)
-      console.log('sessionData', this.sessionData)
-      console.log('sessionSel', this.sessionSel)
+      this.isGroupSession = true
+      this.isIndivSession = false
     },
     editIndivSession (s) {
-      console.log('s', s)
       this.sessionSel = true
       var time = ''
       if (s.event.schedule.times) {
@@ -127,9 +128,8 @@ export default {
       }
       this.formData = form
       this.sessionData = s.individualSession
-      console.log('formData', this.formData)
-      console.log('sessionData', this.sessionData)
-      console.log('sessionSel', this.sessionSel)
+      this.isGroupSession = false
+      this.isIndivSession = true
     },
     parseScheduleOption (appt) {
       var rec = null

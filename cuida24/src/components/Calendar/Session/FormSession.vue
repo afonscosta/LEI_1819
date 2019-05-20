@@ -238,6 +238,14 @@ export default {
     calReadOnly
   },
   props: {
+    isGroupSession: {
+      default: false,
+      type: Boolean
+    },
+    isIndivSession: {
+      default: false,
+      type: Boolean
+    },
     sessionData: {
       default: null,
       type: Object
@@ -333,9 +341,7 @@ export default {
     if (this.sessionData) {
       this.session = this.sessionData
       this.form = this.formData
-      console.log('dentro')
     }
-    console.log('fora')
   },
   computed: {
     ...mapState({
@@ -375,7 +381,14 @@ export default {
     onSubmit (evt) {
       let eventData = this.prepareEvent()
       let payload = {}
-      if ((this.usersActive.caregivers.length + this.usersActive.patients.length) === 1) {
+      if (
+        this.isIndivSession ||
+        (
+          !this.isGroupSession &&
+          !this.isIndivSession &&
+          (this.usersActive.caregivers.length + this.usersActive.patients.length) === 1
+        )
+      ) {
         payload = {
           'individualSession': this.session,
           'event': eventData
@@ -459,7 +472,6 @@ export default {
     },
     parseScheduleOption (option) {
       let result = {}
-      console.log('OPTION', option)
       let dt = LuxonDateTime.fromISO(this.form.dateValue)
       // let wsom = this.weekSpanOfMonth(dt)
       let dow = dt.weekday % 7
@@ -559,14 +571,12 @@ export default {
     },
     isCaregiver (id) {
       if (this.caregivers.find(u => u.info.pk === id)) {
-        console.log('is caregiver', id)
         return true
       }
       return false
     },
     isPatient (id) {
       if (this.patients.find(u => u.info.pk === id)) {
-        console.log('is patient', id)
         return true
       }
       return false

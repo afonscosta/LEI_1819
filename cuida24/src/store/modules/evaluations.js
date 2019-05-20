@@ -1,7 +1,7 @@
 import evaluationsService from '../../services/evaluationsService'
 
 const state = {
-  session: {},
+  session: null,
   caregiversEvaluations: [],
   patientsEvaluations: []
 }
@@ -18,12 +18,16 @@ const getters = {
   },
   getCaregiversInfo (state, getters, rootState, rootGetters) {
     let users = []
-    users.push(...state.session.event.users.caregivers.map(pk => rootGetters['users/getCaregiverById'](pk)))
+    if (state.session) {
+      users.push(...state.session.event.users.caregivers.map(pk => rootGetters['users/getCaregiverById'](pk)))
+    }
     return users
   },
   getPatientsInfo (state, getters, rootState, rootGetters) {
     let users = []
-    users.push(...state.session.event.users.patients.map(pk => rootGetters['users/getPatientById'](pk)))
+    if (state.session) {
+      users.push(...state.session.event.users.patients.map(pk => rootGetters['users/getPatientById'](pk)))
+    }
     return users
   }
 }

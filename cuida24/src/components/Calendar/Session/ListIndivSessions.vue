@@ -167,7 +167,6 @@ export default {
       this.$router.push({ name: 'evaluation' })
     },
     isToday (is) {
-      console.log('event', is.event.occurrenceDate)
       var event = new Date(
         is.event.occurrenceDate.year,
         is.event.occurrenceDate.month - 1,
