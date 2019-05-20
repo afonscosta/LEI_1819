@@ -102,14 +102,14 @@ class IndividualLeisureSerializer(serializers.ModelSerializer):
    #     fields = ('name', 'pk')
 
 class UserSerializer(serializers.ModelSerializer):
-
+    name = serializers.CharField(source="first_name")
     password = serializers.CharField(
           write_only=True,
     )
 
     class Meta:
        model = UserAuth
-       fields = ('password', 'username', 'first_name', 'last_name', 'email',)
+       fields = ('password', 'username', 'name', 'last_name', 'email',)
 
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data)
