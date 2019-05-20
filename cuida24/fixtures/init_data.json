@@ -41,7 +41,7 @@
     "fields": {
         "first_name": "cuidador1",
         "last_name": "cuidador1",
-        "password": "password",
+        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
         "username": "12345@gmail.com",
         "email": "12345@gmail.com"
     }
@@ -52,7 +52,7 @@
     "fields": {
         "first_name": "cuidador2",
         "last_name": "cuidadorTESTEultimo",
-        "password": "password",
+        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
         "username": "12344@gmail.com",
         "email": "12344@gmail.com"
     }
@@ -63,7 +63,7 @@
     "fields": {
         "first_name": "cuidador3",
         "last_name": "cuidadorTESTEultimo",
-        "password": "password",
+        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
         "username": "12343@gmail.com",
         "email": "12343@gmail.com"
     }
@@ -74,7 +74,7 @@
     "fields": {
         "first_name": "utente1",
         "last_name": "utenteTESTEultimo",
-        "password": "password",
+        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
         "username": "12342@gmail.com",
         "email": "12342@gmail.com"
     }
@@ -85,7 +85,7 @@
     "fields": {
         "first_name": "utente2",
         "last_name": "utenteTESTEultimo",
-        "password": "password",
+        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
         "username": "12341@gmail.com",
         "email": "12341@gmail.com"
     }
@@ -96,7 +96,7 @@
     "fields": {
         "first_name": "utente3",
         "last_name": "utenteTESTEultimo",
-        "password": "password",
+        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
         "username": "12340@gmail.com",
         "email": "12340@gmail.com"
     }
@@ -107,7 +107,7 @@
     "fields": {
         "first_name": "coordenador",
         "last_name": "coordenadorTESTEultimo",
-        "password": "password",
+        "password": "pbkdf2_sha256$150000$EvMSsYtjjz18$q5vergD5FWV+zHeSy6aovpI4ArD1loBT6uB0RsUnzSs=",
         "username": "12329@gmail.com",
         "email": "12339@gmail.com"
     }
