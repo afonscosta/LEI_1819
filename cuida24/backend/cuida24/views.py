@@ -1,21 +1,11 @@
-from django.contrib.auth.decorators import permission_required
-from django.http import Http404
-from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework.decorators import action, detail_route, permission_classes
 from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 
-from .models import Message, MessageSerializer, Evaluation, EvaluationSerializer, Medication, MedicationSerializer
-from .models import DefActivity, DefActivitySerializer
-from .models import Event, EventSerializer
-from .models import Calendar, CalendarSerializer
-from .models import Caregiver, CaregiverSerializer
-from .models import Patient, PatientSerializer
-from .models import AppointmentNote, AppointmentNoteSerializer
-from .models import BackofficeUser, BackofficeUserSerializer
-from .models import Medicine, MedicineSerializer
+from backend.cuida24.models import *
+from backend.cuida24.serializers import *
 from .services import *
 import logging
 import json

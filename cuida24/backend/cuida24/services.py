@@ -4,8 +4,8 @@ import json
 
 from django.shortcuts import get_object_or_404
 
-from backend.cuida24.models import Appointment, AppointmentSerializer, Notification, NotificationSerializer, Session, \
-  SessionSerializer, Caregiver, Patient
+from backend.cuida24.models import *
+from backend.cuida24.serializers import *
 
 logger = logging.getLogger("mylogger")
 
