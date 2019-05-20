@@ -59,29 +59,29 @@ class BackofficeUser(models.Model):
 # Historic
 
 class PhysiologicalParam(models.Model):
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class AnalyticalParam(models.Model):
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Water(models.Model):
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     quantity = models.IntegerField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Nap(models.Model):
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     quantity = models.IntegerField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Sleep(models.Model):
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     quantity = models.BooleanField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
@@ -97,7 +97,7 @@ class Activity(models.Model):
 
 class Meal(models.Model):
     TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'LancheTarde'), ('JT', 'Jantar'))
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     realize = models.BooleanField()
     type = models.CharField(max_length=2, choices=TYPE)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
@@ -135,10 +135,10 @@ class Schedule(models.Model):
 
 class Event(models.Model):
     title = models.TextField()
-    dayOfMonth = models.IntegerField()
-    month = models.IntegerField()
-    year = models.IntegerField()
-    location = models.TextField()
+    dayOfMonth = models.IntegerField(blank=True, null=True)
+    month = models.IntegerField(blank=True, null=True)
+    year = models.IntegerField(blank=True, null=True)
+    location = models.TextField(blank=True, null=True)
     description = models.TextField()
     calendar = models.ForeignKey(Calendar, on_delete=models.CASCADE)
     schedule = models.OneToOneField(Schedule, on_delete=models.CASCADE, null=True, blank=True)
@@ -148,8 +148,8 @@ class Event(models.Model):
 
     def delete(self, using=None, keep_parents=False):
         self.schedule.delete()
-        super(Event, self).delete()
         Notification.objects.filter(event=self).delete()
+        super(Event, self).delete()
 
 
 class Notification(models.Model):
@@ -190,9 +190,9 @@ class Medicine(models.Model):
 
 
 class Prescription(models.Model):
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    author = models.ForeignKey(BackofficeUser, on_delete=models.CASCADE)
+    author = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
 
 
 class Medication(models.Model):
@@ -203,9 +203,13 @@ class Medication(models.Model):
     medication = models.ForeignKey(Medicine, on_delete=models.CASCADE)
     prescription = models.ForeignKey(Prescription, on_delete=models.CASCADE)
 
+    def delete(self, using=None, keep_parents=False):
+        self.details.delete()
+        self.prescription.delete()
+        super(Medication, self).delete()
 
 class Take(models.Model):
-    date = models.DateField()
+    date = models.DateField(auto_now=True)
     medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
 
 

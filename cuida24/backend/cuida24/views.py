@@ -344,3 +344,41 @@ class MedicineViewSet(viewsets.ModelViewSet):
 class MedicationViewSet(viewsets.ModelViewSet):
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
+
+    def create(self, request, *args, **kwargs):
+        logger.info("POST PRESCRIPTION")
+        logger.info(request.data)
+        req_data = prescriptionFrontToBackJSON(request.data, request.user)
+        serializer = MedicationSerializer(data=req_data, context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = prescriptionBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def put(self, request):
+        logger.info("PUT PRESCRIPTION")
+        logger.info(request.data)
+        req_data = prescriptionFrontToBackJSON(request.data, request.user)
+        medication = get_object_or_404(Medication, pk=req_data['pk'])
+        serializer = MedicationSerializer(data=req_data, instance=medication, context={'request': req_data})
+        logger.info("DATA SENT")
+        logger.info(req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            sent_data = prescriptionBackToFrontJSON(request.data, serializer.data)
+            logger.info("RETURN DATA")
+            logger.info(sent_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

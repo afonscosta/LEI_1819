@@ -356,3 +356,47 @@ def getEvaluationBackToFrontJSON(serializer_data):
         patient = Patient.objects.get(info_id=serializer_data['participant']).pk
         req_data['patientPK'] = patient
     return req_data
+
+
+def prescriptionFrontToBackJSON(request_param, auth_user):
+    request = copy.deepcopy(request_param)
+    req_data = {'details': request['event']['data'], 'notification': request['event']['data']['notify']}
+
+    calendar_pk = req_data['details']['calendar']
+    req_data['details']['calendar'] = {}
+    req_data['details']['calendar']['pk'] = calendar_pk
+    req_data['details']['calendar']['color'] = req_data['details']['color']
+    req_data['details']['calendar']['forcolor'] = req_data['details']['forecolor']
+
+    del req_data['details']['color']
+    del req_data['details']['forecolor']
+    del req_data['details']['notify']
+
+    req_data['details']['pk'] = request['event']['id']
+
+    req_data['details']['schedule'] = request['event']['schedule']
+    req_data['details']['schedule'].update(scheduleFrontToBackJSON(req_data['details']['schedule']))
+
+    # prescription data
+    if 'pk' in request['prescription']:
+        req_data['pk'] = request['prescription']['pk']
+    req_data['quantity'] = request['prescription']['quantity']
+    req_data['state'] = request['prescription']['state']
+    req_data['medication'] = request['prescription']['medicine']
+    user = None
+    for user in request['users']['caregivers']:
+        user = get_object_or_404(Caregiver, pk=user).pk
+    for user in request['users']['patients']:
+        user = get_object_or_404(Patient, pk=user).pk
+    author = get_object_or_404(UserAuth, email=auth_user).pk
+    req_data['prescription'] = {'patient': user, 'author': author}
+    return req_data
+
+
+def prescriptionBackToFrontJSON(request_param, serializer_data):
+    request = copy.deepcopy(request_param)
+    sent_data = request
+    sent_data['prescription']['pk'] = serializer_data['pk']
+    sent_data['event']['id'] = serializer_data['details']['pk']
+
+    return sent_data

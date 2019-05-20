@@ -243,7 +243,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
         depth = 1
 
     def create(self, validated_data):
-        logger.info('FROM SERIALIZER')
         request = self.context.get("request")
 
         # Details(event) of appointment
@@ -267,7 +266,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
             for user in request['users']['patients']:
                 req_data = {'user': get_object_or_404(Patient, pk=user).info, 'details': event}
                 appointment = Appointment.objects.create(**req_data)
-        logger.info('REturning from serializer')
         return appointment
 
     def update(self, instance, validated_data):
@@ -298,6 +296,8 @@ class AppointmentNoteSerializer(serializers.ModelSerializer):
         fields = ('note', 'author', 'appointment', 'category', 'pk')
 
 
+# Medication
+
 class MedicineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medicine
@@ -307,13 +307,77 @@ class MedicineSerializer(serializers.ModelSerializer):
 class PrescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prescription
-        fields = ('date', 'patient', 'author' 'pk')
+        fields = ('date', 'patient', 'author', 'pk')
 
 
 class MedicationSerializer(serializers.ModelSerializer):
+    details = EventSerializer()
+    prescription = PrescriptionSerializer()
+
     class Meta:
         model = Medication
         fields = ('quantity', 'state', 'details', 'medication', 'prescription', 'pk')
+
+    def create(self, validated_data):
+        logger.info("VALIDATED DATA")
+        logger.info(validated_data)
+        request = self.context.get("request")
+
+        # Details(event) of appointment
+        calendar = get_object_or_404(Calendar, pk=request['details']['calendar']['pk'])
+        schedule_data = validated_data['details'].pop('schedule')
+        schedule = Schedule.objects.create(**schedule_data)
+        event_data = validated_data.pop('details')
+        event = Event.objects.create(calendar=calendar, schedule=schedule, **event_data)
+
+        # Notification associate to event
+        for notification in request['notification']:
+            notification_req_data = {'dateTime': notification, 'event': event}
+            Notification.objects.create(**notification_req_data)
+
+        # Create Prescription
+        prescription_data = validated_data.pop('prescription')
+        prescription = Prescription.objects.create(**prescription_data)
+
+        # Create medication with prescription, medication and event
+        medication = Medication.objects.create(details=event, prescription=prescription, **validated_data)
+        return medication
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+
+        event = get_object_or_404(Event, pk=request['details']['pk'])
+        logger.info(event)
+        event_serializer = EventSerializer(data=validated_data['details'], instance=event, context={'request': request})
+        if event_serializer.is_valid(raise_exception=False):
+            event_serializer.save()
+
+        notifications = Notification.objects.filter(event=event)
+        actual_number_notification = len(notifications)
+        actual_index_change = 0
+        for income_notification in request['notification']:
+            if actual_index_change < actual_number_notification:
+                notification = notifications[actual_index_change]
+                notification.dateTime = income_notification
+                notification.save()
+                actual_index_change += 1
+            else:
+                notification_req_data = {'dateTime': income_notification, 'event': event}
+                Notification.objects.create(**notification_req_data)
+
+        prescription = get_object_or_404(Prescription, pk=instance.prescription.pk)
+        logger.info(prescription)
+        prescription_serializer = PrescriptionSerializer(data=validated_data['prescription'], instance=prescription,
+                                                         context={'resquest': request})
+        if prescription_serializer.is_valid(raise_exception=False):
+            prescription_serializer.save()
+
+        # update instance
+        instance.quantity = validated_data.get("quantity", instance.quantity)
+        instance.state = validated_data.get("state", instance.state)
+        instance.medication = validated_data.get('medication', instance.medication)
+        instance.save()
+        return instance
 
 
 class TakeSerializer(serializers.ModelSerializer):
