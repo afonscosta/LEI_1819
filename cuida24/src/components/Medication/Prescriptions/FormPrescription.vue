@@ -46,30 +46,29 @@
 
               <b-form-group
                 id="input-group-1"
-                label="Quantidade por toma"
+                label="Dose (ml/mg)"
                 label-for="input-1"
               >
                 <b-form-input
                   id="input-1"
-                  v-model="formData.quantity"
+                  v-model="prescription.quantity"
+                  type="number"
                   required
-                  placeholder="Introduza a quantidade por toma"
+                  placeholder="Introduza a quantidade"
                 ></b-form-input>
               </b-form-group>
 
               <b-form-group
                 id="input-group-2"
-                label="Descrição da toma"
+                label="Via de administração"
                 label-for="input-2"
               >
-                <b-form-textarea
+                <b-form-input
                   id="input-2"
                   v-model="formData.description"
                   required
-                  rows="3"
-                  max-rows="6"
-                  placeholder="Descreva a forma como o medicamento deve ser tomado"
-                ></b-form-textarea>
+                  placeholder="Insira a via de administração do medicamento"
+                ></b-form-input>
               </b-form-group>
 
               <b-form-group
@@ -85,7 +84,6 @@
                   :phrases="datetime.phrases"
                   :week-start="datetime['week-start']"
                   :min-datetime="datetime.minDatetime"
-                  @close="updateNotify"
                 ></datetime>
               </b-form-group>
 
@@ -99,55 +97,19 @@
                   :options="optionsSchedule"
                 ></b-form-select>
               </b-form-group>
-
-              <b-container 
-                class="m-0 p-0"
-                v-if="!formData.allDay"
+                
+              <b-form-group
+                id="input-group-4"
+                label="Hora"
+                label-for="input-4"
               >
-                <b-row class="m-0 p-0">
-                  <b-col cols="6" class="p-0 pr-3">
-                    <b-form-group
-                      id="input-group-4"
-                      label="Hora"
-                      label-for="input-4"
-                    >
-                      <datetime 
-                        class="form-control"
-                        type="time"
-                        v-model="formData.timeValue"
-                      ></datetime>
-                    </b-form-group>
-                  </b-col>
-                  <b-col cols="6" class="p-0">
-                    <b-form-group
-                      id="input-group-7"
-                      label="Duração"
-                      label-for="input-7"
-                    >
-                      <b-row>
-                        <b-col cols="4" class="pr-1">
-                          <b-form-input
-                            width="100%"
-                            id="input-7"
-                            v-model="formData.duration"
-                            required
-                            placeholder="Introduza uma duração"
-                          ></b-form-input>
-                        </b-col>
-                        <b-col cols="8" class="pl-0">
-                          <b-form-select
-                            width="100%"
-                            id="input-8"
-                            v-model="formData.durationUnit"
-                            :options="durations"
-                            required
-                          ></b-form-select>
-                        </b-col>
-                      </b-row>
-                    </b-form-group>
-                  </b-col>
-                </b-row>
-              </b-container>
+                <datetime 
+                  class="form-control"
+                  type="time"
+                  v-model="formData.timeValue"
+                  @close="updateNotify"
+                ></datetime>
+              </b-form-group>
 
               <b-form-group id="input-group-6" label="Notificações" label-for="input-6">
                 <notification
@@ -159,7 +121,7 @@
             <b-row>
               <b-col>
                 <b-button block variant="primary" v-if="formData.id === null" @click="$router.go(-1)">Cancelar</b-button>
-                <b-button block variant="primary" v-if="formData.id !== null" @click="hide">Cancelar</b-button>
+                <b-button block variant="primary" v-if="formData.id !== null" @click="$emit('hide')">Cancelar</b-button>
               </b-col>
               <b-col>
                 <b-button block variant="success" @click="onSubmit">Submeter</b-button>
@@ -258,6 +220,12 @@ export default {
       { value: 'monthly', text: 'Mensalmente' },
       { value: 'annually', text: 'Anualmente' }
     ],
+    prescription: {
+      quantity: null,
+      state: 'E',
+      medicine: null,
+      pk: null
+    },
     formData: {
       dateValue: '',
       timeValue: '',
@@ -268,8 +236,7 @@ export default {
       description: '',
       notify: [],
       sched: null,
-      id: null,
-      medicine: null
+      id: null
     },
     medicine: []
   }),
@@ -284,9 +251,7 @@ export default {
       usersActive: state => state.users.usersActive,
       medicines: state => state.medicines.medicines
     }),
-    ...mapGetters('calendars', [
-      'calendarAppoint'
-    ]),
+    ...mapGetters('calendars', ['calendarMedication']),
     scheduleChosen () {
       return this.parseScheduleOption(this.selectedSchedule)
     }
@@ -338,13 +303,13 @@ export default {
         'patients': this.usersActive.patients
       }
       let data = {
-        'calendar': this.calendarAppoint.pk,
-        'color': this.calendarAppoint.color,
-        'description': this.formData.description,
-        'forecolor': this.calendarAppoint.forecolor,
+        'calendar': this.calendarMedication.pk,
+        'color': this.calendarMedication.color,
+        'description': 'Via de administração - ' + this.formData.description,
+        'forecolor': this.calendarMedication.forecolor,
         'location': this.formData.local,
         'notify': this.formData.notify,
-        'title': 'Consulta'
+        'title': 'Medicação'
       }
       this.formData.sched = this.scheduleChosen
       if (!this.formData.sched) {
@@ -363,7 +328,6 @@ export default {
         this.formData.sched.duration = this.formData.duration
         this.formData.sched.durationUnit = this.formData.durationUnit
       }
-      let dt = LuxonDateTime.fromISO(this.formData.dateValue)
       let payload = {
         'event': {
           'data': data,
@@ -371,21 +335,23 @@ export default {
           'id': this.formData.id
         },
         'users': users,
-        'occurrenceDate': {
-          'dayOfMonth': dt.c.day,
-          'month': dt.c.month,
-          'year': dt.c.year
-        }
+        'prescription': this.preparePrescription()
       }
       if (payload.event.id) {
         this.updatePrescription(payload)
-        this.$emit('appointmentUpdated', payload.occurrenceDate)
+        this.$emit('prescriptionUpdated', payload)
       } else {
         this.addPrescription(payload)
         this.$notify({
-          title: 'A consulta foi adicionada com sucesso.',
+          title: 'A prescrição foi adicionada com sucesso.',
           duration: 3000
         })
+        this.prescription = {
+          quantity: null,
+          state: 'E',
+          medicine: null,
+          pk: null
+        }
         this.formData = {
           dateValue: '',
           timeValue: '',
@@ -398,23 +364,27 @@ export default {
           sched: null,
           id: null
         }
+        this.medicine = []
         this.selectedSchedule = 'none'
       }
+    },
+    preparePrescription () {
+      var payload = this.prescription
+      payload.medicine = this.prescription.medicine[0].pk
+      return payload
     },
     updateNotify () {
       if (this.formData.dateValue) {
         var d = parse(this.formData.dateValue)
-        var t = parse(this.formData.timeValue)
-        console.log('timeValue', this.formData.timeValue)
-        console.log('time', t)
-        var prev10Min = format(subMinutes(d, 10), 'YYYY-MM-DD') + 'T09:00:00.000Z'
+        var t = LuxonDateTime.fromISO(this.formData.timeValue)
+        t = t.minus({ minutes: 10 })
+        t = t.minus({ hours: 1 })
+        const formattedTime = 'T' + ('0' + t.hour).slice(-2) + ':' + ('0' + t.minute).slice(-2) + ':' + ('0' + t.second).slice(-2) + '.000Z'
+        var prev10Min = format(subMinutes(d, 10), 'YYYY-MM-DD') + formattedTime
         this.formData.notify = [prev10Min]
       } else {
         this.formData.notify = []
       }
-    },
-    hide () {
-      this.$emit('hide')
     },
     removeMedicine () {
       this.medicine = []
@@ -424,12 +394,12 @@ export default {
     },
     confirme (save) {
       if (save) {
-        this.formData.medicine = this.medicine.length === 1 ? this.medicine : []
+        this.prescription.medicine = this.medicine.length === 1 ? this.medicine : []
       } else {
-        this.medicine = this.formData.medicine
+        this.medicine = this.prescription.medicine
       }
       this.$refs['modal-med'].hide()
-      console.log(this.formData.medicine)
+      console.log(this.prescription.medicine)
     }
   }
 }
@@ -463,6 +433,10 @@ export default {
 }
 
 .vdatetime-input {
+  width: 100%;
+}
+
+[type=number] {
   width: 100%;
 }
 </style>

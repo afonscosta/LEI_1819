@@ -47,6 +47,7 @@ const actions = {
       })
   },
   addPrescription ({ commit }, prescription) {
+    console.log('adding prescription', prescription)
     prescriptionsService.postPrescription(prescription)
       .then(newPrescription => {
         commit('addPrescription', newPrescription)

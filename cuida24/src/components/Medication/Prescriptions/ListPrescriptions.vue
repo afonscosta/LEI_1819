@@ -22,15 +22,12 @@
           <b-card
             v-if="(usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0) && prescriptions.length !== 0"
             v-for="presc in prescriptions"
-            :key="presc.prescriptionPK"
+            :key="presc.prescription.pk"
             border-variant="dark"
             :header="presc.event.data.title"
           >
             <b-card-text align="left">
-              <b>Especialidade:</b> {{ presc.event.data.description }}
-            </b-card-text>
-            <b-card-text align="left">
-              <b>Data:</b> {{ presc.occurrenceDate.dayOfMonth + '/' + presc.occurrenceDate.month + '/' + presc.occurrenceDate.year }}
+              <b>Via de administração:</b> {{ presc.event.data.description }}
             </b-card-text>
             <b-card-text v-if="presc.event.schedule.times" align="left">
               <b>Hora:</b> {{ presc.event.schedule.times[0] }}
@@ -41,12 +38,8 @@
             <b-card-text v-if="presc.event.schedule.duration" align="left">
               <b>Duração:</b> {{ presc.event.schedule.duration + " " + durationUnitTranslated(presc.event.schedule.durationUnit) }}
             </b-card-text>
-            <b-card-text align="left">
-              <b>Localização:</b> {{ presc.event.data.location }}
-            </b-card-text>
             <b-button variant="danger" @click="remove(presc)">Eliminar</b-button>
-            <b-button @click="edit(presc.prescriptionPK)">Editar</b-button>
-            <b-button @click="viewNotes(presc.prescriptionPK)">Notas de consulta</b-button>
+            <b-button @click="">Editar</b-button>
           </b-card>
         </b-col>
       </b-row>
@@ -55,7 +48,7 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapGetters } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'ListPrescription',
@@ -74,12 +67,8 @@ export default {
   computed: {
     ...mapState({
       prescriptions: state => state.prescriptions.prescriptions,
-      usersActive: state => state.users.usersActive,
-      prescPK: state => state.notes.prescPK
+      usersActive: state => state.users.usersActive
     }),
-    ...mapGetters('prescriptions', [
-      'getPrescriptionsById'
-    ]),
     durationUnitTranslated () {
       return (durationUnit) => {
         if (durationUnit === 'minutes') {
@@ -98,13 +87,6 @@ export default {
   },
   methods: {
     ...mapActions('prescriptions', ['deletePrescription']),
-    ...mapActions('notes', ['setApptPK']),
-    edit (prescPK) {
-      this.$emit(
-        'editPrescription',
-        this.getPrescriptionsById(prescPK)
-      )
-    },
     remove (presc) {
       this.prescToRemove = presc
       this.showModal()
@@ -118,10 +100,6 @@ export default {
       }
       this.prescToRemove = null
       this.$refs['my-modal'].hide()
-    },
-    viewNotes (prescPK) {
-      this.setApptPK(prescPK)
-      this.$router.push({ name: 'notes' })
     }
   }
 }
