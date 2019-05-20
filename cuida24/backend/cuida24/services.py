@@ -357,7 +357,7 @@ JSON return on Get method. Here is necessary to create all fields in JSON
 '''
 def getEvaluationBackToFrontJSON(serializer_data):
     request = copy.deepcopy(serializer_data)
-    req_data = {'comment': request['comment'], 'sessionPK': request['session']}
+    req_data = {'comment': request['comment'], 'sessionPK': request['session'], 'pk': request['pk']}
     try:
         caregiver = Caregiver.objects.get(info_id=serializer_data['participant']).pk
         req_data['caregiverPK'] = caregiver
