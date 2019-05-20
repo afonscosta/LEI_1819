@@ -6,6 +6,7 @@ import HabitsPage from '../pages/Habits.page'
 import ChatPage from '../pages/Chat.page'
 import GamesPage from '../pages/Games.page'
 import InfoPage from '../pages/Info.page'
+import LoginPage from '../pages/Login.page'
 import {
   createDrawerNavigator,
   createStackNavigator,
@@ -35,6 +36,21 @@ class NavigationDrawerStructure extends Component {
 
 const bgColor = '#FFD185';
 const htColor = '#343F4B';
+
+const Login_StackNavigator = createStackNavigator({
+  //All the screen from the Screen1 will be indexed here
+  Calendar: {
+    screen: LoginPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Iniciar sessão',
+      headerLeft: <NavigationDrawerStructure navigationProps={navigation} />,
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+  },
+});
  
 const Calendar_StackNavigator = createStackNavigator({
   //All the screen from the Screen1 will be indexed here
@@ -128,6 +144,13 @@ const Info_StackNavigator = createStackNavigator({
 
 const DrawerNavigator = createDrawerNavigator({
     //Drawer Optons and indexing
+    Login: {
+      //Title
+      screen: Login_StackNavigator,
+      navigationOptions: {
+        drawerLabel: 'Iniciar sessão',
+      },
+    },
     Calendar: {
       //Title
       screen: Calendar_StackNavigator,

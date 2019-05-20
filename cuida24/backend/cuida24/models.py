@@ -412,6 +412,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         depth = 1
 
     def create(self, validated_data):
+        logger.info('FROM SERIALIZER')
         request = self.context.get("request")
 
         # Details(event) of appointment
@@ -435,6 +436,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             for user in request['users']['patients']:
                 req_data = {'user': get_object_or_404(Patient, pk=user).info, 'details': event}
                 appointment = Appointment.objects.create(**req_data)
+        logger.info('REturning from serializer')
         return appointment
 
     def update(self, instance, validated_data):
