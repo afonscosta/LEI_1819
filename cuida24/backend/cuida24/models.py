@@ -101,8 +101,11 @@ class IndividualLeisureSerializer(serializers.ModelSerializer):
   #      model = User
    #     fields = ('name', 'pk')
 
+
+
+
 class UserSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source="first_name")
+    name = serializers.SerializerMethodField()
     password = serializers.CharField(
           write_only=True,
     )
@@ -110,6 +113,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
        model = UserAuth
        fields = ('password', 'username', 'name', 'last_name', 'email',)
+
+    def get_name(self, obj):
+        return obj.first_name + " " + obj.last_name
 
     def create(self, validated_data):
         user = super(UserSerializer, self).create(validated_data)
