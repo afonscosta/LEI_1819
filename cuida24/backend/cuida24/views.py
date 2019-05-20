@@ -14,6 +14,7 @@ from .models import Caregiver, CaregiverSerializer
 from .models import Patient, PatientSerializer
 from .models import AppointmentNote, AppointmentNoteSerializer
 from .models import BackofficeUser, BackofficeUserSerializer
+from .models import Medicine, MedicineSerializer
 from .services import *
 import logging
 import json
@@ -328,3 +329,10 @@ class EvaluationViewSet(viewsets.ModelViewSet):
             sent_data.append(getEvaluationBackToFrontJSON(evaluation))
         return Response(sent_data, status=status.HTTP_200_OK)
 
+
+class MedicineViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows medicine to be viewed or edited.
+    """
+    queryset = Medicine.objects.all()
+    serializer_class = MedicineSerializer

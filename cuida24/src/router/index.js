@@ -15,7 +15,9 @@ import FormSession from '@/components/Calendar/Session/FormSession'
 import UserEvaluation from '@/components/Calendar/Session/UserEvaluation'
 
 // Medication
-import Medicacao from '@/components/Medication/Medicacao'
+import Medication from '@/components/Medication/Medication'
+import Prescriptions from '@/components/Medication/Prescriptions/Prescriptions'
+import FormPrescription from '@/components/Medication/Prescriptions/FormPrescription'
 
 // Habits
 import Habitos from '@/components/Habits/Habitos'
@@ -87,9 +89,19 @@ export default new Router({
 
     // Medication
     {
-      path: '/medicacao',
-      name: 'medicacao',
-      component: Medicacao
+      path: '/medication',
+      name: 'medication',
+      component: Medication
+    },
+    {
+      path: '/medication/prescriptions',
+      name: 'prescriptions',
+      component: Prescriptions
+    },
+    {
+      path: '/medication/prescriptions/formPrescription',
+      name: 'formPrescription',
+      component: FormPrescription
     },
 
     // Habits

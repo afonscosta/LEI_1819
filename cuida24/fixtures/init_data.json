@@ -136,5 +136,17 @@
        "info": "3",
        "type": "ADM"
     }
+  },
+  {
+    "model": "cuida24.Medicine",
+    "pk": 1,
+    "fields": {
+        "activeSubs": "Paracetamol",
+        "name": "Paracetamol Accel",
+        "pharmaceuticalForm": "Comprimido",
+        "dosage": 1000, 
+        "holder": "Accel Farma, Unipessoal Lda.",
+        "generic": "Sim"
+    }
   }
 ]
