@@ -12,6 +12,8 @@ logger = logging.getLogger("mylogger")
 '''
 Não está a a ser utilizado
 '''
+
+
 def eventFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
     req_data = {'event': request['event']['data'], 'calendar': request['event']['data']['calendar'],
@@ -43,6 +45,8 @@ def eventFrontToBackJSON(request_param):
 '''
 JSON return on Post method with same JSON receive plus pk's created 
 '''
+
+
 def appointmentBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
     sent_data = request
@@ -79,30 +83,32 @@ def appointmentFrontToBackJSON(request_param):
 '''
 JSON return on Get method. Here is necessary to create all fields in JSON     
 '''
+
+
 def getAppointmentBackToFrontJSON(serializer_appointment_data):
     request = copy.deepcopy(serializer_appointment_data)
     req_data = []
     for appointment in request:
         temp = {'appointmentPK': appointment['pk'],
                 'occurrenceDate': {
-                  'dayOfMonth': appointment['details']['dayOfMonth'],
-                  'month': appointment['details']['month'],
-                  'year': appointment['details']['year']
+                    'dayOfMonth': appointment['details']['dayOfMonth'],
+                    'month': appointment['details']['month'],
+                    'year': appointment['details']['year']
                 },
                 'event': {
-                  'data': {
-                    'calendar': appointment['details']['calendar']['pk'],
-                    'color': appointment['details']['calendar']['color'],
-                    'description': appointment['details']['description'],
-                    'forecolor': appointment['details']['calendar']['forecolor'],
-                    'location': appointment['details']['location'],
-                    'notify': notificationBackToFrontJSON(appointment['details']['notification']),
-                    'title': appointment['details']['title']
-                  },
-                  'id': appointment['details']['pk'],
-                  'schedule': scheduleBackToFrontJSON(appointment['details']['schedule'])
+                    'data': {
+                        'calendar': appointment['details']['calendar']['pk'],
+                        'color': appointment['details']['calendar']['color'],
+                        'description': appointment['details']['description'],
+                        'forecolor': appointment['details']['calendar']['forecolor'],
+                        'location': appointment['details']['location'],
+                        'notify': notificationBackToFrontJSON(appointment['details']['notification']),
+                        'title': appointment['details']['title']
+                    },
+                    'id': appointment['details']['pk'],
+                    'schedule': scheduleBackToFrontJSON(appointment['details']['schedule'])
                 }
-              }
+                }
         if 'patientPK' in appointment:
             temp['patientPK'] = appointment['patientPK']
         else:
@@ -145,6 +151,7 @@ def scheduleBackToFrontJSON(schedule_param):
         req_data['times'].append(schedule['times'])
     return req_data
 
+
 def scheduleFrontToBackJSON(schedule_param):
     schedule = copy.deepcopy(schedule_param)
     if 'dayOfWeek' in schedule:
@@ -163,6 +170,7 @@ def scheduleFrontToBackJSON(schedule_param):
         if schedule['times']:
             schedule['times'] = schedule['times'][0]
     return schedule
+
 
 def sessionFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
@@ -197,7 +205,6 @@ def sessionFrontToBackJSON(request_param):
         if 'pk' in request['individualSession']:
             req_data['pk'] = request['individualSession']['pk']
 
-
     calendar_pk = req_data['details']['calendar']
     req_data['details']['calendar'] = {}
     req_data['details']['calendar']['pk'] = calendar_pk
@@ -222,6 +229,8 @@ def sessionFrontToBackJSON(request_param):
 '''
 JSON return on Post method with same JSON receive plus pk's created 
 '''
+
+
 def sessionBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
     sent_data = request
@@ -236,6 +245,8 @@ def sessionBackToFrontJSON(request_param, serializer_data):
 '''
 JSON return on Get method. Here is necessary to create all fields in JSON     
 '''
+
+
 def getSessionBackToFrontJSON(serializer_appointment_data):
     request = copy.deepcopy(serializer_appointment_data)
     req_data = []
@@ -248,29 +259,29 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
                         'materials': json.loads(session['material']),
                         'state': session['state'],
                         'comment': session['comment']
-        }
+                        }
         if session['type'] == 'I':
             temp['individualSession'] = temp_session
         else:
             temp['groupSession'] = temp_session
         temp_event = {'event': {
-                        'data': {
-                          'calendar': session['details']['calendar']['pk'],
-                          'color': session['details']['calendar']['color'],
-                          'description': session['details']['description'],
-                          'forecolor': session['details']['calendar']['forecolor'],
-                          'location': session['details']['location'],
-                          'notify': notificationBackToFrontJSON(session['details']['notification']),
-                          'title': session['details']['title']
-                        },
-                        'id': session['details']['pk'],
-                        'schedule': scheduleBackToFrontJSON(session['details']['schedule']),
-                        'occurrenceDate': {
-                            'dayOfMonth': session['details']['dayOfMonth'],
-                            'month': session['details']['month'],
-                            'year': session['details']['year']
-                          }
-                      }
+            'data': {
+                'calendar': session['details']['calendar']['pk'],
+                'color': session['details']['calendar']['color'],
+                'description': session['details']['description'],
+                'forecolor': session['details']['calendar']['forecolor'],
+                'location': session['details']['location'],
+                'notify': notificationBackToFrontJSON(session['details']['notification']),
+                'title': session['details']['title']
+            },
+            'id': session['details']['pk'],
+            'schedule': scheduleBackToFrontJSON(session['details']['schedule']),
+            'occurrenceDate': {
+                'dayOfMonth': session['details']['dayOfMonth'],
+                'month': session['details']['month'],
+                'year': session['details']['year']
+            }
+        }
         }
         temp_event['event'].update(session['participants'])
         temp.update(temp_event)
@@ -281,6 +292,8 @@ def getSessionBackToFrontJSON(serializer_appointment_data):
 '''
   Get user appointments
 '''
+
+
 def getAppointments(user, is_patient):
     queryset = Appointment.objects.filter(user=user.info)
     serializer_appointment = AppointmentSerializer(queryset, many=True)
@@ -298,10 +311,14 @@ def getAppointments(user, is_patient):
 '''
   Get user(s) session
 '''
+
+
 def getSessions(participants):
     queryset = Session.objects.filter(participants__in=participants).distinct()
     serializer_session = SessionSerializer(queryset, many=True)
     for session in serializer_session.data:
+        logger.info(session)
+        logger.info(session['details'])
         queryset2 = Notification.objects.filter(event=session['details']['pk']).values('dateTime')
         serializer_notification = NotificationSerializer(queryset2, many=True)
         session['details']['notification'] = serializer_notification.data
@@ -319,6 +336,32 @@ def getSessions(participants):
     return serializer_session.data
 
 
+'''
+  Get user(s) prescriptions
+'''
+
+
+def getPrescriptions(patient):
+    logger.info("Prescription get service")
+    queryset = Prescription.objects.filter(patient=patient)
+    serializer_prescription = PrescriptionSerializer(queryset, many=True)
+    req_data = []
+    logger.info(serializer_prescription.data)
+    for prescription in serializer_prescription.data:
+        queryset2 = Medication.objects.get(prescription=prescription['pk'])
+        serializer_medication = MedicationSerializer(queryset2)
+        medication = serializer_medication.data
+        logger.info(medication)
+        logger.info(medication['details'])
+        queryset3 = Notification.objects.filter(event=medication['details']['pk']).values('dateTime')
+        serializer_notification = NotificationSerializer(queryset3, many=True)
+        medication['details']['notification'] = serializer_notification.data
+        req_data.append(medication)
+    logger.info("GET PRESCRIPTION SERVICES")
+    logger.info(req_data)
+    return req_data
+
+
 def evaluationFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
     req_data = {'comment': request['comment'], 'session': request['sessionPK']}
@@ -329,6 +372,7 @@ def evaluationFrontToBackJSON(request_param):
     if 'pk' in request:
         req_data['pk'] = request['pk']
     return req_data
+
 
 def evaluationBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
@@ -346,6 +390,8 @@ def evaluationBackToFrontJSON(request_param, serializer_data):
 '''
 JSON return on Get method. Here is necessary to create all fields in JSON     
 '''
+
+
 def getEvaluationBackToFrontJSON(serializer_data):
     request = copy.deepcopy(serializer_data)
     req_data = {'comment': request['comment'], 'sessionPK': request['session'], 'pk': request['pk']}
@@ -401,5 +447,54 @@ def prescriptionBackToFrontJSON(request_param, serializer_data):
     sent_data = request
     sent_data['prescription']['pk'] = serializer_data['pk']
     sent_data['event']['id'] = serializer_data['details']['pk']
-
     return sent_data
+
+
+'''
+JSON return on Get method. Here is necessary to create all fields in JSON     
+'''
+
+
+def getPrescriptionBackToFrontJSON(serializer_data):
+    request = copy.deepcopy(serializer_data)
+    logger.info("Tratar do json")
+    logger.info(request)
+    req_data = []
+    for medication in request:
+        temp = {'prescription': {}}
+        temp['prescription']['author'] = medication['prescription']['author']
+        temp['prescription']['date'] = medication['prescription']['date']
+        temp['prescription']['medicine'] = medication['medication']
+        temp['prescription']['pk'] = medication['pk']
+        temp['prescription']['quantity'] = medication['quantity']
+        temp['prescription']['state'] = medication['state']
+
+        temp_event = {'event': {
+            'data': {
+                'calendar': medication['details']['calendar']['pk'],
+                'color': medication['details']['calendar']['color'],
+                'description': medication['details']['description'],
+                'forecolor': medication['details']['calendar']['forecolor'],
+                'location': medication['details']['location'],
+                'notify': notificationBackToFrontJSON(medication['details']['notification']),
+                'title': medication['details']['title']
+            },
+            'id': medication['details']['pk'],
+            'schedule': scheduleBackToFrontJSON(medication['details']['schedule'])
+        }
+        }
+        temp_occurrenceDate = {'occurrenceDate': {
+            'dayOfMonth': medication['details']['dayOfMonth'],
+            'month': medication['details']['month'],
+            'year': medication['details']['year']
+        }
+        }
+        users = {'users': {}}
+        users['users']['patients'] = []
+        users['users']['caregivers'] = []
+        users['users']['patients'].append(medication['prescription']['patient'])
+        temp.update(users)
+        temp.update(temp_event)
+        temp.update(temp_occurrenceDate)
+        req_data.append(temp)
+    return req_data
