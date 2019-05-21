@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 
 from backend.cuida24.models import *
+from backend.cuida24.permissions import IsBackofficeUser
 from backend.cuida24.serializers import *
 from .services import *
 import logging
@@ -16,7 +17,7 @@ index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
 
 class StaticPagesViewSet(viewsets.ModelViewSet):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsBackofficeUser,)
     queryset = StaticPages.objects.all()
     serializer_class = StaticPagesSerializer
 
