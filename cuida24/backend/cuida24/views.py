@@ -382,3 +382,25 @@ class MedicationViewSet(viewsets.ModelViewSet):
             return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    Get method by user id
+    """
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET PRESCRIPTION")
+        logger.info(request.GET)
+        data = json.loads(dict(request.GET)['users'][0])
+        is_patient = False
+        if data['caregivers']:
+            user = get_object_or_404(Caregiver, pk=data['caregivers'][0])
+        else:
+            user = get_object_or_404(Patient, pk=data['patients'][0])
+            is_patient = True
+        serializer_data = getAppointments(user, is_patient)
+        logger.info("SERIALIZER RETURN DATA")
+        logger.info(serializer_data)
+        sent_data = getAppointmentBackToFrontJSON(serializer_data)
+        logger.info("RETURN DATA")
+        logger.info(sent_data)
+        return Response(sent_data, status=status.HTTP_200_OK)
