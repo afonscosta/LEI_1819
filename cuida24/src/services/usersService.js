@@ -35,5 +35,12 @@ export default {
         Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
+  },
+  fetchBackoffice () {
+    return cuida24.get(`backoffice_user/`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
   }
 }
