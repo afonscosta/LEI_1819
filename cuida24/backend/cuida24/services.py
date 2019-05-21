@@ -446,6 +446,7 @@ def prescriptionBackToFrontJSON(request_param, serializer_data):
     request = copy.deepcopy(request_param)
     sent_data = request
     sent_data['prescription']['pk'] = serializer_data['pk']
+    sent_data['prescription']['author'] = serializer_data['prescription']['author']
     sent_data['event']['id'] = serializer_data['details']['pk']
     return sent_data
 
