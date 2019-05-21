@@ -27,19 +27,43 @@
             :header="presc.event.data.title"
           >
             <b-card-text align="left">
+              <b>Medicamento:</b> {{ getMedicineById(presc.prescription.medicine) }}
+            </b-card-text>
+
+            <b-card-text align="left">
+              <b>Quantidade:</b> {{ presc.prescription.quantity }} + "ml/mg"
+            </b-card-text>
+
+            <b-card-text align="left">
               <b>Via de administração:</b> {{ presc.event.data.description }}
             </b-card-text>
+
+            <b-card-text align="left">
+              <b>Data da primeira toma:</b> {{ presc.occurrenceDate.dayOfMonth + '/' + presc.occurrenceDate.month + '/' + presc.occurrenceDate.year }}
+            </b-card-text>
+
+            <b-card-text align="left">
+              <b>Repetição:</b> {{ parseScheduleRepetition(presc) }}
+            </b-card-text>
+
             <b-card-text v-if="presc.event.schedule.times" align="left">
               <b>Hora:</b> {{ presc.event.schedule.times[0] }}
             </b-card-text>
-            <b-card-text v-if="!presc.event.schedule.times" align="left">
-              <b>Duração:</b> Todo o dia
+
+            <b-card-text align="left">
+              <b>Utente:</b> {{ getPatientById(presc.users.patients[0]).info.name }}
             </b-card-text>
-            <b-card-text v-if="presc.event.schedule.duration" align="left">
-              <b>Duração:</b> {{ presc.event.schedule.duration + " " + durationUnitTranslated(presc.event.schedule.durationUnit) }}
+
+            <b-card-text align="left">
+              <b>Prescrição realizada por:</b> {{ presc.prescription.author }}
             </b-card-text>
+            
+            <b-card-text align="left">
+              <b>Data de prescrição:</b> {{ presc.prescription.date }}
+            </b-card-text>
+
             <b-button variant="danger" @click="remove(presc)">Eliminar</b-button>
-            <b-button @click="">Editar</b-button>
+            <b-button @click="$emit('editPrescription', presc)">Editar</b-button>
           </b-card>
         </b-col>
       </b-row>
@@ -48,7 +72,7 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapGetters, mapActions, mapState } from 'vuex'
 
 export default {
   name: 'ListPrescription',
@@ -61,7 +85,7 @@ export default {
   }),
   created () {
     if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
-      this.$store.dispatch('events/getEvents', this.usersActive)
+      this.$store.dispatch('prescriptions/getPrescriptions', this.usersActive)
     }
   },
   computed: {
@@ -69,6 +93,8 @@ export default {
       prescriptions: state => state.prescriptions.prescriptions,
       usersActive: state => state.users.usersActive
     }),
+    ...mapGetters('medicines', ['getMedicineById']),
+    ...mapGetters('users', ['getPatientById']),
     durationUnitTranslated () {
       return (durationUnit) => {
         if (durationUnit === 'minutes') {
@@ -100,6 +126,47 @@ export default {
       }
       this.prescToRemove = null
       this.$refs['my-modal'].hide()
+    },
+    parseScheduleRepetition (presc) {
+      var rec = null
+      if (presc.event.schedule.duration &&
+      presc.event.schedule.durationInDays &&
+      presc.event.schedule.durationUnit &&
+      !presc.event.schedule.times &&
+      !presc.event.schedule.dayOfWeek &&
+      !presc.event.schedule.dayOfMonth &&
+      !presc.event.schedule.month &&
+      !presc.event.schedule.year) {
+        rec = 'diariamente'
+      } else if (!presc.event.schedule.duration &&
+      !presc.event.schedule.durationInDays &&
+      !presc.event.schedule.durationUnit &&
+      !presc.event.schedule.times &&
+      presc.event.schedule.dayOfWeek &&
+      !presc.event.schedule.dayOfMonth &&
+      !presc.event.schedule.month &&
+      !presc.event.schedule.year) {
+        rec = 'semanalmente'
+      } else if (!presc.event.schedule.duration &&
+      !presc.event.schedule.durationInDays &&
+      !presc.event.schedule.durationUnit &&
+      !presc.event.schedule.times &&
+      !presc.event.schedule.dayOfWeek &&
+      presc.event.schedule.dayOfMonth &&
+      !presc.event.schedule.month &&
+      !presc.event.schedule.year) {
+        rec = 'mensalmente'
+      } else if (!presc.event.schedule.duration &&
+      !presc.event.schedule.durationInDays &&
+      !presc.event.schedule.durationUnit &&
+      !presc.event.schedule.times &&
+      !presc.event.schedule.dayOfWeek &&
+      presc.event.schedule.dayOfMonth &&
+      presc.event.schedule.month &&
+      !presc.event.schedule.year) {
+        rec = 'anualmente'
+      }
+      return rec
     }
   }
 }

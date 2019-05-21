@@ -65,7 +65,7 @@
               >
                 <b-form-input
                   id="input-2"
-                  v-model="formData.description"
+                  v-model="form.description"
                   required
                   placeholder="Insira a via de administração do medicamento"
                 ></b-form-input>
@@ -80,7 +80,7 @@
                   id="input-2"
                   class="form-control"
                   type="date" 
-                  v-model="formData.dateValue"
+                  v-model="form.dateValue"
                   :phrases="datetime.phrases"
                   :week-start="datetime['week-start']"
                   :min-datetime="datetime.minDatetime"
@@ -106,22 +106,22 @@
                 <datetime 
                   class="form-control"
                   type="time"
-                  v-model="formData.timeValue"
+                  v-model="form.timeValue"
                   @close="updateNotify"
                 ></datetime>
               </b-form-group>
 
               <b-form-group id="input-group-6" label="Notificações" label-for="input-6">
                 <notification
-                  :notify="formData.notify"
+                  :notify="form.notify"
                 ></notification>
               </b-form-group>
             </b-form>
 
             <b-row>
               <b-col>
-                <b-button block variant="primary" v-if="formData.id === null" @click="$router.go(-1)">Cancelar</b-button>
-                <b-button block variant="primary" v-if="formData.id !== null" @click="$emit('hide')">Cancelar</b-button>
+                <b-button block variant="primary" v-if="form.id === null" @click="$router.go(-1)">Cancelar</b-button>
+                <b-button block variant="primary" v-if="form.id !== null" @click="$emit('hide')">Cancelar</b-button>
               </b-col>
               <b-col>
                 <b-button block variant="success" @click="onSubmit">Submeter</b-button>
@@ -155,7 +155,7 @@ export default {
     ListMedicines
   },
   props: {
-    form: {
+    formData: {
       dateValue: {
         default: '',
         type: String
@@ -196,6 +196,32 @@ export default {
         default: null,
         type: Number
       }
+    },
+    prescriptionDate: {
+      pk: {
+        default: null,
+        type: Number
+      },
+      quantity: {
+        default: null,
+        type: Number
+      },
+      medicine: {
+        default: null,
+        type: Number
+      },
+      state: {
+        default: null,
+        type: String
+      },
+      author: {
+        default: null,
+        type: String
+      },
+      date: {
+        default: null,
+        type: String
+      }
     }
   },
   data: () => ({
@@ -224,9 +250,11 @@ export default {
       quantity: null,
       state: 'E',
       medicine: null,
+      author: null,
+      date: null,
       pk: null
     },
-    formData: {
+    form: {
       dateValue: '',
       timeValue: '',
       allDay: false,
@@ -242,8 +270,8 @@ export default {
   }),
   created () {
     this.$store.dispatch('medicines/getMedicines')
-    if (this.form) {
-      this.formData = this.form
+    if (this.formData) {
+      this.form = this.formData
     }
   },
   computed: {
@@ -260,7 +288,7 @@ export default {
     ...mapActions('prescriptions', ['addPrescription', 'updatePrescription', 'deletePrescription']),
     parseScheduleOption (option) {
       let result = {}
-      let dt = LuxonDateTime.fromISO(this.formData.dateValue)
+      let dt = LuxonDateTime.fromISO(this.form.dateValue)
       // let wsom = this.weekSpanOfMonth(dt)
       let dow = dt.weekday % 7
       dt.c.month = dt.c.month - 1
@@ -305,41 +333,47 @@ export default {
       let data = {
         'calendar': this.calendarMedication.pk,
         'color': this.calendarMedication.color,
-        'description': 'Via de administração - ' + this.formData.description,
+        'description': this.form.description,
         'forecolor': this.calendarMedication.forecolor,
-        'location': this.formData.local,
-        'notify': this.formData.notify,
+        'location': this.form.local,
+        'notify': this.form.notify,
         'title': 'Medicação'
       }
-      this.formData.sched = this.scheduleChosen
-      if (!this.formData.sched) {
-        let dt = LuxonDateTime.fromISO(this.formData.dateValue)
+      this.form.sched = this.scheduleChosen
+      if (!this.form.sched) {
+        let dt = LuxonDateTime.fromISO(this.form.dateValue)
         dt.c.month = dt.c.month - 1
-        this.formData.sched = {
+        this.form.sched = {
           'dayOfMonth': [dt.c.day],
           'month': [dt.c.month],
           'year': [dt.c.year]
         }
       }
-      if (!this.formData.allDay) {
-        let time = LuxonDateTime.fromISO(this.formData.timeValue)
+      if (!this.form.allDay) {
+        let time = LuxonDateTime.fromISO(this.form.timeValue)
         let t = ''.concat(time.c.hour, ':', time.c.minute)
-        this.formData.sched.times = [t]
-        this.formData.sched.duration = this.formData.duration
-        this.formData.sched.durationUnit = this.formData.durationUnit
+        this.form.sched.times = [t]
+        this.form.sched.duration = this.form.duration
+        this.form.sched.durationUnit = this.form.durationUnit
       }
+      let dt = LuxonDateTime.fromISO(this.form.dateValue)
       let payload = {
         'event': {
           'data': data,
-          'schedule': this.formData.sched,
-          'id': this.formData.id
+          'schedule': this.form.sched,
+          'id': this.form.id
         },
         'users': users,
+        'occurrenceDate': {
+          'dayOfMonth': dt.c.day,
+          'month': dt.c.month,
+          'year': dt.c.year
+        },
         'prescription': this.preparePrescription()
       }
       if (payload.event.id) {
         this.updatePrescription(payload)
-        this.$emit('prescriptionUpdated', payload)
+        this.$emit('prescriptionUpdated', payload.occurrenceDate)
       } else {
         this.addPrescription(payload)
         this.$notify({
@@ -350,9 +384,11 @@ export default {
           quantity: null,
           state: 'E',
           medicine: null,
+          author: null,
+          date: null,
           pk: null
         }
-        this.formData = {
+        this.form = {
           dateValue: '',
           timeValue: '',
           allDay: false,
@@ -374,16 +410,16 @@ export default {
       return payload
     },
     updateNotify () {
-      if (this.formData.dateValue) {
-        var d = parse(this.formData.dateValue)
-        var t = LuxonDateTime.fromISO(this.formData.timeValue)
+      if (this.form.dateValue) {
+        var d = parse(this.form.dateValue)
+        var t = LuxonDateTime.fromISO(this.form.timeValue)
         t = t.minus({ minutes: 10 })
         t = t.minus({ hours: 1 })
         const formattedTime = 'T' + ('0' + t.hour).slice(-2) + ':' + ('0' + t.minute).slice(-2) + ':' + ('0' + t.second).slice(-2) + '.000Z'
         var prev10Min = format(subMinutes(d, 10), 'YYYY-MM-DD') + formattedTime
-        this.formData.notify = [prev10Min]
+        this.form.notify = [prev10Min]
       } else {
-        this.formData.notify = []
+        this.form.notify = []
       }
     },
     removeMedicine () {
