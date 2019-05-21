@@ -10,7 +10,6 @@ from .services import *
 import logging
 import json
 
-
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
@@ -23,6 +22,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
+
 class DefActivityViewSet(viewsets.ModelViewSet):
     queryset = DefActivity.objects.all()
     serializer_class = DefActivitySerializer
@@ -30,6 +30,7 @@ class DefActivityViewSet(viewsets.ModelViewSet):
     """
         Get method 
         """
+
     def list(self, request, *args, **kwargs):
         sent_data = []
         logger.info(request.user.username)
@@ -37,9 +38,9 @@ class DefActivityViewSet(viewsets.ModelViewSet):
 
 
 class FixAnAppointmentPermssion(permissions.BasePermission):
-  def has_permission(self, request, view):
-    logger.info('REQUEST PRINT' + request.user.username + str(request.user.id))
-    return True
+    def has_permission(self, request, view):
+        logger.info('REQUEST PRINT' + request.user.username + str(request.user.id))
+        return True
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -49,12 +50,13 @@ class EventViewSet(viewsets.ModelViewSet):
     """
        Get method by user id 
     """
-    def list(self, request,*args, **kwargs):
+
+    def list(self, request, *args, **kwargs):
         logger.info("GET EVENT")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
-        #logger.info(request.data)
-        #data = request.data['users']
+        # logger.info(request.data)
+        # data = request.data['users']
         is_patient = False
         sent_data = {'appointments': [], 'sessions': []}
         participants = []
@@ -124,6 +126,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     """
     Get method by user id
     """
+
     def list(self, request, *args, **kwargs):
         logger.info("GET APPOINTMENT")
         logger.info(request.GET)
@@ -145,6 +148,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     """
     Update method
     """
+
     def put(self, request):
         logger.info("PUT APPOINTMENT")
         logger.info(request.data)
@@ -177,9 +181,11 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
         for choice in choices_value:
             enum_values.append(choice[1])
         return Response(enum_values)
+
     """
     Get method by appoinment
     """
+
     def list(self, request, *args, **kwargs):
         logger.info("GET NOTE APPOINTMENT")
         logger.info(request.user.id)
@@ -239,13 +245,13 @@ class SessionsViewSet(viewsets.ModelViewSet):
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     """
       Get method by session participants
     """
+
     def list(self, request, *args, **kwargs):
-        #logger.info(request.data)
-        #data = request.data['users']
+        # logger.info(request.data)
+        # data = request.data['users']
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
         sent_data = []
@@ -270,7 +276,7 @@ class SessionsViewSet(viewsets.ModelViewSet):
         return Response(enum_values)
 
     @action(detail=False, methods=['get'])
-    def statusSession(self,request):
+    def statusSession(self, request):
         logger.info("GET Status session")
         choices_value = Session.STATE
         enum_values = []
@@ -323,9 +329,10 @@ class EvaluationViewSet(viewsets.ModelViewSet):
     """
     Get method by session pk
     """
+
     def list(self, request, *args, **kwargs):
-        #logger.info(request.data)
-        #data = request.data['sessionPK']
+        # logger.info(request.data)
+        # data = request.data['sessionPK']
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['sessionPK'][0])
         queryset = Evaluation.objects.filter(session=data)
@@ -363,7 +370,6 @@ class MedicationViewSet(viewsets.ModelViewSet):
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     def put(self, request):
         logger.info("PUT PRESCRIPTION")
         logger.info(request.data)
@@ -382,3 +388,18 @@ class MedicationViewSet(viewsets.ModelViewSet):
             return Response(sent_data, status=status.HTTP_200_OK)
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    Get method by user id
+    """
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET PRESCRIPTION")
+        logger.info(request.GET)
+        data = json.loads(dict(request.GET)['users'][0])
+        if data['patients'][0]:
+            serializer_data = getPrescriptions(data['patients'][0])
+            sent_data = getPrescriptionBackToFrontJSON(serializer_data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
