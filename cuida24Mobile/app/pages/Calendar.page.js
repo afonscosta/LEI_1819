@@ -4,12 +4,12 @@ import {
   Text, 
   View, 
   Image, 
-  Button,
   Platform,
   Linking,
   FlatList,
   ActivityIndicator
 } from 'react-native'
+import { Card, List, ListItem, Button } from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import { StackNavigator } from 'react-navigation';
 import RNCalendarEvents from 'react-native-calendar-events';
@@ -19,13 +19,19 @@ import PushNotification from 'react-native-push-notification';
 
 const addNewAppointment = async (appt, hash, appointmentCalendar) => {
   console.log('Adicionando evento...', appt);
+	var today = new Date();
   appt.event.data.notify.forEach((notif) => {
-    PushNotification.localNotificationSchedule({
-      message: appt.event.data.title + '\n' + 
-        appt.event.data.description + '\n' +
-        appt.event.data.location,
-      date: new Date(notif)
-    });
+		var n = new Date(notif);
+		console.log('n', n);
+		console.log('today', today);
+		if (n > today) {
+			PushNotification.localNotificationSchedule({
+				message: appt.event.data.title + '\n' + 
+					appt.event.data.description + '\n' +
+					appt.event.data.location,
+				date: n
+			});
+		}
     //PushNotification.localNotification({
       //message: 'Isto é um exemplo de uma notificação!'
     //});
@@ -72,16 +78,24 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 		rec = 'yearly';
 	}
 	var allDay = true;
-	var startDate;
-	var endDate;
+	var startDate = new Date(
+    appt.occurrenceDate.year,
+    appt.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+    appt.occurrenceDate.dayOfMonth+1
+  )
+	var endDate = new Date(
+    appt.occurrenceDate.year,
+    appt.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+    appt.occurrenceDate.dayOfMonth+1
+  )
 	var timeSplit = ["00", "00", "00"];
 	if (appt.event.schedule.times) {
 		allDay = false;
 		timeSplit = appt.event.schedule.times[0].split(":");
 		startDate = new Date(
-			appt.occurenceDate.year,
-			appt.occurenceDate.month-1, // Porque os meses são de 0 a 11
-			appt.occurenceDate.dayOfMonth,
+			appt.occurrenceDate.year,
+			appt.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+			appt.occurrenceDate.dayOfMonth,
 			parseInt(timeSplit[0])+1, // Porquê que preciso de somar 1???
 			parseInt(timeSplit[1]),
 			parseInt(timeSplit[2])
@@ -102,6 +116,9 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 	else {
 		endDate = startDate;
 	}
+  console.log(JSON.stringify(appt.event));
+  console.log('startDate', JSON.stringify(startDate));
+  console.log('endDate', JSON.stringify(endDate));
 	var eventData = {
 		calendarId: appointmentCalendar.id,
 		startDate: startDate.toISOString(),
@@ -123,7 +140,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 		(async () => {
 			try {
 				await AsyncStorage.setItem(
-					'@appointmentCalendar:' + appt.pk,
+					'@appointmentCalendar:' + appt.appointmentPK,
 					JSON.stringify({ 'id': id, 'hash': String(hash) })
 				);
 			} catch (error) {
@@ -136,7 +153,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 const handleAppointment = async (appt, hash, appointmentCalendar) => {
   try {
     //await AsyncStorage.clear();
-    const oldEvData = await AsyncStorage.getItem('@appointmentCalendar:' + appt.pk);
+    const oldEvData = await AsyncStorage.getItem('@appointmentCalendar:' + appt.appointmentPK);
     if (oldEvData == null) { // O evento ainda não existe
       addNewAppointment(appt, hash, appointmentCalendar);
     }
@@ -147,7 +164,7 @@ const handleAppointment = async (appt, hash, appointmentCalendar) => {
           .then(() => {
             (async () => { // Remove a key do asyncStorage
               try {
-                await AsyncStorage.removeItem('@appointmentCalendar:' + appt.pk);
+                await AsyncStorage.removeItem('@appointmentCalendar:' + appt.appointmentPK);
               } catch (error) {
                 console.warn('AsyncStorage - removeItem', error);
               }
@@ -165,6 +182,7 @@ const handleAppointment = async (appt, hash, appointmentCalendar) => {
   }
 }
 
+
 export default class CalendarPage extends React.Component {
   constructor(props) {
     super(props);
@@ -175,7 +193,25 @@ export default class CalendarPage extends React.Component {
       calendars: [],
       error: null,
       refreshing: false,
-      base_url: "http://10.0.3.2:8000/cuida24/"
+      base_url: "http://10.0.2.2:8000/cuida24/",
+      users: [{
+        name: 'brynn',
+        avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg'
+      }]
+    }
+  }
+  
+  durationUnitTranslated (durationUnit) {
+    if (durationUnit === 'minutes') {
+      return 'minuto(s)'
+    } else if (durationUnit === 'hours') {
+      return 'hora(s)'
+    } else if (durationUnit === 'days') {
+      return 'dia(s)'
+    } else if (durationUnit === 'weeks') {
+      return 'semana(s)'
+    } else if (durationUnit === 'months') {
+      return 'mês(es)'
     }
   }
 
@@ -191,6 +227,24 @@ export default class CalendarPage extends React.Component {
   getMedicationCalendar(result) {
     return result.find(c =>
       c.title === 'Medicação' &&
+      c.type === 'LOCAL' && 
+      c.isPrimary &&
+      !c.allowsModifications
+    );
+  }
+
+  getGroupSessionCalendar(result) {
+    return result.find(c =>
+      c.title === 'Sessões de Grupo' &&
+      c.type === 'LOCAL' && 
+      c.isPrimary &&
+      !c.allowsModifications
+    );
+  }
+
+  getIndivSessionCalendar(result) {
+    return result.find(c =>
+      c.title === 'Sessões Individuais' &&
       c.type === 'LOCAL' && 
       c.isPrimary &&
       !c.allowsModifications
@@ -228,8 +282,12 @@ export default class CalendarPage extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchCalendarsFromApi();
-    this.fetchAppointmentsFromApi();
+    //PushNotification.cancelAllLocalNotifications();
+    const fetchData = async () => {
+      await this.fetchCalendarsFromApi();
+      await this.fetchAppointmentsFromApi();
+    }
+    fetchData();
   }
 
   fetchCalendarsFromApi = ()  => {
@@ -262,6 +320,8 @@ export default class CalendarPage extends React.Component {
 
         const appointmentCalendar = this.getAppointmentCalendar(result);
         const medicationCalendar = this.getMedicationCalendar(result);
+        const groupSessionCalendar = this.getGroupSessionCalendar(result);
+        const indivSessionCalendar = this.getIndivSessionCalendar(result);
 
         // Calendário consultas já existe
         if (appointmentCalendar && cal.calendar === 'Consultas') { 
@@ -269,6 +329,14 @@ export default class CalendarPage extends React.Component {
         }
         // Calendário medicação já existe
         if (medicationCalendar && cal.calendar === 'Medicação') { 
+          return; 
+        }
+        // Calendário sessões de grupo já existe
+        if (groupSessionCalendar && cal.calendar === 'Sessões de Grupo') { 
+          return; 
+        }
+        // Calendário sessões individuais já existe
+        if (indivSessionCalendar && cal.calendar === 'Sessões Individuais') { 
           return; 
         }
 
@@ -306,7 +374,7 @@ export default class CalendarPage extends React.Component {
     fetch(url + `?users=${encodedValue}`)
       .then(res => res.json())
       .then(res => {
-
+        console.log('Appointments loaded', res);
         this.setState({
           appointments: res,
           error: null,
@@ -322,8 +390,8 @@ export default class CalendarPage extends React.Component {
 
   iterateThroughAppointments(eventsToRemove, appointmentCalendar) {
     this.state.appointments.forEach( function(appt) {
-      if (eventsToRemove.includes(appt.pk)) {
-        eventsToRemove = eventsToRemove.filter(e => e !== appt.pk);
+      if (eventsToRemove.includes(appt.appointmentPK)) {
+        eventsToRemove = eventsToRemove.filter(e => e !== appt.appointmentPK);
       }
       sha256(JSON.stringify(appt)).then( hash => {
         (async () => {
@@ -360,7 +428,7 @@ export default class CalendarPage extends React.Component {
     });
     // fazer um array com as pk's do this.state.appointments
     const newEventsToRemove = this.state.appointments.map( appt => {
-      return appt.pk;
+      return appt.appointmentPK;
     });
     // colocar no @appointmentCalendar:etr
     (async () => {
@@ -380,9 +448,13 @@ export default class CalendarPage extends React.Component {
     .then((result) => {
       const appointmentCalendar = this.getAppointmentCalendar(result);
       const medicationCalendar = this.getMedicationCalendar(result);
+      const groupSessionCalendar = this.getGroupSessionCalendar(result);
+      const indivSessionCalendar = this.getIndivSessionCalendar(result);
 
       if (!appointmentCalendar) { return; }
       if (!medicationCalendar) { return; }
+      if (!groupSessionCalendar) { return; }
+      if (!indivSessionCalendar) { return; }
 
       (async () => {
         try {
@@ -403,16 +475,16 @@ export default class CalendarPage extends React.Component {
     });
   }
 
-  handleRefresh = () => {
-    this.setState(
-      {
-        refreshing: true
-      },
-      () => {
-        this.fetchCalendarsFromApi();
-      }
-    );
-  };
+  onRefresh() {
+    this.setState({refreshing: true});
+    const fetchData = async () => {
+      await this.fetchCalendarsFromApi();
+      await this.fetchAppointmentsFromApi();
+    }
+    fetchData().then(() => {
+      this.setState({refreshing: false});
+    });
+  }
 
   openCalendar() {
     if(Platform.OS === 'ios') {
@@ -424,13 +496,63 @@ export default class CalendarPage extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Calendar page</Text>
+      <View>
         <Button
           onPress={this.openCalendar}
           title="Abrir calendário"
           color="#841584"
           accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
+        />
+
+        <FlatList
+          refreshing={this.state.refreshing}
+          onRefresh={() => this.onRefresh()}
+          data={this.state.appointments}
+          keyExtractor={item => String(item.appointmentPK)}
+          renderItem={({ item }) => (
+            <Card title="Consulta">
+              <View>
+                <Text>
+									<Text style={{fontWeight: 'bold'}}>Especialiade:{' '}</Text>
+									{ item.event.data.description }
+								</Text>
+                <Text>
+									<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
+									{ item.occurrenceDate.dayOfMonth + '/' + 
+										item.occurrenceDate.month + '/' + 
+										item.occurrenceDate.year }
+								</Text>
+								{
+									item.event.schedule.times != null
+										?
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
+										{ item.event.schedule.times[0] }
+									</Text>
+										:
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+										todo o dia
+									</Text>
+								}
+								{
+									item.event.schedule.duration != null
+										?
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+										{ item.event.schedule.duration + " " +
+											this.durationUnitTranslated(item.event.schedule.durationUnit) }
+									</Text>
+										:
+									null
+								}
+                <Text>
+									<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
+									{ item.event.data.location }
+								</Text>
+              </View>
+            </Card>
+          )}
         />
       </View>
     )

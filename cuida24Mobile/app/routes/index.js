@@ -144,18 +144,18 @@ const Info_StackNavigator = createStackNavigator({
 
 const DrawerNavigator = createDrawerNavigator({
     //Drawer Optons and indexing
-    Login: {
-      //Title
-      screen: Login_StackNavigator,
-      navigationOptions: {
-        drawerLabel: 'Iniciar sessão',
-      },
-    },
     Calendar: {
       //Title
       screen: Calendar_StackNavigator,
       navigationOptions: {
         drawerLabel: 'Calendário',
+      },
+    },
+    Login: {
+      //Title
+      screen: Login_StackNavigator,
+      navigationOptions: {
+        drawerLabel: 'Iniciar sessão',
       },
     },
     Medication: {
