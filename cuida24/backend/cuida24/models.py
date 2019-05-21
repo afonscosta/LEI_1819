@@ -12,6 +12,12 @@ class Message(models.Model):
     subject = models.CharField(max_length=200)
     body = models.TextField()
 
+# Static Pages
+
+class StaticPages(models.Model):
+    title = models.TextField()
+    text = models.TextField()
+
 
 # Activity defines by Backoffice
 

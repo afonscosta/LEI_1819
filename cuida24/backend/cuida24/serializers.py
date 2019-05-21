@@ -24,6 +24,14 @@ class MessageSerializer(serializers.HyperlinkedModelSerializer):
         return message
 
 
+# Static Pages
+
+class StaticPagesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StaticPages
+        fields = ('title', 'text', 'pk')
+
+
 # Activity defines by Backoffice
 
 class DefActivitySerializer(serializers.ModelSerializer):

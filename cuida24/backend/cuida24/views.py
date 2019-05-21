@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
 from rest_framework.decorators import action, detail_route, permission_classes
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions
 
@@ -14,6 +15,10 @@ import json
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
 
+class StaticPagesViewSet(viewsets.ModelViewSet):
+    permission_classes = (AllowAny,)
+    queryset = StaticPages.objects.all()
+    serializer_class = StaticPagesSerializer
 
 class MessageViewSet(viewsets.ModelViewSet):
     """

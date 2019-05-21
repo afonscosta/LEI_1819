@@ -111,6 +111,16 @@
         "username": "l@gmail.com",
         "email": "l@gmail.com"
     }
+  },{
+    "model": "auth.user",
+    "pk": 8,
+    "fields": {
+        "first_name": "manuel",
+        "last_name": "crespo",
+        "password": "123",
+        "username": "mc@gmail.com",
+        "email": "mc@gmail.com"
+    }
   },
   {
     "model": "cuida24.Caregiver",
@@ -166,6 +176,14 @@
     }
   },
   {
+    "model": "cuida24.BackofficeUser",
+    "pk": 2,
+    "fields": {
+       "info": "8",
+       "type": "PRF"
+    }
+  },
+  {
     "model": "cuida24.Medicine",
     "pk": 1,
     "fields": {
@@ -176,5 +194,22 @@
         "holder": "Accel Farma, Unipessoal Lda.",
         "generic": "Sim"
     }
+  },
+  {
+    "model": "cuida24.StaticPages",
+    "pk": 1,
+    "fields": {
+        "title": "Plano IADem",
+        "text": "Tendo por base o Despacho nº 5988/2018, de 19 de junho, as recomendações da OMS, os\ndados da OCDE e o último Diagnóstico Social de Ponte da Barca, no âmbito das Demências\nrelacionadas com a pessoa com/suspeita de Demência e sua família/cuidador (in)formal\nestabeleceu-se um Acordo de Cooperação e Parceria entre três entidades: Santa Casa da\nMisericórdia de Ponte da Barca, Unidade Local de Saúde do Alto Minho, EPE - UCC de Ponte\nda Barca e Centro de Investigação em Psicologia (CIPsi) da Universidade do Minho.\nO Plano IADem – Plano de Investigação-Ação nas Demências está a ser desenvolvido em duas\netapas. A primeira, visa elaborar o diagnóstico de impacto social da situação da pessoa com\ndemência e cuidadores formais e informais, com metodologias de investigação. Na segunda,\nrelacionada com a intervenção e alicerçada nos resultados do diagnóstico de situação e da\ninvestigação realizada, construiu-se um Plano de Ação, dirigido aos doentes, aos cuidadores\n(in)formais para prevenir ou diminuir a sobrecarga associada à prestação de cuidados no\nsentido de melhorar a sua qualidade de vida.\nA criação de um Centro de Referência em Ponte da Barca - experiência ‘piloto’, assenta numa\nabordagem multidisciplinar, biopsicossocial e multissectorial e atua em cooperação e\ncoordenação de cuidados integrados."
+    }
+  },
+  {
+    "model": "cuida24.StaticPages",
+    "pk": 2,
+    "fields":{
+        "title": "Prevalência da Demência",
+        "text": "No Relatório “Health at a Glance 2017” “Uma visão da saúde”, da OCDE, publicado a 10 de\nnovembro de 2017, estima-se que em Portugal cerca de 205.000 pessoas sofrem de demência\ne que subirá para mais de 320.000 em 2037. A prevalência tende a aumentar com a idade\npassando de 2% entre os 65 e os 69 anos e para 41% com mais de 90 anos.\nNeste estudo, Portugal situa-se como o 4.º país com mais casos por cada mil habitantes. A\nmédia da OCDE é de 14,8 casos por cada mil habitantes, sendo que para Portugal a estimativa\né de 19,9. \n“Todos os anos, 1,4 milhões de cidadãos europeus desenvolvem demência, o que\nsignifica que a cada 24 segundos, um novo caso é diagnosticado. Em Portugal estima-\n\nse que existam cerca de 153.000 pessoas com demência, 90.000 com Doença de\nAlzheimer.” (Resultados do Plano European Collaboration on Dementia (Eurocode)\nconduzido pela Alzheimer Europe e financiado pela Comissão Europeia, 2017).\nNo entanto, o número de pessoas que sofrem de Demência está subavaliado devido às\ndificuldades em efetuar um diagnóstico precoce."
+    }
   }
+
 ]
