@@ -7,6 +7,9 @@ const state = {
 const getters = {
   medicines: state => {
     return state.medicines
+  },
+  getMedicineById: (state) => (id) => {
+    return state.medicines.find(m => m.pk === id)
   }
 }
 

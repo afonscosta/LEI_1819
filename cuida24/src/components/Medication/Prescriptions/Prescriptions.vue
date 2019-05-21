@@ -22,7 +22,8 @@
     ></ListPrescriptions>
     <FormPrescription 
       v-if="prescriptionSel"
-      :form="form"
+      :formData="form"
+      :prescriptionData="prescription"
       @prescriptionUpdated="prescriptionUpdated"
       @hide="prescriptionSel = null"
     ></FormPrescription>
@@ -45,7 +46,8 @@ export default {
   },
   data: () => ({
     prescriptionSel: null,
-    form: {}
+    form: {},
+    prescription: {}
   }),
   created () {
   },
@@ -98,7 +100,7 @@ export default {
       return rec
     },
     editPrescription (presc) {
-      this.prescriptionSel = presc.prescriptionPK
+      this.prescriptionSel = presc.prescrition.pk
       var time = ''
       if (presc.event.schedule.times) {
         var timeSplit = presc.event.schedule.times[0].split(':')
@@ -119,12 +121,13 @@ export default {
         duration: presc.event.schedule.duration ? presc.event.schedule.duration : 0,
         durationUnit: presc.event.schedule.durationUnit ? presc.event.schedule.durationUnit : '',
         local: presc.event.data.location,
-        specialty: presc.event.data.description,
+        description: presc.event.data.description,
         notify: presc.event.data.notify,
         sched: this.parseScheduleOption(presc),
         id: presc.event.id
       }
       this.form = form
+      this.prescrition = presc.prescription
     },
     prescriptionUpdated (occurrenceDate) {
       this.prescriptionSel = null

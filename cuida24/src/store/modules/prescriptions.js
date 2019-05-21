@@ -12,7 +12,7 @@ const getters = {
     return state.prescriptions.filter(p => p.user.pk === id)
   },
   getPrescriptionsById: (state) => (id) => {
-    return state.prescriptions.find(p => p.prescriptionPK === id)
+    return state.prescriptions.find(p => p.prescription.pk === id)
   }
 }
 
@@ -24,20 +24,15 @@ const mutations = {
     state.prescriptions.push(prescription)
   },
   updatePrescription (state, prescription) {
-    state.prescriptions = state.prescriptions.filter(p => p.pk !== prescription.pk)
+    state.prescriptions = state.prescriptions.filter(p => p.pk !== prescription.prescription.pk)
     state.prescriptions.push(prescription)
   },
   deletePrescription (state, prescriptionID) {
-    state.prescriptions = state.prescriptions.filter(p => p.prescriptionPK !== prescriptionID)
+    state.prescriptions = state.prescriptions.filter(p => p.prescription.pk !== prescriptionID)
   }
 }
 
 const actions = {
-  setPrescriptions ({ commit }, prescriptions) {
-    console.log('set prescriptions', prescriptions)
-    commit('setPrescriptions', prescriptions)
-    this.dispatch('events/addEvents', prescriptions)
-  },
   getPrescriptions ({ commit }, payload) {
     prescriptionsService.fetchPrescriptions(payload)
       .then(prescriptions => {
@@ -62,8 +57,8 @@ const actions = {
       })
   },
   deletePrescription ({ commit }, prescription) {
-    prescriptionsService.deletePrescription(prescription.prescriptionPK)
-    commit('deletePrescription', prescription.prescriptionPK)
+    prescriptionsService.deletePrescription(prescription.prescription.pk)
+    commit('deletePrescription', prescription.prescription.pk)
     this.dispatch('events/deleteEvent', prescription.event.id)
   }
 }
