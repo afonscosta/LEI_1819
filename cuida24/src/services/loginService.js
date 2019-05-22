@@ -9,5 +9,8 @@ export default {
       // username: 'admin',
       // password: 'admin'
     }).then(response => response.data)
+      .catch((error) => {
+        alert(error.message)
+      })
   }
 }

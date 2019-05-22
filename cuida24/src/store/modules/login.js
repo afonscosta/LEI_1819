@@ -19,11 +19,17 @@ const mutations = {
 
 const actions = {
   getToken ({ commit }, credencials) {
-    loginService.getToken(credencials)
-      .then(response => {
-        commit('setToken', response)
-        console.log('teste de receção token na action ' + state.accesstoken)
-      })
+    return new Promise((resolve, reject) => {
+      loginService.getToken(credencials)
+        .then(function (response) {
+          commit('setToken', response)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   }
 }
 
