@@ -7,6 +7,7 @@ import {
   Platform,
   Linking,
   FlatList,
+  ListView,
   ActivityIndicator
 } from 'react-native'
 import { Card, List, ListItem, Button } from 'react-native-elements';
@@ -16,14 +17,13 @@ import RNCalendarEvents from 'react-native-calendar-events';
 import { sha256 } from 'react-native-sha256';
 import { addMinutes, addDays, addWeeks, addMonths } from 'date-fns';
 import PushNotification from 'react-native-push-notification';
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 
 const addNewAppointment = async (appt, hash, appointmentCalendar) => {
   console.log('Adicionando evento...', appt);
 	var today = new Date();
   appt.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
-		console.log('n', n);
-		console.log('today', today);
 		if (n > today) {
 			PushNotification.localNotificationSchedule({
 				message: appt.event.data.title + '\n' + 
@@ -32,9 +32,6 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 				date: n
 			});
 		}
-    //PushNotification.localNotification({
-      //message: 'Isto é um exemplo de uma notificação!'
-    //});
   });
 	var rec = null;
 	if (appt.event.schedule.duration &&
@@ -182,6 +179,320 @@ const handleAppointment = async (appt, hash, appointmentCalendar) => {
   }
 }
 
+const addNewIndivSession = async (is, hash, indivSessionCalendar) => {
+  console.log('Adicionando indivSession evento...', is);
+	var today = new Date();
+  is.event.data.notify.forEach((notif) => {
+		var n = new Date(notif);
+		if (n > today) {
+			PushNotification.localNotificationSchedule({
+				message: is.event.data.title + '\n' + 
+					is.individualSession.theme + ' - ' + is.individualSession.description + '\n' +
+					is.event.data.location,
+				date: n
+			});
+		}
+  });
+	var rec = null;
+	if (is.event.schedule.duration &&
+	is.event.schedule.durationInDays &&
+	is.event.schedule.durationUnit &&
+	!is.event.schedule.times &&
+	!is.event.schedule.dayOfWeek &&
+	!is.event.schedule.dayOfMonth &&
+	!is.event.schedule.month &&
+	!is.event.schedule.year) {
+		rec = 'daily';
+	}
+	else if (!is.event.schedule.duration &&
+	!is.event.schedule.durationInDays &&
+	!is.event.schedule.durationUnit &&
+	!is.event.schedule.times &&
+	is.event.schedule.dayOfWeek &&
+	!is.event.schedule.dayOfMonth &&
+	!is.event.schedule.month &&
+	!is.event.schedule.year) {
+		rec = 'weekly';
+	}
+	else if (!is.event.schedule.duration &&
+	!is.event.schedule.durationInDays &&
+	!is.event.schedule.durationUnit &&
+	!is.event.schedule.times &&
+	!is.event.schedule.dayOfWeek &&
+	is.event.schedule.dayOfMonth &&
+	!is.event.schedule.month &&
+	!is.event.schedule.year) {
+		rec = 'monthly';
+	}
+	else if (!is.event.schedule.duration &&
+	!is.event.schedule.durationInDays &&
+	!is.event.schedule.durationUnit &&
+	!is.event.schedule.times &&
+	!is.event.schedule.dayOfWeek &&
+	is.event.schedule.dayOfMonth &&
+	is.event.schedule.month &&
+	!is.event.schedule.year) {
+		rec = 'yearly';
+	}
+	var allDay = true;
+	var startDate = new Date(
+    is.event.occurrenceDate.year,
+    is.event.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+    is.event.occurrenceDate.dayOfMonth+1
+  )
+	var endDate = new Date(
+    is.event.occurrenceDate.year,
+    is.event.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+    is.event.occurrenceDate.dayOfMonth+1
+  )
+	var timeSplit = ["00", "00", "00"];
+	if (is.event.schedule.times) {
+		allDay = false;
+		timeSplit = is.event.schedule.times[0].split(":");
+		startDate = new Date(
+			is.event.occurrenceDate.year,
+			is.event.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+			is.event.occurrenceDate.dayOfMonth,
+			parseInt(timeSplit[0])+1, // Porquê que preciso de somar 1???
+			parseInt(timeSplit[1]),
+			parseInt(timeSplit[2])
+		);
+		if (is.event.schedule.durationUnit == "minutes") {
+			endDate = addMinutes(startDate, is.event.schedule.duration);
+		}
+		else if (is.event.schedule.durationUnit == "days") {
+			endDate = addDays(startDate, is.event.schedule.duration);
+		}
+		else if (is.event.schedule.durationUnit == "weeks") {
+			endDate = addWeeks(startDate, is.event.schedule.duration);
+		}
+		else if (is.event.schedule.durationUnit == "months") {
+			endDate = addMonths(startDate, is.event.schedule.duration);
+		}
+	}
+	else {
+		endDate = startDate;
+	}
+	var eventData = {
+		calendarId: indivSessionCalendar.id,
+		startDate: startDate.toISOString(),
+		endDate: endDate.toISOString(),
+		allDay: is.event.schedule.times ? false : true,
+		location: is.event.data.location,
+		description: is.individualSession.theme + ' - ' + is.individualSession.description,
+		recurrence: rec
+	};
+
+	if (eventData.recurrence == null) {
+		delete eventData.recurrence;
+	}
+	
+  RNCalendarEvents.saveEvent(
+    is.event.data.title, 
+		eventData
+  ).then(id => { 
+		(async () => {
+			try {
+				await AsyncStorage.setItem(
+					'@indivSessionCalendar:' + is.individualSession.pk,
+					JSON.stringify({ 'id': id, 'hash': String(hash) })
+				);
+			} catch (error) {
+				console.warn('AsyncStorage - setItem', error);
+			}
+		})();
+  }).catch(error => console.warn('RNCalendarEvents - saveEvent', error));
+}
+
+const handleIndivSession = async (is, hash, indivSessionCalendar) => {
+  try {
+    //await AsyncStorage.clear();
+    const oldEvData = await AsyncStorage.getItem('@indivSessionCalendar:' + is.individualSession.pk);
+    if (oldEvData == null) { // O evento ainda não existe
+      addNewIndivSession(is, hash, indivSessionCalendar);
+    }
+    else { // Já tem o evento. Está atualizado?
+      var oldEvDataParsed = JSON.parse(oldEvData);
+      if (oldEvDataParsed.hash !== hash) { // O evento mudou
+        RNCalendarEvents.removeEvent(oldEvDataParsed.id)
+          .then(() => {
+            (async () => { // Remove a key do asyncStorage
+              try {
+                await AsyncStorage.removeItem('@indivSessionCalendar:' + is.individualSession.pk);
+              } catch (error) {
+                console.warn('AsyncStorage - removeItem', error);
+              }
+            })();
+            // Adiciona o evento atualizado
+            addNewIndivSession(is, hash, indivSessionCalendar);
+          })
+          .catch(error => {
+            console.log('RNCalendarEvents - removeEvent', error);
+          });
+      }
+    }
+  } catch (error) {
+    console.warn('AsyncStorage - handleIndivSession', error);
+  }
+}
+
+const addNewGroupSession = async (gs, hash, groupSessionCalendar) => {
+  console.log('Adicionando groupSession evento...', gs);
+	var today = new Date();
+  gs.event.data.notify.forEach((notif) => {
+		var n = new Date(notif);
+		if (n > today) {
+			PushNotification.localNotificationSchedule({
+				message: gs.event.data.title + '\n' + 
+					gs.groupSession.theme + ' - ' + gs.groupSession.description + '\n' +
+					gs.event.data.location,
+				date: n
+			});
+		}
+  });
+	var rec = null;
+	if (gs.event.schedule.duration &&
+	gs.event.schedule.durationInDays &&
+	gs.event.schedule.durationUnit &&
+	!gs.event.schedule.times &&
+	!gs.event.schedule.dayOfWeek &&
+	!gs.event.schedule.dayOfMonth &&
+	!gs.event.schedule.month &&
+	!gs.event.schedule.year) {
+		rec = 'daily';
+	}
+	else if (!gs.event.schedule.duration &&
+	!gs.event.schedule.durationInDays &&
+	!gs.event.schedule.durationUnit &&
+	!gs.event.schedule.times &&
+	gs.event.schedule.dayOfWeek &&
+	!gs.event.schedule.dayOfMonth &&
+	!gs.event.schedule.month &&
+	!gs.event.schedule.year) {
+		rec = 'weekly';
+	}
+	else if (!gs.event.schedule.duration &&
+	!gs.event.schedule.durationInDays &&
+	!gs.event.schedule.durationUnit &&
+	!gs.event.schedule.times &&
+	!gs.event.schedule.dayOfWeek &&
+	gs.event.schedule.dayOfMonth &&
+	!gs.event.schedule.month &&
+	!gs.event.schedule.year) {
+		rec = 'monthly';
+	}
+	else if (!gs.event.schedule.duration &&
+	!gs.event.schedule.durationInDays &&
+	!gs.event.schedule.durationUnit &&
+	!gs.event.schedule.times &&
+	!gs.event.schedule.dayOfWeek &&
+	gs.event.schedule.dayOfMonth &&
+	gs.event.schedule.month &&
+	!gs.event.schedule.year) {
+		rec = 'yearly';
+	}
+	var allDay = true;
+	var startDate = new Date(
+    gs.event.occurrenceDate.year,
+    gs.event.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+    gs.event.occurrenceDate.dayOfMonth+1
+  )
+	var endDate = new Date(
+    gs.event.occurrenceDate.year,
+    gs.event.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+    gs.event.occurrenceDate.dayOfMonth+1
+  )
+	var timeSplit = ["00", "00", "00"];
+	if (gs.event.schedule.times) {
+		allDay = false;
+		timeSplit = gs.event.schedule.times[0].split(":");
+		startDate = new Date(
+			gs.event.occurrenceDate.year,
+			gs.event.occurrenceDate.month-1, // Porque os meses são de 0 a 11
+			gs.event.occurrenceDate.dayOfMonth,
+			parseInt(timeSplit[0])+1, // Porquê que preciso de somar 1???
+			parseInt(timeSplit[1]),
+			parseInt(timeSplit[2])
+		);
+		if (gs.event.schedule.durationUnit == "minutes") {
+			endDate = addMinutes(startDate, gs.event.schedule.duration);
+		}
+		else if (gs.event.schedule.durationUnit == "days") {
+			endDate = addDays(startDate, gs.event.schedule.duration);
+		}
+		else if (gs.event.schedule.durationUnit == "weeks") {
+			endDate = addWeeks(startDate, gs.event.schedule.duration);
+		}
+		else if (gs.event.schedule.durationUnit == "months") {
+			endDate = addMonths(startDate, gs.event.schedule.duration);
+		}
+	}
+	else {
+		endDate = startDate;
+	}
+	var eventData = {
+		calendarId: groupSessionCalendar.id,
+		startDate: startDate.toISOString(),
+		endDate: endDate.toISOString(),
+		allDay: gs.event.schedule.times ? false : true,
+		location: gs.event.data.location,
+		description: gs.groupSession.theme + ' - ' + gs.groupSession.description,
+		recurrence: rec
+	};
+
+	if (eventData.recurrence == null) {
+		delete eventData.recurrence;
+	}
+	
+  RNCalendarEvents.saveEvent(
+    gs.event.data.title, 
+		eventData
+  ).then(id => { 
+		(async () => {
+			try {
+				await AsyncStorage.setItem(
+					'@groupSessionCalendar:' + gs.groupSession.pk,
+					JSON.stringify({ 'id': id, 'hash': String(hash) })
+				);
+			} catch (error) {
+				console.warn('AsyncStorage - setItem', error);
+			}
+		})();
+  }).catch(error => console.warn('RNCalendarEvents - saveEvent', error));
+}
+
+const handleGroupSession = async (gs, hash, groupSessionCalendar) => {
+  try {
+    //await AsyncStorage.clear();
+    const oldEvData = await AsyncStorage.getItem('@groupSessionCalendar:' + gs.groupSession.pk);
+    if (oldEvData == null) { // O evento ainda não existe
+      addNewGroupSession(gs, hash, groupSessionCalendar);
+    }
+    else { // Já tem o evento. Está atualizado?
+      var oldEvDataParsed = JSON.parse(oldEvData);
+      if (oldEvDataParsed.hash !== hash) { // O evento mudou
+        RNCalendarEvents.removeEvent(oldEvDataParsed.id)
+          .then(() => {
+            (async () => { // Remove a key do asyncStorage
+              try {
+                await AsyncStorage.removeItem('@groupSessionCalendar:' + gs.groupSession.pk);
+              } catch (error) {
+                console.warn('AsyncStorage - removeItem', error);
+              }
+            })();
+            // Adiciona o evento atualizado
+            addNewGroupSession(gs, hash, groupSessionCalendar);
+          })
+          .catch(error => {
+            console.log('RNCalendarEvents - removeEvent', error);
+          });
+      }
+    }
+  } catch (error) {
+    console.warn('AsyncStorage - handleGroupSession', error);
+  }
+}
+
 
 export default class CalendarPage extends React.Component {
   constructor(props) {
@@ -190,14 +501,18 @@ export default class CalendarPage extends React.Component {
       cal_auth: '',
       loading: false,
       appointments: [],
+      groupSessions: [],
+      indivSessions: [],
       calendars: [],
       error: null,
       refreshing: false,
       base_url: "http://10.0.2.2:8000/cuida24/",
-      users: [{
-        name: 'brynn',
-        avatar: 'https://s3.amazonaws.com/uifaces/faces/twitter/brynn/128.jpg'
-      }]
+      filters: [
+        {label: 'Consultas', value: 0 },
+        {label: 'Sessões de Grupo', value: 1 },
+        {label: 'Sessões Individuais', value: 2 }
+      ],
+			selectedFilter: 0
     }
   }
   
@@ -285,7 +600,7 @@ export default class CalendarPage extends React.Component {
     //PushNotification.cancelAllLocalNotifications();
     const fetchData = async () => {
       await this.fetchCalendarsFromApi();
-      await this.fetchAppointmentsFromApi();
+      await this.fetchEventsFromApi();
     }
     fetchData();
   }
@@ -362,8 +677,8 @@ export default class CalendarPage extends React.Component {
     });
   }
 
-  fetchAppointmentsFromApi = ()  => {
-    const url = this.state.base_url + "appointments";
+  fetchEventsFromApi = ()  => {
+    const url = this.state.base_url + "events";
 
     this.setState({ loading: true });
 
@@ -374,14 +689,22 @@ export default class CalendarPage extends React.Component {
     fetch(url + `?users=${encodedValue}`)
       .then(res => res.json())
       .then(res => {
-        console.log('Appointments loaded', res);
+        console.log('Events loaded', res);
+        var appts = res.appointments[0];
+        var gs = res.sessions[0].filter(s => s.groupSession != null);
+        var is = res.sessions[0].filter(s => s.individualSession != null);
         this.setState({
-          appointments: res,
+          appointments: appts,
+          groupSessions: gs,
+          indivSessions: is,
           error: null,
           loading: false,
           refreshing: false
-        }, () => this.handleAppointments());
-        //}, () => console.log('appointments', this.state.appointments));
+        }, () => {
+          this.handleAppointments();
+          this.handleGroupSessions();
+          this.handleIndivSessions();
+        });
       })
       .catch(error => {
         this.setState({ error, loading : false });
@@ -475,11 +798,175 @@ export default class CalendarPage extends React.Component {
     });
   }
 
+  iterateThroughGroupSessions(eventsToRemove, groupSessionCalendar) {
+    this.state.groupSessions.forEach( function(gs) {
+      if (eventsToRemove.includes(gs.groupSession.pk)) {
+        eventsToRemove = eventsToRemove.filter(e => e !== gs.groupSession.pk);
+      }
+      sha256(JSON.stringify(gs)).then( hash => {
+        (async () => {
+          try {
+            handleGroupSession(gs, hash, groupSessionCalendar);
+          } catch (error) {
+            console.warn('handleGroupSession - outside', error);
+          }
+        })();
+      }).catch(error => console.warn('sha256', error));
+    });
+    // remover os eventos com as pk's que sobram no eventsToRemove
+    eventsToRemove.forEach( function(gsPK) {
+      (async () => {
+        try {
+          const oldEvData = await AsyncStorage.getItem('@groupSessionCalendar:' + gsPK);
+          RNCalendarEvents.removeEvent(JSON.parse(oldEvData).id)
+            .then(() => {
+              (async () => { // Remove a key do asyncStorage
+                try {
+                  await AsyncStorage.removeItem('@groupSessionCalendar:' + gsPK);
+                } catch (error) {
+                  console.warn('AsyncStorage - removeItem groupSessionCalendar', error);
+                }
+              })();
+            })
+            .catch(error => {
+              console.log('RNCalendarEvents - removeEvent groupSessionCalendar', error);
+            });
+        } catch (error) {
+          console.warn('AsyncStorage - removeItem groupSessionCalendar', error);
+        }
+      })();
+    });
+    // fazer um array com as pk's do this.state.groupSessions
+    const newEventsToRemove = this.state.groupSessions.map( gs => {
+      return gs.groupSession.pk;
+    });
+    // colocar no @groupSessionCalendar:etr
+    (async () => {
+      try {
+        await AsyncStorage.setItem(
+          '@groupSessionCalendar:etr',
+          JSON.stringify(newEventsToRemove)
+        );
+      } catch (error) {
+        console.warn('AsyncStorage - setItem: newEventsToRemove', error);
+      }
+    })();
+  }
+
+  handleGroupSessions() {
+    console.log('handleGroupSessions', this.state.groupSessions);
+    RNCalendarEvents.findCalendars()
+    .then((result) => {
+      const groupSessionCalendar = this.getGroupSessionCalendar(result);
+
+      if (!groupSessionCalendar) { return; }
+
+      (async () => {
+        try {
+          var eventsToRemove
+          const eventsToRemoveStr = await AsyncStorage.getItem('@groupSessionCalendar:etr');
+          if (eventsToRemoveStr == null) {
+            eventsToRemove = [];
+            this.iterateThroughGroupSessions(eventsToRemove, groupSessionCalendar);
+          } else {
+            eventsToRemove = JSON.parse(eventsToRemoveStr);
+            this.iterateThroughGroupSessions(eventsToRemove, groupSessionCalendar);
+          }
+        } catch (error) {
+          console.warn('AsyncStorage - getItem groupSessionCalendar: eventsToRemove', error);
+        }
+      })();
+
+    });
+  }
+
+  iterateThroughIndivSessions(eventsToRemove, indivSessionCalendar) {
+    this.state.indivSessions.forEach( function(is) {
+      if (eventsToRemove.includes(is.individualSession.pk)) {
+        eventsToRemove = eventsToRemove.filter(e => e !== is.individualSession.pk);
+      }
+      sha256(JSON.stringify(is)).then( hash => {
+        (async () => {
+          try {
+            handleIndivSession(is, hash, indivSessionCalendar);
+          } catch (error) {
+            console.warn('handleIndivSession - outside', error);
+          }
+        })();
+      }).catch(error => console.warn('sha256', error));
+    });
+    // remover os eventos com as pk's que sobram no eventsToRemove
+    eventsToRemove.forEach( function(isPK) {
+      (async () => {
+        try {
+          const oldEvData = await AsyncStorage.getItem('@indivSessionCalendar:' + isPK);
+          RNCalendarEvents.removeEvent(JSON.parse(oldEvData).id)
+            .then(() => {
+              (async () => { // Remove a key do asyncStorage
+                try {
+                  await AsyncStorage.removeItem('@indivSessionCalendar:' + isPK);
+                } catch (error) {
+                  console.warn('AsyncStorage - removeItem indivSessionCalendar', error);
+                }
+              })();
+            })
+            .catch(error => {
+              console.log('RNCalendarEvents - removeEvent indivSessionCalendar', error);
+            });
+        } catch (error) {
+          console.warn('AsyncStorage - removeItem indivSessionCalendar', error);
+        }
+      })();
+    });
+    // fazer um array com as pk's do this.state.indivSessions
+    const newEventsToRemove = this.state.indivSessions.map( is => {
+      return is.individualSession.pk;
+    });
+    // colocar no @indivSessionCalendar:etr
+    (async () => {
+      try {
+        await AsyncStorage.setItem(
+          '@indivSessionCalendar:etr',
+          JSON.stringify(newEventsToRemove)
+        );
+      } catch (error) {
+        console.warn('AsyncStorage - setItem: newEventsToRemove', error);
+      }
+    })();
+  }
+
+  handleIndivSessions() {
+    console.log('handleIndivSessions', this.state.indivSessions);
+    RNCalendarEvents.findCalendars()
+    .then((result) => {
+      const indivSessionCalendar = this.getIndivSessionCalendar(result);
+
+      if (!indivSessionCalendar) { return; }
+
+      (async () => {
+        try {
+          var eventsToRemove
+          const eventsToRemoveStr = await AsyncStorage.getItem('@indivSessionCalendar:etr');
+          if (eventsToRemoveStr == null) {
+            eventsToRemove = [];
+            this.iterateThroughIndivSessions(eventsToRemove, indivSessionCalendar);
+          } else {
+            eventsToRemove = JSON.parse(eventsToRemoveStr);
+            this.iterateThroughIndivSessions(eventsToRemove, indivSessionCalendar);
+          }
+        } catch (error) {
+          console.warn('AsyncStorage - getItem indivSessionCalendar: eventsToRemove', error);
+        }
+      })();
+
+    });
+  }
+
   onRefresh() {
     this.setState({refreshing: true});
     const fetchData = async () => {
       await this.fetchCalendarsFromApi();
-      await this.fetchAppointmentsFromApi();
+      await this.fetchEventsFromApi();
     }
     fetchData().then(() => {
       this.setState({refreshing: false});
@@ -504,56 +991,236 @@ export default class CalendarPage extends React.Component {
           accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
         />
 
-        <FlatList
-          refreshing={this.state.refreshing}
-          onRefresh={() => this.onRefresh()}
-          data={this.state.appointments}
-          keyExtractor={item => String(item.appointmentPK)}
-          renderItem={({ item }) => (
-            <Card title="Consulta">
-              <View>
-                <Text>
-									<Text style={{fontWeight: 'bold'}}>Especialiade:{' '}</Text>
-									{ item.event.data.description }
-								</Text>
-                <Text>
-									<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
-									{ item.occurrenceDate.dayOfMonth + '/' + 
-										item.occurrenceDate.month + '/' + 
-										item.occurrenceDate.year }
-								</Text>
-								{
-									item.event.schedule.times != null
-										?
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
-										{ item.event.schedule.times[0] }
-									</Text>
-										:
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-										todo o dia
-									</Text>
-								}
-								{
-									item.event.schedule.duration != null
-										?
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-										{ item.event.schedule.duration + " " +
-											this.durationUnitTranslated(item.event.schedule.durationUnit) }
-									</Text>
-										:
-									null
-								}
-                <Text>
-									<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
-									{ item.event.data.location }
-								</Text>
-              </View>
-            </Card>
-          )}
+        <RadioForm
+          radio_props={this.state.filters}
+          initial={0}
+          formHorizontal={true}
+          labelHorizontal={false}
+          buttonColor={'#2196f3'}
+          animation={false}
+          onPress={(value) => {this.setState({selectedFilter:value})}}
         />
+
+				{
+					this.state.selectedFilter == 0
+						?
+					<FlatList
+						refreshing={this.state.refreshing}
+						onRefresh={() => this.onRefresh()}
+						data={this.state.appointments}
+						keyExtractor={item => String(item.appointmentPK)}
+						renderItem={({ item }) => (
+							<Card title="Consulta">
+								<View>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Especialiade:{' '}</Text>
+										{ item.event.data.description }
+									</Text>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
+										{ item.occurrenceDate.dayOfMonth + '/' + 
+											item.occurrenceDate.month + '/' + 
+											item.occurrenceDate.year }
+									</Text>
+									{
+										item.event.schedule.times != null
+											?
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
+											{ item.event.schedule.times[0] }
+										</Text>
+											:
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+											todo o dia
+										</Text>
+									}
+									{
+										item.event.schedule.duration != null
+											?
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+											{ item.event.schedule.duration + " " +
+												this.durationUnitTranslated(item.event.schedule.durationUnit) }
+										</Text>
+											:
+										null
+									}
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
+										{ item.event.data.location }
+									</Text>
+								</View>
+							</Card>
+						)}
+					/>
+						:
+					null
+				}
+				{
+					this.state.selectedFilter == 1
+						?
+					<FlatList
+						refreshing={this.state.refreshing}
+						onRefresh={() => this.onRefresh()}
+						data={this.state.groupSessions}
+						keyExtractor={item => String(item.groupSession.pk)}
+						renderItem={({ item }) => (
+							<Card title="Sessões de Grupo">
+								<View>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Tema:{' '}</Text>
+										{ item.groupSession.theme }
+									</Text>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Descrição:{' '}</Text>
+										{ item.groupSession.description }
+									</Text>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Objetivos:{' '}</Text>
+									</Text>
+                  {
+                    item.groupSession.goals.map((g) => (
+                      <ListItem
+                        key={g}
+                        title={<Text>{`\u2022 ${g}`}</Text>}
+                      />
+                    ))
+                  }
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Material necessário:{' '}</Text>
+									</Text>
+                  {
+                    item.groupSession.materials.map((m) => (
+                      <ListItem
+                        key={m}
+                        title={<Text>{`\u2022 ${m}`}</Text>}
+                      />
+                    ))
+                  }
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
+										{ item.event.occurrenceDate.dayOfMonth + '/' + 
+											item.event.occurrenceDate.month + '/' + 
+											item.event.occurrenceDate.year }
+									</Text>
+									{
+										item.event.schedule.times != null
+											?
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
+											{ item.event.schedule.times[0] }
+										</Text>
+											:
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+											todo o dia
+										</Text>
+									}
+									{
+										item.event.schedule.duration != null
+											?
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+											{ item.event.schedule.duration + " " +
+												this.durationUnitTranslated(item.event.schedule.durationUnit) }
+										</Text>
+											:
+										null
+									}
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
+										{ item.event.data.location }
+									</Text>
+								</View>
+							</Card>
+						)}
+					/>
+						:
+					null
+				}
+				{
+					this.state.selectedFilter == 2
+						?
+					<FlatList
+						refreshing={this.state.refreshing}
+						onRefresh={() => this.onRefresh()}
+						data={this.state.indivSessions}
+						keyExtractor={item => String(item.individualSession.pk)}
+						renderItem={({ item }) => (
+							<Card title="Sessões Individuais">
+								<View>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Tema:{' '}</Text>
+										{ item.individualSession.theme }
+									</Text>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Descrição:{' '}</Text>
+										{ item.individualSession.description }
+									</Text>
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Objetivos:{' '}</Text>
+									</Text>
+                  {
+                    item.individualSession.goals.map((g) => (
+                      <ListItem
+                        key={g}
+                        title={<Text>{`\u2022 ${g}`}</Text>}
+                      />
+                    ))
+                  }
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Material necessário:{' '}</Text>
+									</Text>
+                  {
+                    item.individualSession.materials.map((m) => (
+                      <ListItem
+                        key={m}
+                        title={<Text>{`\u2022 ${m}`}</Text>}
+                      />
+                    ))
+                  }
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
+										{ item.event.occurrenceDate.dayOfMonth + '/' + 
+											item.event.occurrenceDate.month + '/' + 
+											item.event.occurrenceDate.year }
+									</Text>
+									{
+										item.event.schedule.times != null
+											?
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
+											{ item.event.schedule.times[0] }
+										</Text>
+											:
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+											todo o dia
+										</Text>
+									}
+									{
+										item.event.schedule.duration != null
+											?
+										<Text>
+											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+											{ item.event.schedule.duration + " " +
+												this.durationUnitTranslated(item.event.schedule.durationUnit) }
+										</Text>
+											:
+										null
+									}
+									<Text>
+										<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
+										{ item.event.data.location }
+									</Text>
+								</View>
+							</Card>
+						)}
+					/>
+						:
+					null
+				}
       </View>
     )
   }
