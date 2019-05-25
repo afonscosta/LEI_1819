@@ -36,6 +36,27 @@
     }
   },
   {
+    "model": "auth.group",
+    "pk":1,
+    "fields": {
+        "name": "backofficeUser"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":2,
+    "fields": {
+        "name": "caregiver"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":3,
+    "fields": {
+        "name": "patient"
+    }
+  },
+  {
     "model": "auth.user",
     "pk": 1,
     "fields": {
@@ -130,6 +151,14 @@
     }
   },
   {
+    "model": "auth.user_groups",
+    "pk": 1,
+    "fields": {
+        "user": "1",
+        "group": "2"
+    }
+  },
+  {
     "model": "cuida24.Caregiver",
     "pk": 2,
     "fields": {
@@ -137,10 +166,26 @@
     }
   },
   {
+    "model": "auth.user_groups",
+    "pk": 2,
+    "fields": {
+        "user": "4",
+        "group": "2"
+    }
+  },
+  {
     "model": "cuida24.Caregiver",
     "pk": 3,
     "fields": {
        "info": "5"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 3,
+    "fields": {
+        "user": "5",
+        "group": "2"
     }
   },
   {
@@ -152,11 +197,27 @@
     }
   },
   {
+    "model": "auth.user_groups",
+    "pk": 4,
+    "fields": {
+        "user": "2",
+        "group": "3"
+    }
+  },
+  {
     "model": "cuida24.Patient",
     "pk": 2,
     "fields": {
        "info": "6",
        "caregiver": "2"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 5,
+    "fields": {
+        "user": "6",
+        "group": "3"
     }
   },
   {
@@ -168,6 +229,14 @@
     }
   },
   {
+    "model": "auth.user_groups",
+    "pk": 6,
+    "fields": {
+        "user": "7",
+        "group": "3"
+    }
+  },
+  {
     "model": "cuida24.BackofficeUser",
     "pk": 1,
     "fields": {
@@ -176,11 +245,27 @@
     }
   },
   {
+    "model": "auth.user_groups",
+    "pk": 7,
+    "fields": {
+        "user": "3",
+        "group": "1"
+    }
+  },
+  {
     "model": "cuida24.BackofficeUser",
     "pk": 2,
     "fields": {
        "info": "8",
        "type": "PRF"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 8,
+    "fields": {
+        "user": "8",
+        "group": "1"
     }
   },
   {

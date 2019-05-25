@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status, permissions, generics
 
 from backend.cuida24.models import *
-from backend.cuida24.permissions import IsBackofficeUser
+from backend.cuida24.permissions import *
 from backend.cuida24.serializers import *
 from .services import *
 import logging
@@ -19,7 +19,7 @@ logger = logging.getLogger("mylogger")
 
 @renderer_classes((StaticHTMLRenderer,))
 class StaticPagesView(generics.ListAPIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, FixPermission,)
     queryset = StaticPages.objects.all()
     serializer_class = StaticPagesSerializer
 
@@ -45,13 +45,7 @@ class DefActivityViewSet(viewsets.ModelViewSet):
         return Response(sent_data, status=status.HTTP_200_OK)
 
 
-class FixAnAppointmentPermssion(permissions.BasePermission):
-    def has_permission(self, request, view):
-        logger.info('REQUEST PRINT' + request.user.username + str(request.user.id))
-        return True
-
-
-class EventViewSet(viewsets.ModelViewSet):
+class EventViewSet(generics.ListAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
@@ -106,6 +100,13 @@ class BackofficeUserViewSet(viewsets.ModelViewSet):
 
 
 class AppointmentViewSet(viewsets.ModelViewSet):
+    permission_classes = [HasGroupPermission]
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'POST': ['backofficeUser'],
+        'PUT': ['backofficeUser'],
+        'DELETE': ['backofficeUser']
+    }
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
 
