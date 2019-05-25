@@ -1,5 +1,6 @@
 import React from 'react'
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, ScrollView, Image, Dimensions } from 'react-native'
+import HTML from 'react-native-render-html';
 
 export default class InfoPage extends React.Component {
   constructor(props) {
@@ -23,49 +24,43 @@ export default class InfoPage extends React.Component {
     )
   }
 
-  // componentDidMount() {
-  //   const url = this.state.base_url + "staticPages";
+  componentDidMount() {
+    const url = this.state.base_url + "staticPages";
 
-  //   this.setState({ loading: true });
+    this.setState({ loading: true });
 
-  //   fetch(url)
-  //     .then(res => res.json())
-  //     .then(res => {
-  //       this.setState({
-  //         info: res,
-  //         error: null,
-  //         loading: false,
-  //         refreshing: false
-  //       });
-  //     })
-  //     .catch(error => {
-  //       this.setState({ error, loading : false });
-  //     });
-  // }
+    fetch(url)
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          info: res,
+          error: null,
+          loading: false,
+          refreshing: false
+        });
+      })
+      .catch(error => {
+        this.setState({ error, loading : false });
+      });
+  }
 
   render() {
-    const elems = {'titulo1': 'adjshvbejhrv', 'titulo2': 'ajdhvejfhv'};
-
-    const items = [];
-
-    for ((key, value) of elems) {
-      items.push(<h2> {index} </h2> )
-      // elems.push(<p> {value} </p>)
-    }
+    const elems = this.state.info;
 
     return (
-      <View style={styles.container}>
-        {items}
-      </View>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container}>
+        {Object.keys(elems).map(key => (
+          <HTML key={key} html={ '<h3>' + elems[key].title + '</h3>' + elems[key].text } />
+          //<HTML html={elems[key].text} />
+        ))}
+      </ScrollView>
     )
   }
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 10,
   },
 })
