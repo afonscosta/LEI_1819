@@ -39,7 +39,7 @@ const htColor = '#343F4B';
 
 const Login_StackNavigator = createStackNavigator({
   //All the screen from the Screen1 will be indexed here
-  Calendar: {
+  Login: {
     screen: LoginPage,
     navigationOptions: ({ navigation }) => ({
       title: 'Iniciar sessão',
@@ -142,6 +142,28 @@ const Info_StackNavigator = createStackNavigator({
   },
 });
 
+const DrawerNavigatorNoLogin = createDrawerNavigator({
+  //Drawer Optons and indexing
+  Login: {
+    //Title
+    screen: Login_StackNavigator,
+    navigationOptions: {
+      drawerLabel: 'Iniciar sessão',
+    },
+  },
+  Info: {
+    //Title
+    screen: Info_StackNavigator,
+    navigationOptions: {
+      drawerLabel: 'Páginas informativas',
+    },
+  },
+},
+{
+  drawerBackgroundColor: bgColor,
+});
+
+
 const DrawerNavigator = createDrawerNavigator({
     //Drawer Optons and indexing
     Login: {
@@ -198,6 +220,24 @@ const DrawerNavigator = createDrawerNavigator({
     drawerBackgroundColor: bgColor,
   });
 
-const AppContainer = createAppContainer(DrawerNavigator);
- 
-export default AppContainer;
+const AppContainerLogged = createAppContainer(DrawerNavigator);
+const AppContainerUnlogged = createAppContainer(DrawerNavigatorNoLogin);
+
+async function checkUserSignedIn(){
+  try {
+     let value = await AsyncStorage.getItem('@login');
+     if (value != null){
+        return AppContainerLogged;
+     }
+     else {
+        return AppContainerUnlogged;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export default AppContainerLogged;
+// export default async () => {
+//   return await checkUserSignedIn();
+// }

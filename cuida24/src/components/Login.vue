@@ -29,8 +29,10 @@ export default {
       this.$store.dispatch('login/getToken', {
         username: this.email,
         password: this.password
-      }).then(() => {
-        // this code is only executed after dispatch
+      }).then((response) => {
+        this.$router.push('/')
+      }).catch((error) => {
+        console.log(error)
       })
     }
   }
