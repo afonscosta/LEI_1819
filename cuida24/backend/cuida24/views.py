@@ -17,9 +17,8 @@ import json
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
 
-@renderer_classes((StaticHTMLRenderer,))
 class StaticPagesView(generics.ListAPIView):
-    permission_classes = (AllowAny, FixPermission,)
+    permission_classes = (AllowAny,)
     queryset = StaticPages.objects.all()
     serializer_class = StaticPagesSerializer
 
