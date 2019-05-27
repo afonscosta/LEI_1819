@@ -81,40 +81,50 @@
             @click="goToFormSession"
             v-if="(usersActive.caregivers.length + usersActive.patients.length) === 1"
             block
+            variant="outline-dark"
           >Adicionar Sessão Individual</b-button>
           <b-button 
             @click="goToFormSession"
             v-if="(usersActive.caregivers.length + usersActive.patients.length) > 1"
             block
+            variant="outline-dark"
           >Adicionar Sessão de Grupo</b-button>
         </b-col>
       </b-row>
       <b-row class="mt-3 justify-content-md-center">
         <b-col md="8" cols="12">
-          <b-card no-body>
-            <b-form-group
-              class="mt-3"
-              label="Visualizar sessões com os seguintes estados:"
-              label-cols-sm="6"
-              label-cols-lg="6"
-            >
-              <b-form-checkbox-group
-                v-model="selectedStateFilters"
-                :options="filterStateOptions"
-                name="stateFilters"
-              ></b-form-checkbox-group>
-            </b-form-group>
-            <b-form-group
-              label="Tipo de sessões a visualizar:"
-              label-cols-sm="4"
-              label-cols-lg="4"
-            >
-              <b-form-checkbox-group
-                v-model="selectedSessionTypes"
-                :options="sessionTypesOptions"
-                name="sessionTypes"
-              ></b-form-checkbox-group>
-            </b-form-group>
+          <b-card align="left" no-body>
+            <b-container class="p-3">
+              <b-row align-v="center">
+                <b-col cols="6">
+                  <label><b>Tipo de sessões a visualizar:</b></label>
+                </b-col>
+                <b-col cols="6">
+                  <b-form-checkbox-group
+                    v-model="selectedSessionTypes"
+                    :options="sessionTypesOptions"
+                    name="sessionTypes"
+                  ></b-form-checkbox-group>
+                </b-col>
+              </b-row>
+              <b-row class="m-0 p-0">
+                <b-col>
+                  <hr />
+                </b-col>
+              </b-row>
+              <b-row align-v="center">
+                <b-col cols="6">
+                  <label><b>Visualizar sessões com os seguintes estados:</b></label>
+                </b-col>
+                <b-col cols="6">
+                  <b-form-checkbox-group
+                    v-model="selectedStateFilters"
+                    :options="filterStateOptions"
+                    name="stateFilters"
+                  ></b-form-checkbox-group>
+                </b-col>
+              </b-row>
+            </b-container>
           </b-card>
         </b-col>
       </b-row>
