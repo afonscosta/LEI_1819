@@ -169,6 +169,7 @@ export default class CalendarPage extends React.Component {
   constructor(props) {
     super(props);
     this.state  = {
+      token: '',
       cal_auth: '',
       loading: false,
       appointments: [],
@@ -228,6 +229,11 @@ export default class CalendarPage extends React.Component {
   }
 
   componentDidMount() {
+    AsyncStorage.getItem("@login:")
+    .then(value => {
+      this.setState({ "token": value });
+    })
+    .done();
     this.fetchCalendarsFromApi();
     this.fetchAppointmentsFromApi();
   }
@@ -237,7 +243,12 @@ export default class CalendarPage extends React.Component {
 
     this.setState({ loading: true });
 
-    fetch(url)
+    fetch(url, {
+      headers: new Headers({
+        'Authorization': 'Token ' + this.state.token,
+        'Content-Type': 'application/json'
+      })
+    })
       .then(res => res.json())
       .then(res => {
         this.setState({
@@ -303,7 +314,12 @@ export default class CalendarPage extends React.Component {
 			JSON.stringify({caregivers: [1], patients: []})
 		);
 
-    fetch(url + `?users=${encodedValue}`)
+    fetch(url + `?users=${encodedValue}`, {
+      headers: new Headers({
+        'Authorization': 'Token ' + this.state.token,
+        'Content-Type': 'application/json'
+      })
+    })
       .then(res => res.json())
       .then(res => {
 
