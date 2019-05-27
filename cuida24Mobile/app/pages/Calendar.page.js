@@ -176,7 +176,7 @@ export default class CalendarPage extends React.Component {
       calendars: [],
       error: null,
       refreshing: false,
-      base_url: "http://10.0.3.2:8000/cuida24/"
+      base_url: "http://10.0.2.2:8000/cuida24/"
     }
   }
 
@@ -229,23 +229,29 @@ export default class CalendarPage extends React.Component {
   }
 
   componentDidMount() {
-    AsyncStorage.getItem("@login:")
-    .then(value => {
-      this.setState({ "token": value });
-    })
-    .done();
-    this.fetchCalendarsFromApi();
-    this.fetchAppointmentsFromApi();
+    (async () => {
+      try {
+        const token_res = await AsyncStorage.getItem('@login:');
+        if (token_res != null) {
+          this.fetchCalendarsFromApi(token_res);
+          this.fetchAppointmentsFromApi(token_res);
+        } else {
+          console.log('ERROR GETTING AUTH TOKEN');
+        }
+      } catch (error) {
+        console.warn('AsyncStorage - getItem: eventsToRemove', error);
+      }
+    })();
   }
 
-  fetchCalendarsFromApi = ()  => {
-    const url = this.state.base_url + "calendars";
+  fetchCalendarsFromApi = (token)  => {
+    const url = this.state.base_url + "calendars/";
 
     this.setState({ loading: true });
 
     fetch(url, {
       headers: new Headers({
-        'Authorization': 'Token ' + this.state.token,
+        'Authorization': 'Token ' + token,
         'Content-Type': 'application/json'
       })
     })
@@ -305,8 +311,8 @@ export default class CalendarPage extends React.Component {
     });
   }
 
-  fetchAppointmentsFromApi = ()  => {
-    const url = this.state.base_url + "appointments";
+  fetchAppointmentsFromApi = (token)  => {
+    const url = this.state.base_url + "appointments/";
 
     this.setState({ loading: true });
 
@@ -316,7 +322,7 @@ export default class CalendarPage extends React.Component {
 
     fetch(url + `?users=${encodedValue}`, {
       headers: new Headers({
-        'Authorization': 'Token ' + this.state.token,
+        'Authorization': 'Token ' + token,
         'Content-Type': 'application/json'
       })
     })

@@ -99,7 +99,7 @@ class BackofficeUserViewSet(viewsets.ModelViewSet):
 
 
 class AppointmentViewSet(viewsets.ModelViewSet):
-    permission_classes = [HasGroupPermission]
+    permission_classes = (HasGroupPermission, FixPermission,)
     required_groups = {
         'GET': ['caregiver', 'patient', 'backofficeUser'],
         'POST': ['backofficeUser'],
@@ -136,6 +136,8 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request, *args, **kwargs):
+        logger.info(request.user)
+        logger.info(request.method)
         logger.info("GET APPOINTMENT")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])

@@ -22,10 +22,10 @@ export default class LoginPage extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        // username: this.state.email,
-        // password: this.state.password,
-        username: 'admin',
-        password: 'admin'
+        username: this.state.email,
+        password: this.state.password,
+        // username: 'admin',
+        // password: 'admin'
       }),
     }).then(res => res.json())
       .then(res => {
@@ -36,9 +36,8 @@ export default class LoginPage extends React.Component {
               '@login:',
               res.token
             );
-            console.log(this.props);
           } catch (error) {
-            console.warn('Error', error);
+            console.warn('AsyncStorage - setItem', error);
           }
         })();
       })
