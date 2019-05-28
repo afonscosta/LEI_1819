@@ -3,7 +3,8 @@ import usersService from '../../services/usersService'
 const state = {
   users: {
     caregivers: [],
-    patients: []
+    patients: [],
+    backoffice: []
   },
   usersActive: {
     caregivers: [],
@@ -24,6 +25,9 @@ const getters = {
   getPatientById: (state) => (id) => {
     return state.users.patients.find(u => u.pk === id)
   },
+  getBackofficeUserById: (state) => (id) => {
+    return state.users.backoffice.find(u => u.pk === id)
+  },
   users: state => {
     return state.users
   },
@@ -35,6 +39,9 @@ const getters = {
   },
   patients: state => {
     return state.users.patients
+  },
+  backoffice: state => {
+    return state.users.backoffice
   }
 }
 
@@ -44,6 +51,9 @@ const mutations = {
   },
   setPatients (state, patients) {
     state.users.patients = patients
+  },
+  setBackoffice (state, backoffice) {
+    state.users.backoffice = backoffice
   }
 }
 
@@ -59,6 +69,11 @@ const actions = {
         console.log('patients', patients)
         commit('setPatients', patients)
       })
+    usersService.fetchBackoffice()
+      .then(backoffice => {
+        console.log('backoffice', backoffice)
+        commit('setBackoffice', backoffice)
+      })
   },
   getCaregivers ({ commit }) {
     usersService.fetchCaregivers()
@@ -70,6 +85,13 @@ const actions = {
     usersService.fetchPatients()
       .then(patients => {
         commit('setPatients', patients)
+      })
+  },
+  getBackoffice ({ commit }) {
+    usersService.fetchBackoffice()
+      .then(backoffice => {
+        console.log('backoffice', backoffice)
+        commit('setBackoffice', backoffice)
       })
   }
 }

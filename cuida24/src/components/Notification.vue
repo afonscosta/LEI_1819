@@ -1,7 +1,7 @@
 <template>
   <div class="notification">
     <b-container class="p-0">
-      <b-row class="mb-1" align-v="center" align-h="around" v-for="(notif, index) in notify">
+      <b-row class="mb-1" align-v="center" align-h="around" :key="index" v-for="(notif, index) in notify">
         <b-col cols="10" class="pr-0">
           <datetime type="datetime" 
             class="form-control"

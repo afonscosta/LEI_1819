@@ -96,15 +96,10 @@ var width = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#929393',
+    backgroundColor: '#343F4B',
     alignItems: 'center',
     justifyContent: 'center',
     padding : 20
-  },
-  linky: {
-    fontWeight: 'bold',
-    color: '#4C3E54',
-    paddingTop: 10
   },
   logo: {
     marginTop: 20,
@@ -115,19 +110,25 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     width: width * .8,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    color: '#343F4B',
     marginBottom: 10,
     paddingHorizontal: 10
   },
   loginbuttoncontainer: {
     height: 40,
     width: width * .8,
-    backgroundColor: '#636363',
+    backgroundColor: '#FFD185',
     paddingVertical: 10
   },
   loginbuttontext: {
-    color: 'white',
+    color: '#343F4B',
     textAlign: 'center',
     fontWeight: '700'
+  },
+  title: {
+    fontWeight: 'bold',
+    fontSize: 40,
+    color: 'rgba(255, 255, 255, 0.9)',
   }
 })
