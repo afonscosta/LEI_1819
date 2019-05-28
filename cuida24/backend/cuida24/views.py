@@ -373,6 +373,9 @@ class MedicationViewSet(viewsets.ModelViewSet):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
             logger.info(serializer.data)
+            author_user = serializer.data['prescription']['author']
+            serializer.data['prescription']['author'] = get_object_or_404(BackofficeUser, info=author_user).pk
+            logger.info(serializer.data['prescription']['author'])
             sent_data = prescriptionBackToFrontJSON(request.data, serializer.data)
             logger.info("RETURN DATA")
             logger.info(sent_data)
@@ -392,6 +395,9 @@ class MedicationViewSet(viewsets.ModelViewSet):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
             logger.info(serializer.data)
+            author_user = serializer.data['prescription']['author']
+            serializer.data['prescription']['author'] = get_object_or_404(BackofficeUser, info=author_user).pk
+            logger.info(serializer.data['prescription']['author'])
             sent_data = prescriptionBackToFrontJSON(request.data, serializer.data)
             logger.info("RETURN DATA")
             logger.info(sent_data)
@@ -409,6 +415,10 @@ class MedicationViewSet(viewsets.ModelViewSet):
         data = json.loads(dict(request.GET)['users'][0])
         if data['patients'][0]:
             serializer_data = getPrescriptions(data['patients'][0])
+            # associar o backoffice user à pk auth
+            for medication in serializer_data:
+                author_user = medication['prescription']['author']
+                medication['prescription']['author'] = get_object_or_404(BackofficeUser, info=author_user).pk
             sent_data = getPrescriptionBackToFrontJSON(serializer_data)
             return Response(sent_data, status=status.HTTP_200_OK)
         else:
