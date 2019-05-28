@@ -27,11 +27,11 @@
             :header="presc.event.data.title"
           >
             <b-card-text align="left">
-              <b>Medicamento:</b> {{ getMedicineById(presc.prescription.medicine) }}
+              <b>Medicamento:</b> {{ getMedicineById(presc.prescription.medicine).activeSubs }}
             </b-card-text>
 
             <b-card-text align="left">
-              <b>Quantidade:</b> {{ presc.prescription.quantity }} + "ml/mg"
+              <b>Quantidade:</b> {{ presc.prescription.quantity }} ml/mg
             </b-card-text>
 
             <b-card-text align="left">
@@ -55,7 +55,7 @@
             </b-card-text>
 
             <b-card-text align="left">
-              <b>Prescrição realizada por:</b> {{ presc.prescription.author }}
+              <b>Prescrição realizada por:</b> {{ getBackofficeUserById(presc.prescription.author) }}
             </b-card-text>
             
             <b-card-text align="left">
@@ -86,6 +86,8 @@ export default {
   created () {
     if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
       this.$store.dispatch('prescriptions/getPrescriptions', this.usersActive)
+      this.$store.dispatch('medicines/getMedicines')
+      this.$store.dispatch('users/getBackoffice')
     }
   },
   computed: {
@@ -94,7 +96,7 @@ export default {
       usersActive: state => state.users.usersActive
     }),
     ...mapGetters('medicines', ['getMedicineById']),
-    ...mapGetters('users', ['getPatientById']),
+    ...mapGetters('users', ['getPatientById', 'getBackofficeUserById']),
     durationUnitTranslated () {
       return (durationUnit) => {
         if (durationUnit === 'minutes') {
