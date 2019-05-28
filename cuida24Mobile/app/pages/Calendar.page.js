@@ -499,6 +499,7 @@ export default class CalendarPage extends React.Component {
     super(props);
     this.state  = {
       cal_auth: '',
+      token: '',
       loading: false,
       appointments: [],
       groupSessions: [],
@@ -604,6 +605,7 @@ export default class CalendarPage extends React.Component {
     const fetchData = async () => {
       try {
         const token_res = await AsyncStorage.getItem('@login:');
+        this.setState({ token: token_res });
         if (token_res != null) {
           await this.fetchCalendarsFromApi(token_res);
           await this.fetchEventsFromApi(token_res);
@@ -987,8 +989,8 @@ export default class CalendarPage extends React.Component {
   onRefresh() {
     this.setState({refreshing: true});
     const fetchData = async () => {
-      await this.fetchCalendarsFromApi();
-      await this.fetchEventsFromApi();
+      await this.fetchCalendarsFromApi(this.state.token);
+      await this.fetchEventsFromApi(this.state.token);
     }
     fetchData().then(() => {
       this.setState({refreshing: false});

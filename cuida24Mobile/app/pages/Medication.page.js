@@ -17,10 +17,39 @@ import RNCalendarEvents from 'react-native-calendar-events';
 import { sha256 } from 'react-native-sha256';
 import { addMinutes, addDays, addWeeks, addMonths } from 'date-fns';
 import PushNotification from 'react-native-push-notification';
-import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
+import 
+  RadioForm, 
+  {RadioButton, RadioButtonInput, RadioButtonLabel} 
+from 'react-native-simple-radio-button';
 
-const addNewPrescription = async (presc, hash, medicationCalendar) => {
+const fetchMedName = async (token, pk) => {
+  await fetch("http://10.0.2.2:8000/cuida24/medicine/" + pk, {
+    headers: new Headers({
+      'Authorization': 'Token ' + token,
+      'Content-Type': 'application/json'
+    })
+  })
+    .then(res => res.json())
+    .then(res => {
+      console.log('med', res.activeSubs);
+      //return new Promise(res.activeSubs);
+      return new Promise((resolve, reject) => {       
+        resolve(res.activeSubs)
+      })
+    })
+    .catch(error => {
+      this.setState({ error, loading : false });
+    })
+}
+
+const addNewPrescription = async (token, presc, hash, medicationCalendar) => {
   console.log('Adicionando prescrição...', presc);
+  fetchMedName(token, presc.prescription.medicine)
+    .then(name => {
+      console.log('name', name);
+      presc.prescription.medicine = name;
+      console.log('after', presc.prescription.medicine)
+    });
 	var today = new Date();
   presc.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
@@ -144,12 +173,12 @@ const addNewPrescription = async (presc, hash, medicationCalendar) => {
   }).catch(error => console.warn('RNCalendarEvents - saveEvent', error));
 }
 
-const handlePrescription = async (presc, hash, medicationCalendar) => {
+const handlePrescription = async (token, presc, hash, medicationCalendar) => {
   try {
     //await AsyncStorage.clear();
     const oldEvData = await AsyncStorage.getItem('@medicationCalendar:' + presc.prescription.pk);
     if (oldEvData == null) { // O evento ainda não existe
-      addNewPrescription(presc, hash, medicationCalendar);
+      addNewPrescription(token, presc, hash, medicationCalendar);
     }
     else { // Já tem o evento. Está atualizado?
       var oldEvDataParsed = JSON.parse(oldEvData);
@@ -164,7 +193,7 @@ const handlePrescription = async (presc, hash, medicationCalendar) => {
               }
             })();
             // Adiciona o evento atualizado
-            addNewPrescription(presc, hash, medicationCalendar);
+            addNewPrescription(token, presc, hash, medicationCalendar);
           })
           .catch(error => {
             console.log('RNCalendarEvents - removeEvent', error);
@@ -181,6 +210,7 @@ export default class MedicationPage extends React.Component {
     super(props);
     this.state  = {
       cal_auth: '',
+      token: '',
       loading: false,
       prescriptions: [],
       calendars: [],
@@ -202,48 +232,6 @@ export default class MedicationPage extends React.Component {
     } else if (durationUnit === 'months') {
       return 'mês(es)'
     }
-  }
-
-  parseScheduleRepetition (presc) {
-    var rec = null
-    if (presc.event.schedule.duration &&
-    presc.event.schedule.durationInDays &&
-    presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    !presc.event.schedule.dayOfWeek &&
-    !presc.event.schedule.dayOfMonth &&
-    !presc.event.schedule.month &&
-    !presc.event.schedule.year) {
-      rec = 'diariamente'
-    } else if (!presc.event.schedule.duration &&
-    !presc.event.schedule.durationInDays &&
-    !presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    presc.event.schedule.dayOfWeek &&
-    !presc.event.schedule.dayOfMonth &&
-    !presc.event.schedule.month &&
-    !presc.event.schedule.year) {
-      rec = 'semanalmente'
-    } else if (!presc.event.schedule.duration &&
-    !presc.event.schedule.durationInDays &&
-    !presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    !presc.event.schedule.dayOfWeek &&
-    presc.event.schedule.dayOfMonth &&
-    !presc.event.schedule.month &&
-    !presc.event.schedule.year) {
-      rec = 'mensalmente'
-    } else if (!presc.event.schedule.duration &&
-    !presc.event.schedule.durationInDays &&
-    !presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    !presc.event.schedule.dayOfWeek &&
-    presc.event.schedule.dayOfMonth &&
-    presc.event.schedule.month &&
-    !presc.event.schedule.year) {
-      rec = 'anualmente'
-    }
-    return rec
   }
 
   getAppointmentCalendar(result) {
@@ -317,6 +305,7 @@ export default class MedicationPage extends React.Component {
     const fetchData = async () => {
       try {
         const token_res = await AsyncStorage.getItem('@login:');
+        this.setState({ token: token_res });
         if (token_res != null) {
           await this.fetchCalendarsFromApi(token_res);
           await this.fetchPrescriptionsFromApi(token_res);
@@ -426,8 +415,7 @@ export default class MedicationPage extends React.Component {
       .then(res => {
         console.log('Prescriptions loaded', res);
         this.setState({
-          //prescriptions: res[0],
-          prescriptions: [],
+          prescriptions: res,
           error: null,
           loading: false,
           refreshing: false
@@ -467,6 +455,7 @@ export default class MedicationPage extends React.Component {
   }
 
   iterateThroughPrescriptions(eventsToRemove, medicationCalendar) {
+    const t = this.state.token;
     this.state.prescriptions.forEach( function(presc) {
       if (eventsToRemove.includes(presc.prescription.pk)) {
         eventsToRemove = eventsToRemove.filter(e => e !== presc.prescription.pk);
@@ -474,7 +463,7 @@ export default class MedicationPage extends React.Component {
       sha256(JSON.stringify(presc)).then( hash => {
         (async () => {
           try {
-            handlePrescription(presc, hash, medicationCalendar);
+            handlePrescription(t, presc, hash, medicationCalendar);
           } catch (error) {
             console.warn('handleAppointment - outside', error);
           }
@@ -524,8 +513,8 @@ export default class MedicationPage extends React.Component {
   onRefresh() {
     this.setState({refreshing: true});
     const fetchData = async () => {
-      await this.fetchCalendarsFromApi();
-      await this.fetchPrescriptionsFromApi();
+      await this.fetchCalendarsFromApi(this.state.token);
+      await this.fetchPrescriptionsFromApi(this.state.token);
     }
     fetchData().then(() => {
       this.setState({refreshing: false});
@@ -542,11 +531,63 @@ export default class MedicationPage extends React.Component {
 
 	_listPrescEmptyComponent = () => {
 		return (
-			<View style={styles.emptyList}>
+			<View>
 				<Text>Não existem prescrições</Text>
 			</View>
 		)
 	}
+
+  _parseScheduleRepetition = presc => {
+    var rec = null
+    if (presc.event.schedule.duration &&
+    presc.event.schedule.durationInDays &&
+    presc.event.schedule.durationUnit &&
+    !presc.event.schedule.times &&
+    !presc.event.schedule.dayOfWeek &&
+    !presc.event.schedule.dayOfMonth &&
+    !presc.event.schedule.month &&
+    !presc.event.schedule.year) {
+      return (
+        <Text>diariamente</Text>
+      )
+    } else if (!presc.event.schedule.duration &&
+    !presc.event.schedule.durationInDays &&
+    !presc.event.schedule.durationUnit &&
+    !presc.event.schedule.times &&
+    presc.event.schedule.dayOfWeek &&
+    !presc.event.schedule.dayOfMonth &&
+    !presc.event.schedule.month &&
+    !presc.event.schedule.year) {
+      return (
+        <Text>semanalmente</Text>
+      )
+    } else if (!presc.event.schedule.duration &&
+    !presc.event.schedule.durationInDays &&
+    !presc.event.schedule.durationUnit &&
+    !presc.event.schedule.times &&
+    !presc.event.schedule.dayOfWeek &&
+    presc.event.schedule.dayOfMonth &&
+    !presc.event.schedule.month &&
+    !presc.event.schedule.year) {
+      return (
+        <Text>mensalmente</Text>
+      )
+    } else if (!presc.event.schedule.duration &&
+    !presc.event.schedule.durationInDays &&
+    !presc.event.schedule.durationUnit &&
+    !presc.event.schedule.times &&
+    !presc.event.schedule.dayOfWeek &&
+    presc.event.schedule.dayOfMonth &&
+    presc.event.schedule.month &&
+    !presc.event.schedule.year) {
+      return (
+        <Text>anualmente</Text>
+      )
+    }
+    return (
+      <Text>Sem repetição</Text>
+    )
+  }
 
   render() {
     return (
@@ -573,7 +614,7 @@ export default class MedicationPage extends React.Component {
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Quantidade:{' '}</Text>
-                  { item.prescription.quantity + 'ml/mg' }
+                  { item.prescription.quantity + ' ml/mg' }
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Via de administração:{' '}</Text>
@@ -587,7 +628,7 @@ export default class MedicationPage extends React.Component {
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Repetição:{' '}</Text>
-                  { this.parseScheduleRepetition(item) }
+                  { this._parseScheduleRepetition(item) }
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>

@@ -99,7 +99,7 @@ class BackofficeUserViewSet(viewsets.ModelViewSet):
 
 
 class AppointmentViewSet(viewsets.ModelViewSet):
-    # permission_classes = (HasGroupPermission, FixPermission,)
+    permission_classes = (HasGroupPermission,)
     required_groups = {
         'GET': ['caregiver', 'patient', 'backofficeUser'],
         'POST': ['backofficeUser'],
