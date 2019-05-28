@@ -10,7 +10,7 @@ import {
   ListView,
   ActivityIndicator
 } from 'react-native'
-import { Card, List, ListItem, Button } from 'react-native-elements';
+import { Card, List, ListItem, CheckBox, Button } from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import { StackNavigator } from 'react-navigation';
 import RNCalendarEvents from 'react-native-calendar-events';
@@ -512,6 +512,9 @@ export default class CalendarPage extends React.Component {
         {label: 'Sessões de Grupo', value: 1 },
         {label: 'Sessões Individuais', value: 2 }
       ],
+      apptFilterSelected: false,
+      gsFilterSelected: false,
+      isFilterSelected: false,
 			selectedFilter: 0
     }
   }
@@ -599,18 +602,32 @@ export default class CalendarPage extends React.Component {
   componentDidMount() {
     //PushNotification.cancelAllLocalNotifications();
     const fetchData = async () => {
-      await this.fetchCalendarsFromApi();
-      await this.fetchEventsFromApi();
+      try {
+        const token_res = await AsyncStorage.getItem('@login:');
+        if (token_res != null) {
+          await this.fetchCalendarsFromApi(token_res);
+          await this.fetchEventsFromApi(token_res);
+        } else {
+          console.log('ERROR GETTING AUTH TOKEN');
+        }
+      } catch (error) {
+        console.warn('AsyncStorage - getItem: eventsToRemove', error);
+      }
     }
     fetchData();
   }
 
-  fetchCalendarsFromApi = ()  => {
-    const url = this.state.base_url + "calendars";
+  fetchCalendarsFromApi = (token)  => {
+    const url = this.state.base_url + "calendars/";
 
     this.setState({ loading: true });
 
-    fetch(url)
+    fetch(url, {
+      headers: new Headers({
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json'
+      })
+    })
       .then(res => res.json())
       .then(res => {
         this.setState({
@@ -677,7 +694,7 @@ export default class CalendarPage extends React.Component {
     });
   }
 
-  fetchEventsFromApi = ()  => {
+  fetchEventsFromApi = (token)  => {
     const url = this.state.base_url + "events";
 
     this.setState({ loading: true });
@@ -686,7 +703,12 @@ export default class CalendarPage extends React.Component {
 			JSON.stringify({caregivers: [1], patients: []})
 		);
 
-    fetch(url + `?users=${encodedValue}`)
+    fetch(url + `?users=${encodedValue}`, {
+      headers: new Headers({
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json'
+      })
+    })
       .then(res => res.json())
       .then(res => {
         console.log('Events loaded', res);
@@ -981,33 +1003,65 @@ export default class CalendarPage extends React.Component {
     }
   }
 
+	_listApptEmptyComponent = () => {
+		return (
+			<View style={styles.emptyList}>
+				<Text>Não existem consultas</Text>
+			</View>
+		)
+	}
+
+	_listGSEmptyComponent = () => {
+		return (
+			<View style={styles.emptyList}>
+				<Text>Não existem sessões de grupo</Text>
+			</View>
+		)
+	}
+
+	_listISEmptyComponent = () => {
+		return (
+			<View style={styles.emptyList}>
+				<Text>Não existem sessões individuais</Text>
+			</View>
+		)
+	}
+
   render() {
     return (
+
       <View>
         <Button
           onPress={this.openCalendar}
           title="Abrir calendário"
-          color="#841584"
+					buttonStyle={styles.calButton}
           accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
         />
 
-        <RadioForm
-          radio_props={this.state.filters}
-          initial={0}
-          formHorizontal={true}
-          labelHorizontal={false}
-          buttonColor={'#2196f3'}
-          animation={false}
-          onPress={(value) => {this.setState({selectedFilter:value})}}
-        />
+				<CheckBox
+					title='Consultas'
+					checked={this.state.apptFilterSelected}
+					onPress={() => this.setState({apptFilterSelected: !this.state.apptFilterSelected})}
+				/>
+				<CheckBox
+					title='Sessões de grupo'
+					checked={this.state.gsFilterSelected}
+					onPress={() => this.setState({gsFilterSelected: !this.state.gsFilterSelected})}
+				/>
+				<CheckBox
+					title='Sessões individuais'
+					checked={this.state.isFilterSelected}
+					onPress={() => this.setState({isFilterSelected: !this.state.isFilterSelected})}
+				/>
 
 				{
-					this.state.selectedFilter == 0
+					this.state.apptFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
 						?
 					<FlatList
-						refreshing={this.state.refreshing}
-						onRefresh={() => this.onRefresh()}
 						data={this.state.appointments}
+						refreshing={this.state.refreshing}
+						ListEmptyComponent={this._listApptEmptyComponent}
+						onRefresh={() => this.onRefresh()}
 						keyExtractor={item => String(item.appointmentPK)}
 						renderItem={({ item }) => (
 							<Card title="Consulta">
@@ -1058,12 +1112,13 @@ export default class CalendarPage extends React.Component {
 					null
 				}
 				{
-					this.state.selectedFilter == 1
+					this.state.gsFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
 						?
 					<FlatList
+						data={this.state.groupSessions}
 						refreshing={this.state.refreshing}
 						onRefresh={() => this.onRefresh()}
-						data={this.state.groupSessions}
+						ListEmptyComponent={this._listGSEmptyComponent}
 						keyExtractor={item => String(item.groupSession.pk)}
 						renderItem={({ item }) => (
 							<Card title="Sessões de Grupo">
@@ -1140,12 +1195,13 @@ export default class CalendarPage extends React.Component {
 					null
 				}
 				{
-					this.state.selectedFilter == 2
+					this.state.isFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
 						?
 					<FlatList
+						data={this.state.indivSessions}
 						refreshing={this.state.refreshing}
 						onRefresh={() => this.onRefresh()}
-						data={this.state.indivSessions}
+						ListEmptyComponent={this._listISEmptyComponent}
 						keyExtractor={item => String(item.individualSession.pk)}
 						renderItem={({ item }) => (
 							<Card title="Sessões Individuais">
@@ -1227,33 +1283,12 @@ export default class CalendarPage extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  subtitleView: {
-    flexDirection: 'column',
-    paddingLeft: 10,
-    paddingTop: 5,
-    marginLeft: 110
-  },
-  menuText: {
-    paddingLeft: 10,
-    color: 'grey'
-  },
-  locText: {
-    paddingLeft: 10,
-    color: 'grey',
-    marginTop: 6,
-    fontSize: 12
-  },
-  titleText: {
-    fontWeight: 'bold'
-  },
-  restaurantImage: {
-    width: 600,
-    height: 800
+	emptyList: {
+		alignItems: 'center',
+		marginTop: 20
+	},
+  calButton: {
+    backgroundColor: '#343f4b',
+    margin: 10
   }
 })

@@ -1,11 +1,13 @@
 from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
-from rest_framework.decorators import action, detail_route, permission_classes
+from rest_framework.decorators import action, detail_route, permission_classes, renderer_classes
 from rest_framework.permissions import AllowAny
+from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
-from rest_framework import viewsets, status, permissions
+from rest_framework import viewsets, status, permissions, generics
 
 from backend.cuida24.models import *
+from backend.cuida24.permissions import *
 from backend.cuida24.serializers import *
 from .services import *
 import logging
@@ -15,7 +17,7 @@ import json
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
 
-class StaticPagesViewSet(viewsets.ModelViewSet):
+class StaticPagesView(generics.ListAPIView):
     permission_classes = (AllowAny,)
     queryset = StaticPages.objects.all()
     serializer_class = StaticPagesSerializer
@@ -42,13 +44,7 @@ class DefActivityViewSet(viewsets.ModelViewSet):
         return Response(sent_data, status=status.HTTP_200_OK)
 
 
-class FixAnAppointmentPermssion(permissions.BasePermission):
-    def has_permission(self, request, view):
-        logger.info('REQUEST PRINT' + request.user.username + str(request.user.id))
-        return True
-
-
-class EventViewSet(viewsets.ModelViewSet):
+class EventViewSet(generics.ListAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
@@ -103,6 +99,13 @@ class BackofficeUserViewSet(viewsets.ModelViewSet):
 
 
 class AppointmentViewSet(viewsets.ModelViewSet):
+    # permission_classes = (HasGroupPermission, FixPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'POST': ['backofficeUser'],
+        'PUT': ['backofficeUser'],
+        'DELETE': ['backofficeUser']
+    }
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
 
@@ -133,6 +136,8 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request, *args, **kwargs):
+        logger.info(request.user)
+        logger.info(request.method)
         logger.info("GET APPOINTMENT")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])

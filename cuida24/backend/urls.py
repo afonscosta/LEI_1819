@@ -11,12 +11,12 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from .cuida24.views import index_view, MessageViewSet, DefActivityViewSet, EventViewSet, CalendarViewSet, \
   CaregiverViewSet, PatientViewSet, AppointmentViewSet, AppointmentNoteViewSet, BackofficeUserViewSet, \
-  SessionsViewSet, EvaluationViewSet, MedicineViewSet, MedicationViewSet, StaticPagesViewSet
+  SessionsViewSet, EvaluationViewSet, MedicineViewSet, MedicationViewSet, StaticPagesView
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
 router.register('defatividades', DefActivityViewSet)
-router.register('events', EventViewSet)
+#router.register('events', EventViewSet)
 router.register('calendars', CalendarViewSet)
 router.register('caregivers', CaregiverViewSet)
 router.register('patients', PatientViewSet)
@@ -27,7 +27,6 @@ router.register('sessions', SessionsViewSet)
 router.register('evaluation', EvaluationViewSet)
 router.register('medicine', MedicineViewSet)
 router.register('prescriptions', MedicationViewSet)
-router.register('staticPages', StaticPagesViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
 urlpatterns = [
@@ -37,6 +36,11 @@ urlpatterns = [
 
     # http://localhost:8000/cuida24/<router-viewsets>
     path('cuida24/', include(router.urls)),
+
+    # StaticPages is only a read request
+    path('cuida24/staticPages/', StaticPagesView.as_view()),
+
+    path('cuida24/events/', EventViewSet.as_view()),
 
     # http://localhost:8000/cuida24/admin/
     path('cuida24/admin/', admin.site.urls),
