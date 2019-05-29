@@ -55,7 +55,7 @@
             </b-card-text>
 
             <b-card-text align="left">
-              <b>Prescrição realizada por:</b> {{ getBackofficeUserById(presc.prescription.author) }}
+              <b>Prescrição realizada por:</b> {{ getBackofficeUserById(presc.prescription.author).info.name }}
             </b-card-text>
             
             <b-card-text align="left">
@@ -130,7 +130,7 @@ export default {
       this.$refs['my-modal'].hide()
     },
     parseScheduleRepetition (presc) {
-      var rec = null
+      var rec = 'sem repetição'
       if (presc.event.schedule.duration &&
       presc.event.schedule.durationInDays &&
       presc.event.schedule.durationUnit &&
