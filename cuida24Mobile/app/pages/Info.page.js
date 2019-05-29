@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, FlatList, Image, Text } from 'react-native'
+import { StyleSheet, FlatList, Image, Text, View } from 'react-native'
 import { List } from 'react-native-elements';
 import HTML from 'react-native-render-html';
 
@@ -63,24 +63,33 @@ export default class InfoPage extends React.Component {
 // };
 
   render() {
-    const elems = this.state.info;
+
+    // {Object.keys(this.state.info).map(key => {
+    //   console.log(key.title);
+    //   console.log('KEY' + typeof key);
+    // })}
 
     return (
-      <List>
+
+      <View>
+
+        {/* {Object.keys(this.state.info).map(key => (
+          <Text style={{color: 'blue'}} onPress={this.flatListRef.scrollToIndex({animated: true, index: key})} >
+            {this.state.info[key].title}
+          </Text>
+        ))} */}
+
         <FlatList
-          data={elems}
-          renderItem={({ item }) => (
-            <HTML html={ '<h3>' + item.title + '</h3>' + item.text } />
+          ref={(ref) => { this.flatListRef = ref; }}
+          keyExtractor={item => String(item.pk)}
+          style={styles.container}
+          data={this.state.info}
+          renderItem={({ item, index }) => (
+            <HTML key={item.pk} html={ '<h3>' + item.title + '</h3>' + item.text } />
           )}
         />
-      </List>
+      </View>
     )
-
-          // {Object.keys(elems).map(key => (
-          //   <Text style={{color: 'blue'}} onPress={this.scrollToTitle(elems[key].title)} >
-          //     {elems[key].title}
-          //   </Text>
-          // ))}
   }
 }
 
