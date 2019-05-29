@@ -22,8 +22,26 @@ import
   {RadioButton, RadioButtonInput, RadioButtonLabel} 
 from 'react-native-simple-radio-button';
 
+//const fetchMedName = async (token, pk) => {
+  //return await fetch("http://10.0.2.2:8000/cuida24/medicine/" + pk, {
+    //headers: new Headers({
+      //'Authorization': 'Token ' + token,
+      //'Content-Type': 'application/json'
+    //})
+  //})
+    //.then(res => res.json())
+    //.then(res => {
+      //console.log('med before return', res.activeSubs);
+      //return res.activeSubs;
+    //})
+    //.catch(error => {
+      //this.setState({ error, loading : false });
+    //})
+//}
 const fetchMedName = async (token, pk) => {
-  await fetch("http://10.0.2.2:8000/cuida24/medicine/" + pk, {
+  console.log('token', token);
+  console.log('pk', pk);
+  return await fetch("http://10.0.2.2:8000/cuida24/medicine/" + pk, {
     headers: new Headers({
       'Authorization': 'Token ' + token,
       'Content-Type': 'application/json'
@@ -31,25 +49,53 @@ const fetchMedName = async (token, pk) => {
   })
     .then(res => res.json())
     .then(res => {
-      console.log('med', res.activeSubs);
-      //return new Promise(res.activeSubs);
-      return new Promise((resolve, reject) => {       
-        resolve(res.activeSubs)
-      })
+      console.log('med before return', res.activeSubs);
+      return res.activeSubs;
     })
     .catch(error => {
       this.setState({ error, loading : false });
     })
 }
 
+const fetchMedsNames = async (t, prescriptions) => {
+  return await Promise.all(
+    prescriptions.map( async presc => {
+      var name = await fetchMedName(t, presc.prescription.medicine);
+      return ({pk: presc.prescription.medicine, name: name});
+    })
+  )
+}
+
+const fetchAuthorName = async (token, pk) => {
+  console.log('token', token);
+  console.log('pk', pk);
+  return await fetch("http://10.0.2.2:8000/cuida24/backoffice_user/" + pk, {
+    headers: new Headers({
+      'Authorization': 'Token ' + token,
+      'Content-Type': 'application/json'
+    })
+  })
+    .then(res => res.json())
+    .then(res => {
+      console.log('author before return', res.info.name);
+      return res.info.name;
+    })
+    .catch(error => {
+      this.setState({ error, loading : false });
+    })
+}
+
+const fetchAuthorsNames = async (t, prescriptions) => {
+  return await Promise.all(
+    prescriptions.map( async presc => {
+      var name = await fetchAuthorName(t, presc.prescription.author);
+      return ({pk: presc.prescription.author, name: name});
+    })
+  )
+}
+
 const addNewPrescription = async (token, presc, hash, medicationCalendar) => {
   console.log('Adicionando prescrição...', presc);
-  fetchMedName(token, presc.prescription.medicine)
-    .then(name => {
-      console.log('name', name);
-      presc.prescription.medicine = name;
-      console.log('after', presc.prescription.medicine)
-    });
 	var today = new Date();
   presc.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
@@ -213,6 +259,8 @@ export default class MedicationPage extends React.Component {
       token: '',
       loading: false,
       prescriptions: [],
+      meds: [],
+      authors: [],
       calendars: [],
       error: null,
       refreshing: false,
@@ -397,6 +445,7 @@ export default class MedicationPage extends React.Component {
   }
 
   fetchPrescriptionsFromApi = (token)  => {
+
     const url = this.state.base_url + "prescriptions/";
 
     this.setState({ loading: true });
@@ -416,10 +465,13 @@ export default class MedicationPage extends React.Component {
         console.log('Prescriptions loaded', res);
         this.setState({
           prescriptions: res,
+          meds: [],
           error: null,
           loading: false,
           refreshing: false
         }, () => {
+          this.fetchMedsNames();
+          this.fetchAuthorsNames();
           this.handlePrescriptions();
         });
       })
@@ -427,6 +479,25 @@ export default class MedicationPage extends React.Component {
         this.setState({ error, loading : false });
       })
   };
+
+
+  fetchMedsNames() {
+    fetchMedsNames(this.state.token, this.state.prescriptions).then(meds => {
+      console.log('Meds loaded', meds);
+      this.setState({
+        meds: meds,
+      })
+    })
+  }
+
+  fetchAuthorsNames() {
+    fetchAuthorsNames(this.state.token, this.state.prescriptions).then(authors => {
+      console.log('authors loaded', authors);
+      this.setState({
+        authors: authors,
+      })
+    })
+  }
 
   handlePrescriptions() {
     RNCalendarEvents.findCalendars()
@@ -531,7 +602,7 @@ export default class MedicationPage extends React.Component {
 
 	_listPrescEmptyComponent = () => {
 		return (
-			<View>
+			<View style={styles.emptyList}>
 				<Text>Não existem prescrições</Text>
 			</View>
 		)
@@ -589,6 +660,34 @@ export default class MedicationPage extends React.Component {
     )
   }
 
+  _getMedName = pk => {
+    console.log('meds', this.state.meds);
+    var med = this.state.meds.find(m => m.pk == pk);
+    if (med != null) {
+      console.log('name', med);
+      return (
+        <Text>{med.name}</Text>
+      )
+    }
+    return (
+      <Text></Text>
+    )
+  }
+
+  _getAuthorName = pk => {
+    console.log('authors', this.state.authors);
+    var author = this.state.authors.find(a => a.pk == pk);
+    if (author != null) {
+      console.log('name', author);
+      return (
+        <Text>{author.name}</Text>
+      )
+    }
+    return (
+      <Text></Text>
+    )
+  }
+
   render() {
     return (
       <View>
@@ -610,7 +709,7 @@ export default class MedicationPage extends React.Component {
               <View>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Medicamento:{' '}</Text>
-                  { item.prescription.medicine }
+                  { this._getMedName(item.prescription.medicine) }
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Quantidade:{' '}</Text>
@@ -636,7 +735,7 @@ export default class MedicationPage extends React.Component {
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Prescrição realizada por:{' '}</Text>
-                  { item.prescription.author }
+                  { this._getAuthorName(item.prescription.author) }
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Data de prescrição:{' '}</Text>
