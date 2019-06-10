@@ -74,7 +74,7 @@
 
     <!--Filter options + Button to add new session-->
     <b-container
-      v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
+      v-if="reviewGroupSession === null && reviewIndivSession === null && (usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0)">
       <b-row class="justify-content-md-center">
         <b-col md="8" cols="12">
           <b-button 

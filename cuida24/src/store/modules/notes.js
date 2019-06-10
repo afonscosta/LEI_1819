@@ -61,20 +61,44 @@ const actions = {
       })
   },
   addNote ({ commit }, note) {
-    notesService.postNote(note)
-      .then(newNote => {
-        commit('addNote', newNote)
-      })
+    return new Promise((resolve, reject) => {
+      notesService.postNote(note)
+        .then(newNote => {
+          commit('addNote', newNote)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   },
   updateNote ({ commit }, note) {
-    notesService.putNote(note)
-      .then(() => {
-        commit('updateNote', note)
-      })
+    return new Promise((resolve, reject) => {
+      notesService.putNote(note)
+        .then(() => {
+          commit('updateNote', note)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   },
   deleteNote ({ commit }, noteID) {
-    notesService.deleteNote(noteID)
-    commit('deleteNote', noteID)
+    return new Promise((resolve, reject) => {
+      notesService.deleteNote(noteID)
+        .then(() => {
+          console.log('deleting note with PK =', this.noteID)
+          commit('deleteNote', noteID)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   }
 }
 

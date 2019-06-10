@@ -2,10 +2,19 @@
   <div>
     <notifications 
       position="top center"
-      classes="notif"
+      classes="notif-success"
       :speed="500"
       :width="450"
       animation-name="v-fade-top"
+      group="success"
+    />
+    <notifications 
+      position="top center"
+      classes="notif-error"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+      group="error"
     />
 
     <div v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">
@@ -348,26 +357,45 @@ export default {
       }
       if (payload.event.id) {
         this.updateAppointment(payload)
-        this.$emit('appointmentUpdated', payload.occurrenceDate)
+          .then(() => {
+            this.$emit('appointmentUpdated', payload.occurrenceDate)
+          })
+          .catch(() => {
+            this.$notify({
+              title: 'Ocorreu um erro ao atualizar a consulta.',
+              duration: 3000,
+              group: 'error'
+            })
+          })
       } else {
         this.addAppointment(payload)
-        this.$notify({
-          title: 'A consulta foi adicionada com sucesso.',
-          duration: 3000
-        })
-        this.formData = {
-          dateValue: '',
-          timeValue: '',
-          allDay: true,
-          duration: 0,
-          durationUnit: '',
-          local: '',
-          specialty: '',
-          notify: [],
-          sched: null,
-          id: null
-        }
-        this.selectedSchedule = 'none'
+          .then(() => {
+            this.$notify({
+              title: 'A consulta foi adicionada com sucesso.',
+              duration: 3000,
+              group: 'success'
+            })
+            this.formData = {
+              dateValue: '',
+              timeValue: '',
+              allDay: true,
+              duration: 0,
+              durationUnit: '',
+              local: '',
+              specialty: '',
+              notify: [],
+              sched: null,
+              id: null
+            }
+            this.selectedSchedule = 'none'
+          })
+          .catch(() => {
+            this.$notify({
+              title: 'Ocorreu um erro ao adicionar a consulta.',
+              duration: 3000,
+              group: 'error'
+            })
+          })
       }
     },
     updateNotify () {
@@ -388,13 +416,22 @@ export default {
 </script>
 
 <style>
-.notif {
+.notif-success {
   margin: 10px;
   margin-bottom: 0;
   border-radius: 3px;
   padding: 10px 20px;
   background: #E8F9F0;
   border: 2px solid #D0F2E1;
+}
+
+.notif-error {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #F9E8E8;
+  border: 2px solid #FCF2F2;
 }
 
 .notification-title {

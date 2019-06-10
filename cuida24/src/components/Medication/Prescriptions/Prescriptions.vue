@@ -60,10 +60,9 @@ export default {
   methods: {
     parseScheduleOption (presc) {
       var rec = null
-      if (presc.event.schedule.duration === 1 &&
+      if (presc.event.schedule.duration &&
       presc.event.schedule.durationInDays === 0 &&
-      presc.event.schedule.durationUnit === 'days' &&
-      !presc.event.schedule.times &&
+      presc.event.schedule.durationUnit &&
       !presc.event.schedule.dayOfWeek &&
       !presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
@@ -72,7 +71,6 @@ export default {
       } else if (!presc.event.schedule.duration &&
       !presc.event.schedule.durationInDays &&
       !presc.event.schedule.durationUnit &&
-      !presc.event.schedule.times &&
       presc.event.schedule.dayOfWeek &&
       !presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
@@ -81,7 +79,6 @@ export default {
       } else if (!presc.event.schedule.duration &&
       !presc.event.schedule.durationInDays &&
       !presc.event.schedule.durationUnit &&
-      !presc.event.schedule.times &&
       !presc.event.schedule.dayOfWeek &&
       presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
@@ -90,7 +87,6 @@ export default {
       } else if (!presc.event.schedule.duration &&
       !presc.event.schedule.durationInDays &&
       !presc.event.schedule.durationUnit &&
-      !presc.event.schedule.times &&
       !presc.event.schedule.dayOfWeek &&
       presc.event.schedule.dayOfMonth &&
       presc.event.schedule.month &&
@@ -100,7 +96,7 @@ export default {
       return rec
     },
     editPrescription (presc) {
-      this.prescriptionSel = presc.prescrition.pk
+      this.prescriptionSel = presc.prescription.pk
       var time = ''
       if (presc.event.schedule.times) {
         var timeSplit = presc.event.schedule.times[0].split(':')
@@ -127,7 +123,9 @@ export default {
         id: presc.event.id
       }
       this.form = form
-      this.prescrition = presc.prescription
+      this.prescription = presc.prescription
+      console.log('form', this.form)
+      console.log('prescription', this.prescription)
     },
     prescriptionUpdated (occurrenceDate) {
       this.prescriptionSel = null

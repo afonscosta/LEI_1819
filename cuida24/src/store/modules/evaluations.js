@@ -75,42 +75,93 @@ const actions = {
       })
   },
   addCaregiverEvaluation ({ commit }, e) {
-    console.log('adding evaluation', e)
-    evaluationsService.postEvaluation(e)
-      .then(newE => {
-        commit('addCaregiverEvaluation', newE)
-      })
+    return new Promise((resolve, reject) => {
+      console.log('adding evaluation', e)
+      evaluationsService.postEvaluation(e)
+        .then(newE => {
+          commit('addCaregiverEvaluation', newE)
+        })
+        .then(response => {
+          resolve(response)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
   },
   addPatientEvaluation ({ commit }, e) {
-    console.log('adding evaluation', e)
-    evaluationsService.postEvaluation(e)
-      .then(newE => {
-        commit('addPatientEvaluation', newE)
-      })
+    return new Promise((resolve, reject) => {
+      console.log('adding evaluation', e)
+      evaluationsService.postEvaluation(e)
+        .then(newE => {
+          commit('addPatientEvaluation', newE)
+        })
+        .then(response => {
+          resolve(response)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
   },
   updateCaregiverEvaluation ({ commit }, e) {
-    console.log('updating evaluation', e)
-    evaluationsService.putEvaluation(e)
-      .then(() => {
-        commit('updateCaregiverEvaluation', e)
-      })
+    return new Promise((resolve, reject) => {
+      console.log('updating evaluation', e)
+      evaluationsService.putEvaluation(e)
+        .then(() => {
+          commit('updateCaregiverEvaluation', e)
+        })
+        .then(response => {
+          resolve(response)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
   },
   updatePatientEvaluation ({ commit }, e) {
-    console.log('updating evaluation', e)
-    evaluationsService.putEvaluation(e)
-      .then(() => {
-        commit('updatePatientEvaluation', e)
-      })
+    return new Promise((resolve, reject) => {
+      console.log('updating evaluation', e)
+      evaluationsService.putEvaluation(e)
+        .then(() => {
+          commit('updatePatientEvaluation', e)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   },
   deleteCaregiverEvaluation ({ commit }, ePK) {
-    console.log('deleting evaluation with PK = ', ePK)
-    evaluationsService.deleteEvaluation(ePK)
-    commit('deleteCaregiverEvaluation', ePK)
+    return new Promise((resolve, reject) => {
+      console.log('deleting evaluation with PK = ', ePK)
+      evaluationsService.deleteEvaluation(ePK)
+        .then(() => {
+          commit('deleteCaregiverEvaluation', ePK)
+        })
+        .then(response => {
+          resolve(response)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
   },
   deletePatientEvaluation ({ commit }, ePK) {
-    console.log('deleting evaluation with PK = ', ePK)
-    evaluationsService.deleteEvaluation(ePK)
-    commit('deletePatientEvaluation', ePK)
+    return new Promise((resolve, reject) => {
+      console.log('deleting evaluation with PK = ', ePK)
+      evaluationsService.deleteEvaluation(ePK)
+        .then(() => {
+          commit('deletePatientEvaluation', ePK)
+        })
+        .then(response => {
+          resolve(response)
+        })
+        .catch(error => {
+          reject(error)
+        })
+    })
   }
 }
 

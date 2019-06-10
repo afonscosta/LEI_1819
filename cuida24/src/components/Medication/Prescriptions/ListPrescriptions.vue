@@ -1,5 +1,22 @@
 <template>
   <div>
+    <notifications 
+      position="top center"
+      classes="notif-success"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+      group="success"
+    />
+    <notifications 
+      position="top center"
+      classes="notif-error"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+      group="error"
+    />
+
     <div>
       <b-modal 
         ref="my-modal"
@@ -8,8 +25,8 @@
         <div class="d-block text-center">
           <h3>Tem a certeza que pretende eliminar a prescrição?</h3>
         </div>
-        <b-button class="mt-3" variant="danger" block @click="confirme(true)">Sim</b-button>
         <b-button class="mt-2" variant="success" block @click="confirme(false)">Não</b-button>
+        <b-button class="mt-3" variant="danger" block @click="confirme(true)">Sim</b-button>
       </b-modal>
     </div>
     <b-container>
@@ -55,7 +72,7 @@
             </b-card-text>
 
             <b-card-text align="left">
-              <b>Prescrição realizada por:</b> {{ getBackofficeUserById(presc.prescription.author) }}
+              <b>Prescrição realizada por:</b> {{ getBackofficeUserById(presc.prescription.author).info.name }}
             </b-card-text>
             
             <b-card-text align="left">
@@ -125,25 +142,42 @@ export default {
     confirme (bool) {
       if (bool === true) {
         this.deletePrescription(this.prescToRemove)
+          .then(() => {
+            this.$notify({
+              title: 'A prescrição foi eliminada com sucesso.',
+              duration: 3000,
+              group: 'success'
+            })
+            this.prescToRemove = null
+            this.$refs['my-modal'].hide()
+          })
+          .catch(() => {
+            this.$notify({
+              title: 'Ocorreu um erro ao eliminar a prescição.',
+              duration: 3000,
+              group: 'error'
+            })
+          })
+      } else {
+        this.prescToRemove = null
+        this.$refs['my-modal'].hide()
       }
-      this.prescToRemove = null
-      this.$refs['my-modal'].hide()
     },
     parseScheduleRepetition (presc) {
-      var rec = null
+      var rec = 'sem repetição'
+      console.log(presc.event.schedule.durationInDays === 0)
       if (presc.event.schedule.duration &&
-      presc.event.schedule.durationInDays &&
+      presc.event.schedule.durationInDays === 0 &&
       presc.event.schedule.durationUnit &&
-      !presc.event.schedule.times &&
       !presc.event.schedule.dayOfWeek &&
       !presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
       !presc.event.schedule.year) {
+        console.log('XXXXX')
         rec = 'diariamente'
       } else if (!presc.event.schedule.duration &&
       !presc.event.schedule.durationInDays &&
       !presc.event.schedule.durationUnit &&
-      !presc.event.schedule.times &&
       presc.event.schedule.dayOfWeek &&
       !presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
@@ -152,7 +186,6 @@ export default {
       } else if (!presc.event.schedule.duration &&
       !presc.event.schedule.durationInDays &&
       !presc.event.schedule.durationUnit &&
-      !presc.event.schedule.times &&
       !presc.event.schedule.dayOfWeek &&
       presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
@@ -161,7 +194,6 @@ export default {
       } else if (!presc.event.schedule.duration &&
       !presc.event.schedule.durationInDays &&
       !presc.event.schedule.durationUnit &&
-      !presc.event.schedule.times &&
       !presc.event.schedule.dayOfWeek &&
       presc.event.schedule.dayOfMonth &&
       presc.event.schedule.month &&
@@ -173,3 +205,44 @@ export default {
   }
 }
 </script>
+
+<style>
+.notif-success {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #E8F9F0;
+  border: 2px solid #D0F2E1;
+}
+
+.notif-error {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #F9E8E8;
+  border: 2px solid #FCF2F2;
+}
+
+.notification-title {
+  letter-spacing: 1px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.v-fade-top-enter-active,
+.v-fade-top-leave-active,
+.v-fade-ltopmove {
+  transition: all .5s;
+}
+.v-fade-top-enter,
+.v-fade-top-leave-to {
+  opacity: 0;
+  transform: translateY(-500px) scale(0.2);
+}
+
+.vdatetime-input {
+  width: 100%;
+}
+</style>

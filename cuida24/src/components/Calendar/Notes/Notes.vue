@@ -5,7 +5,7 @@
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
       <b-row class="justify-content-md-center">
         <b-col xl="8" lg="8" md="8" sm="12" cols="12">
-          <FormNote @returnNote="addNote"></FormNote>
+          <FormNote />
         </b-col>
       </b-row>
       <b-row class="justify-content-md-center">
@@ -20,7 +20,7 @@
 <script>
 import FormNote from './FormNote'
 import ListNotes from './ListNotes'
-import { mapActions, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
 export default {
   name: 'Notes',
@@ -34,9 +34,6 @@ export default {
     ...mapState({
       usersActive: state => state.users.usersActive
     })
-  },
-  methods: {
-    ...mapActions('notes', ['addNote'])
   }
 }
 </script>

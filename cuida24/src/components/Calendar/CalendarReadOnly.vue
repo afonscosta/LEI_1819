@@ -12,22 +12,14 @@
          :read-only="readOnly"
         >
           <template slot="eventPopoverToolbarActions" slot-scope="{calendarEvent, calendar, slotData, labels, styleButton}">
-            <ds-schedule-actions
-             slot="activator"
-             v-bind="slotData"
-             :schedule="calendarEvent.schedule"
-             :calendar-event="calendarEvent"
-             :calendar="calendar"
-             :labels="labels"
-            >
-              <v-btn icon dark :style="styleButton">
-                <v-icon>more_vert</v-icon>
-              </v-btn>
-            </ds-schedule-actions>
           </template>
 
           <template slot="eventPopoverNotifications" slot-scope="{slotData, details}">
-            <v-list-tile-title>{{ details.notify }}</v-list-tile-title>
+            <div v-for="n in parseNotify(details.notify)">
+              <v-list-tile-title>
+                {{ n }}
+              </v-list-tile-title>
+            </div>
           </template>
 
         </ds-calendar-event-popover>
@@ -80,32 +72,25 @@ import { mapState } from 'vuex'
 import * as moment from 'moment'
 import notification from '@/components/Notification'
 import calendarApp from '@/components/Calendar/CalendarApp'
+import { DateTime as LuxonDateTime } from 'luxon'
 
 export default {
 
   name: 'calReadOnly',
-
   components: {
     notification,
     calendarApp
   },
-
-  props: {
-  },
-
+  data: vm => ({
+    storeKey: 'dayspanState',
+    readOnly: true,
+    currentLocale: vm.$dayspan.setLocale('pt')
+  }),
   computed: mapState({
     calendar: state => state.events.calendar,
     usersActive: state => state.users.usersActive
   }),
-
-  created () {
-    // if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
-    //   this.$store.dispatch('appointments/getAppointments', this.usersActive)
-    // }
-  },
-
-  methods:
-  {
+  methods: {
     getCalendarTime (calendarEvent) {
       let sa = calendarEvent.start.format('a')
       let ea = calendarEvent.end.format('a')
@@ -130,14 +115,25 @@ export default {
       this.$dayspan.refreshTimes()
 
       this.$refs.cal.$forceUpdate()
-    }
-  },
+    },
 
-  data: vm => ({
-    storeKey: 'dayspanState',
-    readOnly: true,
-    currentLocale: vm.$dayspan.setLocale('pt')
-  })
+    // Always 2 digit
+    formatNumber (number) {
+      return ('0' + number).slice(-2)
+    },
+
+    parseNotify (notifs) {
+      var notifsParsed = notifs.map(n => {
+        let dt = LuxonDateTime.fromISO(n)
+        return this.formatNumber(dt.day) + '/' +
+               this.formatNumber(dt.month) + '/' +
+               dt.year + ' - ' +
+               this.formatNumber(dt.hour) + ':' +
+               this.formatNumber(dt.minute) + 'h'
+      })
+      return notifsParsed
+    }
+  }
 }
 </script>
 
