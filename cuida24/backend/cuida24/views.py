@@ -215,7 +215,7 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
         logger.info("PUT NOTE APPOINTMENT")
         logger.info(request.data)
         data = request.data
-        appointment_note = get_object_or_404(AppointmentNote, author=data['author'], appointment=data['appointment'])
+        appointment_note = get_object_or_404(AppointmentNote, pk=data['pk'])
         serializer = AppointmentNoteSerializer(data=data, instance=appointment_note, context={'request': data})
         logger.info("DATA SENT")
         logger.info(data)
