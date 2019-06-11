@@ -35,45 +35,36 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
   });
 	var rec = null;
 	if (appt.event.schedule.duration &&
-	appt.event.schedule.durationInDays &&
+	appt.event.schedule.durationInDays === 0 &&
 	appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
 	!appt.event.schedule.dayOfWeek &&
 	!appt.event.schedule.dayOfMonth &&
 	!appt.event.schedule.month &&
 	!appt.event.schedule.year) {
 		rec = 'daily';
 	}
-	else if (!appt.event.schedule.duration &&
-	!appt.event.schedule.durationInDays &&
-	!appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
+	else if (!appt.event.schedule.durationInDays &&
 	appt.event.schedule.dayOfWeek &&
 	!appt.event.schedule.dayOfMonth &&
 	!appt.event.schedule.month &&
 	!appt.event.schedule.year) {
 		rec = 'weekly';
 	}
-	else if (!appt.event.schedule.duration &&
-	!appt.event.schedule.durationInDays &&
-	!appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
+	else if (!appt.event.schedule.durationInDays &&
 	!appt.event.schedule.dayOfWeek &&
 	appt.event.schedule.dayOfMonth &&
 	!appt.event.schedule.month &&
 	!appt.event.schedule.year) {
 		rec = 'monthly';
 	}
-	else if (!appt.event.schedule.duration &&
-	!appt.event.schedule.durationInDays &&
-	!appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
+	else if (!appt.event.schedule.durationInDays &&
 	!appt.event.schedule.dayOfWeek &&
 	appt.event.schedule.dayOfMonth &&
 	appt.event.schedule.month &&
 	!appt.event.schedule.year) {
 		rec = 'yearly';
 	}
+  console.log('rec', rec);
 	var allDay = true;
 	var startDate = new Date(
     appt.occurrenceDate.year,
@@ -93,7 +84,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 			appt.occurrenceDate.year,
 			appt.occurrenceDate.month-1, // Porque os meses são de 0 a 11
 			appt.occurrenceDate.dayOfMonth,
-			parseInt(timeSplit[0])+1, // Porquê que preciso de somar 1???
+			parseInt(timeSplit[0]),
 			parseInt(timeSplit[1]),
 			parseInt(timeSplit[2])
 		);
@@ -157,6 +148,7 @@ const handleAppointment = async (appt, hash, appointmentCalendar) => {
     else { // Já tem o evento. Está atualizado?
       var oldEvDataParsed = JSON.parse(oldEvData);
       if (oldEvDataParsed.hash !== hash) { // O evento mudou
+        console.log('ENTROU!!!!');
         RNCalendarEvents.removeEvent(oldEvDataParsed.id)
           .then(() => {
             (async () => { // Remove a key do asyncStorage

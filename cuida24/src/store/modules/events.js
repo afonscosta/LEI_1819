@@ -20,19 +20,20 @@ const mutations = {
       fill: true,
       updateRows: true
     })
-
-    var newEvents = events.map(function (ev) {
-      // eslint-disable-next-line
-      var calendar = rootGetters['calendars/calendars'].find(cal => cal.pk == ev.event.data.calendar)
-      ev.event.data.calendar = calendar.calendar
-      return new Event(
-        new Schedule(ev.event.schedule),
-        ev.event.data,
-        ev.event.id,
-        true
-      )
-    })
-    cal.addEvents(newEvents)
+    if (events) {
+      var newEvents = events.map(function (ev) {
+        // eslint-disable-next-line
+        var calendar = rootGetters['calendars/calendars'].find(cal => cal.pk == ev.event.data.calendar)
+        ev.event.data.calendar = calendar.calendar
+        return new Event(
+          new Schedule(ev.event.schedule),
+          ev.event.data,
+          ev.event.id,
+          true
+        )
+      })
+      cal.addEvents(newEvents)
+    }
     state.calendar = cal
   },
   addEvents (state, {rootGetters, events}) {
@@ -98,7 +99,8 @@ const actions = {
     eventsService.fetchEvents(payload)
       .then(events => {
         console.log('sessions/appointments recebidas do django', events)
-        // commit('setEvents', {rootGetters, []})
+        var evs = []
+        commit('setEvents', {rootGetters, evs})
         events.appointments.forEach(appts => {
           this.dispatch('appointments/setAppointments', appts)
         })

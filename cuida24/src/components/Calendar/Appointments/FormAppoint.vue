@@ -272,7 +272,7 @@ export default {
   methods: {
     ...mapActions('appointments', ['addAppointment', 'updateAppointment', 'deleteAppointment']),
     parseScheduleOption (option) {
-      let result = {}
+      let result = null
       let dt = LuxonDateTime.fromISO(this.formData.dateValue)
       // let wsom = this.weekSpanOfMonth(dt)
       let dow = dt.weekday % 7
