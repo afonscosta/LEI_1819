@@ -45,8 +45,8 @@
               border-variant="dark"
               header="Nota de consulta"
             >
-              <FormNote v-if="editingNote" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
-              <div v-if="!editingNote">
+              <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
+              <div v-if="editingNote != note.pk">
                 <b-card-text align="left">{{ note.note }}</b-card-text>
                 <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
                 <b-button @click="edit(note.pk)">Editar</b-button>
@@ -68,9 +68,12 @@
               border-variant="dark"
               header="Nota de consulta"
             >
-              <b-card-text align="left">{{ note.note }}</b-card-text>
-              <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
-              <b-button @click="edit(note.pk)">Editar</b-button>
+              <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
+              <div v-if="editingNote != note.pk">
+                <b-card-text align="left">{{ note.note }}</b-card-text>
+                <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+                <b-button @click="edit(note.pk)">Editar</b-button>
+              </div>
             </b-card>
           </b-card-body>
         </b-collapse>
@@ -88,9 +91,12 @@
               border-variant="dark"
               header="Nota de consulta"
             >
-              <b-card-text align="left">{{ note.note }}</b-card-text>
-              <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
-              <b-button @click="edit(note.pk)">Editar</b-button>
+              <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
+              <div v-if="editingNote != note.pk">
+                <b-card-text align="left">{{ note.note }}</b-card-text>
+                <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+                <b-button @click="edit(note.pk)">Editar</b-button>
+              </div>
             </b-card>
           </b-card-body>
         </b-collapse>
@@ -108,9 +114,12 @@
               border-variant="dark"
               header="Nota de consulta"
             >
-              <b-card-text align="left">{{ note.note }}</b-card-text>
-              <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
-              <b-button @click="edit(note.pk)">Editar</b-button>
+              <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
+              <div v-if="editingNote != note.pk">
+                <b-card-text align="left">{{ note.note }}</b-card-text>
+                <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+                <b-button @click="edit(note.pk)">Editar</b-button>
+              </div>
             </b-card>
           </b-card-body>
         </b-collapse>

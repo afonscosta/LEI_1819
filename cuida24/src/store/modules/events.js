@@ -20,6 +20,7 @@ const mutations = {
       fill: true,
       updateRows: true
     })
+
     var newEvents = events.map(function (ev) {
       // eslint-disable-next-line
       var calendar = rootGetters['calendars/calendars'].find(cal => cal.pk == ev.event.data.calendar)
@@ -93,11 +94,11 @@ const actions = {
   deleteEvent ({ commit }, eventID) {
     commit('deleteEvent', eventID)
   },
-  getEvents ({ commit }, payload) {
+  getEvents ({ rootGetters, commit }, payload) {
     eventsService.fetchEvents(payload)
       .then(events => {
         console.log('sessions/appointments recebidas do django', events)
-        commit('setEvents', [])
+        // commit('setEvents', {rootGetters, []})
         events.appointments.forEach(appts => {
           this.dispatch('appointments/setAppointments', appts)
         })
