@@ -232,9 +232,9 @@ export default {
       { text: 'mês', value: 'months' }
     ],
     show: true,
-    selectedSchedule: 'none',
+    selectedSchedule: null,
     optionsSchedule: [
-      { value: 'none', text: 'Não se repete' },
+      { value: null, text: 'Não se repete' },
       { value: 'daily', text: 'Todos os dias' },
       { value: 'weekly', text: 'Semanalmente' },
       { value: 'monthly', text: 'Mensalmente' },
@@ -256,6 +256,7 @@ export default {
   created () {
     if (this.form) {
       this.formData = this.form
+      this.selectedSchedule = this.form.sched
     }
   },
   computed: {
