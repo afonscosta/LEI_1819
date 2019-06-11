@@ -1,5 +1,12 @@
 import React, { Component } from 'react';
-import { View, Image, TouchableOpacity } from 'react-native';
+import { 
+  View,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  StatusBar,
+} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
 import CalendarPage from '../pages/Calendar.page'
 import MedicationPage from '../pages/Medication.page'
 import HabitsPage from '../pages/Habits.page'
@@ -11,6 +18,7 @@ import {
   createDrawerNavigator,
   createStackNavigator,
   createAppContainer,
+  createSwitchNavigator
 } from 'react-navigation';
  
 class NavigationDrawerStructure extends Component {
@@ -29,6 +37,78 @@ class NavigationDrawerStructure extends Component {
             style={{ width: 25, height: 25, marginLeft: 5 }}
           />
         </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+class AuthLoadingScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this._bootstrapAsync();
+  }
+
+  // Fetch the token from storage then navigate to our appropriate place
+  _bootstrapAsync = async () => {
+    try{
+      const userToken = await AsyncStorage.getItem('@login:');
+
+      // This will switch to the App screen or Auth screen and this loading
+      // screen will be unmounted and thrown away.
+      this.props.navigation.navigate(userToken ? 'App' : 'Auth');
+    } catch(error) {
+      console.log(error);
+    }
+  };
+
+  // Render any loading content that you like here
+  render() {
+    return (
+      <View>
+        <ActivityIndicator />
+        <StatusBar barStyle="default" />
+      </View>
+    );
+  }
+}
+
+class Logout extends React.Component {
+  constructor(props) {
+    super(props);
+    this._bootstrapAsync();
+  }
+
+  async removeItemValue(key) {
+    try {
+      await AsyncStorage.removeItem(key);
+      return true;
+    }
+    catch(exception) {
+      return false;
+    }
+  }
+
+  // Fetch the token from storage then navigate to our appropriate place
+  _bootstrapAsync = async () => {
+    try{
+      const tokenRemoved = await this.removeItemValue('@login:');
+
+      console.log(tokenRemoved);
+
+      // This will switch to the App screen or Auth screen and this loading
+      // screen will be unmounted and thrown away.
+      this.props.navigation.navigate(tokenRemoved ? 'Auth' : 'App');
+    } catch(error) {
+      console.log(error);
+    }
+  };
+
+  // Render any loading content that you like here
+  render() {
+    return (
+      <View>
+        <ActivityIndicator />
+        <StatusBar barStyle="default" />
       </View>
     );
   }
@@ -166,13 +246,6 @@ const DrawerNavigatorNoLogin = createDrawerNavigator({
 
 const DrawerNavigator = createDrawerNavigator({
     //Drawer Optons and indexing
-    Login: {
-      //Title
-      screen: Login_StackNavigator,
-      navigationOptions: {
-        drawerLabel: 'Iniciar sessão',
-      },
-    },
     Calendar: {
       //Title
       screen: Calendar_StackNavigator,
@@ -215,29 +288,22 @@ const DrawerNavigator = createDrawerNavigator({
         drawerLabel: 'Páginas informativas',
       },
     },
+    Logout: {
+      //Title
+      screen: Logout,
+    }
   },
   {
     drawerBackgroundColor: bgColor,
   });
 
-const AppContainerLogged = createAppContainer(DrawerNavigator);
-const AppContainerUnlogged = createAppContainer(DrawerNavigatorNoLogin);
-
-async function checkUserSignedIn(){
-  try {
-     let value = await AsyncStorage.getItem('@login');
-     if (value != null){
-        return AppContainerLogged;
-     }
-     else {
-        return AppContainerUnlogged;
-    }
-  } catch (error) {
-    console.log(error);
+export default createAppContainer(createSwitchNavigator(
+  {
+    AuthLoading: AuthLoadingScreen,
+    App: DrawerNavigator,
+    Auth: DrawerNavigatorNoLogin,
+  },
+  {
+    initialRouteName: 'AuthLoading',
   }
-}
-
-export default AppContainerLogged;
-// export default async () => {
-//   return await checkUserSignedIn();
-// }
+));
