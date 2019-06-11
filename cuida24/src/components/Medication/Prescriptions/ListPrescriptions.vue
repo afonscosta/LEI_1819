@@ -165,7 +165,6 @@ export default {
     },
     parseScheduleRepetition (presc) {
       var rec = 'sem repetição'
-      console.log(presc.event.schedule.durationInDays === 0)
       if (presc.event.schedule.duration &&
       presc.event.schedule.durationInDays === 0 &&
       presc.event.schedule.durationUnit &&

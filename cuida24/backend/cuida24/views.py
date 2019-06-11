@@ -208,6 +208,26 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
         logger.info(appointment_note_serializer.data)
         return Response(appointment_note_serializer.data, status=status.HTTP_200_OK)
 
+    """
+    Update method 
+    """
+    def put(self, request):
+        logger.info("PUT NOTE APPOINTMENT")
+        logger.info(request.data)
+        data = request.data
+        appointment_note = get_object_or_404(AppointmentNote, pk=data['pk'])
+        serializer = AppointmentNoteSerializer(data=data, instance=appointment_note, context={'request': data})
+        logger.info("DATA SENT")
+        logger.info(data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class SessionsViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()

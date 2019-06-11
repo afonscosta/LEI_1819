@@ -98,7 +98,9 @@ const actions = {
       .then(events => {
         console.log('sessions/appointments recebidas do django', events)
         commit('setEvents', [])
-        this.dispatch('appointments/setAppointments', events.appointments[0])
+        events.appointments.forEach(appts => {
+          this.dispatch('appointments/setAppointments', appts)
+        })
         this.dispatch('sessions/setSessions', events.sessions[0])
       })
   }
