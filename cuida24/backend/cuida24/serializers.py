@@ -217,14 +217,14 @@ class EventSerializer(serializers.ModelSerializer):
         calendar.save()
 
         # update schedule fields
-        schedule.duration = schedule_data.get("duration", schedule.duration)
-        schedule.durationInDays = schedule_data.get("durationInDays", schedule.durationInDays)
-        schedule.durationUnit = schedule_data.get("durationUnit", schedule.durationUnit)
-        schedule.dayOfWeek = schedule_data.get("dayOfWeek", schedule.dayOfWeek)
-        schedule.dayOfMonth = schedule_data.get("dayOfMonth", schedule.dayOfMonth)
-        schedule.month = schedule_data.get("month", schedule.month)
-        schedule.times = schedule_data.get("times", schedule.times)
-        schedule.year = schedule_data.get("year", schedule.year)
+        schedule.duration = schedule_data.get("duration")
+        schedule.durationInDays = schedule_data.get("durationInDays")
+        schedule.durationUnit = schedule_data.get("durationUnit")
+        schedule.dayOfWeek = schedule_data.get("dayOfWeek")
+        schedule.dayOfMonth = schedule_data.get("dayOfMonth")
+        schedule.month = schedule_data.get("month")
+        schedule.times = schedule_data.get("times")
+        schedule.year = schedule_data.get("year")
         schedule.save()
 
         instance.save()
