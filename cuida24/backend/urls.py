@@ -9,9 +9,7 @@ from django.urls import path, include
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
-from .cuida24.views import index_view, MessageViewSet, DefActivityViewSet, EventViewSet, CalendarViewSet, \
-  CaregiverViewSet, PatientViewSet, AppointmentViewSet, AppointmentNoteViewSet, BackofficeUserViewSet, \
-  SessionsViewSet, EvaluationViewSet, MedicineViewSet, MedicationViewSet, StaticPagesView
+from .cuida24.views import *
 
 router = routers.DefaultRouter()
 router.register('messages', MessageViewSet)
@@ -39,6 +37,9 @@ urlpatterns = [
 
     # StaticPages is only a read request
     path('cuida24/staticPages/', StaticPagesView.as_view()),
+
+    # Autenticate user is only read request
+    path('cuida24/authenticateUser/', AuthenticateUserView.as_view()),
 
     path('cuida24/events/', EventViewSet.as_view()),
 

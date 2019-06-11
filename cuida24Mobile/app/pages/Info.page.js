@@ -30,6 +30,12 @@ export default class InfoPage extends React.Component {
 
     this.setState({ loading: true });
 
+    var i;
+    for (var i = 0; i < 10; i++) {
+      let randomIndex = Math.floor(Math.random(Date.now()) * this.state.info.length);
+      console.log(randomIndex);
+    }
+
     fetch(url)
       .then(res => res.json())
       .then(res => {

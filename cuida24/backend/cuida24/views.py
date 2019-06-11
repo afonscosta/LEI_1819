@@ -29,7 +29,6 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
 
-
 class DefActivityViewSet(viewsets.ModelViewSet):
     queryset = DefActivity.objects.all()
     serializer_class = DefActivitySerializer
@@ -42,6 +41,31 @@ class DefActivityViewSet(viewsets.ModelViewSet):
         sent_data = []
         logger.info(request.user.username)
         return Response(sent_data, status=status.HTTP_200_OK)
+
+
+class AuthenticateUserView(generics.ListAPIView):
+    queryset = UserAuth.objects.all()
+    serializer_class = UserSerializer
+
+    def list(self, request, *args, **kwargs):
+        logger.info("Get user authenticated")
+        user = get_object_or_404(UserAuth, email=request.user)
+        try:
+            caregiver = Caregiver.objects.get(info_id=user.pk)
+            serializer = CaregiverSerializer(caregiver)
+        except Caregiver.DoesNotExist:
+            try:
+                patient = Patient.objects.get(info_id=user.pk)
+                serializer = PatientSerializer(patient)
+            except Patient.DoesNotExist:
+                try:
+                    backoffice = BackofficeUser.objects.get(info_id=user.pk)
+                    serializer = BackofficeUserSerializer(backoffice)
+                except BackofficeUser.DoesNotExist:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+        logger.info(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class EventViewSet(generics.ListAPIView):
