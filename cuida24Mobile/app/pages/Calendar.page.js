@@ -74,6 +74,14 @@ const addNewAppointment = async (appt, hash, appointmentCalendar, eventID) => {
           date: n,
           repeatType: 'day'
         });
+      } else if (rec === 'weekly') {
+        PushNotification.localNotificationSchedule({
+          message: appt.event.data.title + '\n' + 
+            appt.event.data.description + '\n' +
+            appt.event.data.location,
+          date: n,
+          repeatType: 'week'
+        });
       } else {
         PushNotification.localNotificationSchedule({
           message: appt.event.data.title + '\n' + 
