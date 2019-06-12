@@ -133,37 +133,27 @@ export default {
     },
     parseScheduleOption (appt) {
       var rec = null
-      if (appt.event.schedule.duration === 1 &&
+      if (appt.event.schedule.duration &&
       appt.event.schedule.durationInDays === 0 &&
-      appt.event.schedule.durationUnit === 'days' &&
-      !appt.event.schedule.times &&
+      appt.event.schedule.durationUnit &&
       !appt.event.schedule.dayOfWeek &&
       !appt.event.schedule.dayOfMonth &&
       !appt.event.schedule.month &&
       !appt.event.schedule.year) {
         rec = 'daily'
-      } else if (!appt.event.schedule.duration &&
-      !appt.event.schedule.durationInDays &&
-      !appt.event.schedule.durationUnit &&
-      !appt.event.schedule.times &&
+      } else if (!appt.event.schedule.durationInDays &&
       appt.event.schedule.dayOfWeek &&
       !appt.event.schedule.dayOfMonth &&
       !appt.event.schedule.month &&
       !appt.event.schedule.year) {
         rec = 'weekly'
-      } else if (!appt.event.schedule.duration &&
-      !appt.event.schedule.durationInDays &&
-      !appt.event.schedule.durationUnit &&
-      !appt.event.schedule.times &&
+      } else if (!appt.event.schedule.durationInDays &&
       !appt.event.schedule.dayOfWeek &&
       appt.event.schedule.dayOfMonth &&
       !appt.event.schedule.month &&
       !appt.event.schedule.year) {
         rec = 'monthly'
-      } else if (!appt.event.schedule.duration &&
-      !appt.event.schedule.durationInDays &&
-      !appt.event.schedule.durationUnit &&
-      !appt.event.schedule.times &&
+      } else if (!appt.event.schedule.durationInDays &&
       !appt.event.schedule.dayOfWeek &&
       appt.event.schedule.dayOfMonth &&
       appt.event.schedule.month &&
