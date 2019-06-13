@@ -49,10 +49,10 @@ export const postNaps = ({url, token, naps, date}) => {
   }
 }
 
-export const postSleep = ({url, token, sleep}) => {
+export const postSleep = ({url, token, sleep, date}) => {
   return {
     type: POST_SLEEP,
-    payload: { token: token, sleep: sleep },
+    payload: { token: token, sleep: sleep, date: date },
     meta: {
       offline: {
         effect: {
@@ -63,7 +63,8 @@ export const postSleep = ({url, token, sleep}) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            quantity: sleep
+            quantity: sleep,
+            date: date
           })
         }
       }

@@ -4,6 +4,7 @@ import { CheckBox, Button } from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
 import { postSleep } from '../../redux/actions/index'
 import { connect } from 'react-redux';
+import { addDays, subDays, differenceInDays } from 'date-fns';
 
 class SleepPage extends React.Component {
   constructor(props) {
@@ -12,8 +13,35 @@ class SleepPage extends React.Component {
       token: '',
       base_url: "http://10.0.2.2:8000/cuida24/",
       sleepLess7: false,
-      sleepMore7: false
+      sleepMore7: false,
+      remainSleep: []
     }
+  }
+
+  async processLastSleep() {
+    var today = new Date();
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+    AsyncStorage.getItem('@sleep')
+      .then((lastSleepStr) => {
+        var remainSleep = [];
+        if (lastSleepStr) {
+          var lastSleep = new Date(JSON.parse(lastSleepStr).lastSleep);
+          var diff = Math.abs(differenceInDays(lastSleep, today));
+          for (var i = 1; i < diff; i++) {
+            remainSleep.push(addDays(lastSleep, i));
+          }
+        } else {
+          var yesterday = subDays(today, 1);
+          remainSleep.push(yesterday);
+        }
+        this.setState({ remainSleep: remainSleep });
+      })
+      .catch((error) => {
+        console.warn('AsyncStorage - getItem sleep', error);
+      });
   }
 
   async componentDidMount() {
@@ -24,6 +52,7 @@ class SleepPage extends React.Component {
       .catch((error) => {
         console.warn('AsyncStorage - getItem: eventsToRemove', error);
       });
+    this.processLastSleep();
   }
 
   setLess7 = () => {
@@ -42,17 +71,47 @@ class SleepPage extends React.Component {
     }
   }
 
+
   saveSleep = () => {
     const url = this.state.base_url + "sleep/";
     const token = this.state.token;
     const sleep = this.state.sleepMore7;
-    this.props.postSleep({url, token, sleep});
+    const date = this.state.remainSleep[0].toISOString();
+    this.props.postSleep({url, token, sleep, date});
+    AsyncStorage.setItem(
+      '@sleep',
+      JSON.stringify({ 'lastSleep': this.state.remainSleep[0] })
+    )
+    .then(() => {
+      var remainSleepUpdated = this.state.remainSleep.slice(1);
+      this.setState({
+        remainSleep: remainSleepUpdated
+      }, () => {
+        if (this.state.remainSleep.length === 0) {
+          this.props.navigation.navigate('App');
+        } else {
+          this.setState({
+            sleepLess7: false,
+            sleepMore7: false
+          });
+        }
+      });
+    })
+    .catch((error) => {
+      console.warn('AsyncStorage - setItem', error);
+    });
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text>Assinale a opção consoante as horas que dormiu na última noite</Text>
+        {
+          this.state.remainSleep.length > 0
+            ?
+          <Text>Assinale a opção consoante as horas que dormiu na noite de { this.state.remainSleep[0].toDateString() } para { addDays(this.state.remainSleep[0], 1).toDateString() }</Text>
+            :
+          null
+        }
         <View style={{ flexDirection: 'row' }}>
           <View style={styles.buttonItem}>
             <CheckBox

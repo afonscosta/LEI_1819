@@ -92,15 +92,6 @@ export default class HabitsPage extends React.Component {
         <View style={{ flexDirection: 'row' }}>
           <View style={styles.buttonItem}>
             <Button
-              onPress={() => this.props.navigation.navigate('Sleep')}
-              title="Dormir"
-              titleStyle={styles.titles}
-              buttonStyle={styles.button}
-              accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
-            />
-          </View>
-          <View style={styles.buttonItem}>
-            <Button
               onPress={() => this.props.navigation.navigate('SOS')}
               title="SOS"
               titleStyle={styles.titles}

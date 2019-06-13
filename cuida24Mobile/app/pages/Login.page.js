@@ -40,7 +40,7 @@ export default class LoginPage extends React.Component {
             console.warn('AsyncStorage - setItem', error);
           }
         })();
-        this.props.navigation.navigate('App');
+        this.props.navigation.navigate('SleepLoading');
       })
       .catch((error) => {
         console.error(error);
