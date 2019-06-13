@@ -4,10 +4,10 @@ export const POST_NAPS = "POST_NAPS";
 export const POST_SLEEP = "POST_SLEEP";
 export const POST_SOS = "POST_SOS";
 
-export const postWater = ({url, token, water}) => {
+export const postWater = ({url, token, water, date}) => {
   return {
     type: POST_WATER,
-    payload: { token: token, water: water },
+    payload: { token: token, water: water, date: date },
     meta: {
       offline: {
         effect: {
@@ -19,6 +19,7 @@ export const postWater = ({url, token, water}) => {
           },
           body: JSON.stringify({
             water: water,
+            date: date,
           })
         }
       }

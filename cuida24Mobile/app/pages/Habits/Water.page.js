@@ -44,7 +44,12 @@ class WaterPage extends React.Component {
     const url = this.state.base_url + "water/";
     const token = this.state.token;
     const water = this.state.water;
-    this.props.postWater({url, token, water});
+    var date = new Date();
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    this.props.postWater({url, token, water, date});
   }
 
   render() {
