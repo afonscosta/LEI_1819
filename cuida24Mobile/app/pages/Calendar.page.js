@@ -528,7 +528,7 @@ export default class CalendarPage extends React.Component {
   }
 
   componentDidMount() {
-    //PushNotification.cancelAllLocalNotifications();
+    // PushNotification.cancelAllLocalNotifications();
     const fetchData = async () => {
       try {
         const token_res = await AsyncStorage.getItem('@login:');
@@ -564,7 +564,11 @@ export default class CalendarPage extends React.Component {
           error: null,
           loading: false,
           refreshing: false
-        }, () => this.addCalendars());
+        }, () => {
+          if (res.detail && res.detail !== 'Invalid token.') {
+            this.addCalendars()
+          }
+        });
       })
       .catch(error => {
         this.setState({ error, loading : false });
