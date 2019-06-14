@@ -1,17 +1,12 @@
-from django.views.generic import TemplateView
 from django.views.decorators.cache import never_cache
-from rest_framework.decorators import action, detail_route, permission_classes, renderer_classes
+from django.views.generic import TemplateView
+from rest_framework import viewsets, status, generics
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
-from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
-from rest_framework import viewsets, status, permissions, generics
 
-from backend.cuida24.models import *
 from backend.cuida24.permissions import *
-from backend.cuida24.serializers import *
 from .services import *
-import logging
-import json
 
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
