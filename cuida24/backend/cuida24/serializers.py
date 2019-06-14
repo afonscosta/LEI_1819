@@ -7,21 +7,27 @@ from backend.cuida24.models import *
 
 logger = logging.getLogger("mylogger")
 
+# Auxiliar Serializers
 
-class MessageSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Message
-        fields = ('url', 'subject', 'body', 'pk')
+class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+    """
+    A ModelSerializer that takes an additional `fields` argument that
+    controls which fields should be displayed.
+    """
 
-    def create(self, validated_data):
-        logger.info(validated_data)
+    def __init__(self, *args, **kwargs):
+        # Don't pass the 'fields' arg up to the superclass
+        fields = kwargs.pop('fields', None)
 
-        message = Message(
-            subject="olaFromCode",
-            body=validated_data['body'],
-        )
-        message.save()
-        return message
+        # Instantiate the superclass normally
+        super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
+
+        if fields is not None:
+            # Drop any fields that are not specified in the `fields` argument.
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
 
 
 # Static Pages
@@ -46,19 +52,29 @@ class GameSerializer(serializers.ModelSerializer):
         fields = ('activity', 'pk')
 
 
-class PhysicalActivitySerializer(serializers.ModelSerializer):
+class PhysicalActivitySerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = PhysicalActivity
         fields = ('description', 'activity', 'pk')
 
 
-class SocialLeisureSerializer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        logger.info("VALIDATED DATA POST SESSION")
+        logger.info(validated_data)
+
+        activity_data = validated_data.pop('activity')
+        activity = DefActivity.objects.create(**activity_data)
+        physicalActivity = PhysicalActivity.objects.create(activity=activity, **validated_data)
+
+        return physicalActivity
+
+class SocialLeisureSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = SocialLeisure
         fields = ('description', 'activity', 'pk')
 
 
-class IndividualLeisureSerializer(serializers.ModelSerializer):
+class IndividualLeisureSerializer(DynamicFieldsModelSerializer):
     class Meta:
         model = IndividualLeisure
         fields = ('description', 'activity', 'pk')

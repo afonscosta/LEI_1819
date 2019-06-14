@@ -12,9 +12,6 @@ from rest_framework.authtoken.views import obtain_auth_token
 from .cuida24.views import *
 
 router = routers.DefaultRouter()
-router.register('messages', MessageViewSet)
-router.register('defatividades', DefActivityViewSet)
-#router.register('events', EventViewSet)
 router.register('calendars', CalendarViewSet)
 router.register('caregivers', CaregiverViewSet)
 router.register('patients', PatientViewSet)
@@ -27,6 +24,7 @@ router.register('medicine', MedicineViewSet)
 router.register('prescriptions', MedicationViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
+
 urlpatterns = [
 
     # http://localhost:8000/
@@ -40,6 +38,11 @@ urlpatterns = [
 
     # Autenticate user is only read request
     path('cuida24/authenticateUser/', AuthenticateUserView.as_view()),
+
+    #Get possible types of activity
+    path('cuida24/typePhysicalActivity/', PhysicalActivityView.as_view()),
+    path('cuida24/typeSocialLeisure/', SocialLeisureView.as_view()),
+    path('cuida24/typeIndividualLeisure/', IndividualLeisureView.as_view()),
 
     path('cuida24/events/', EventViewSet.as_view()),
 

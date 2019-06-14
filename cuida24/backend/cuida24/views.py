@@ -17,26 +17,46 @@ class StaticPagesView(generics.ListAPIView):
     queryset = StaticPages.objects.all()
     serializer_class = StaticPagesSerializer
 
-class MessageViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows messages to be viewed or edited.
-    """
-    queryset = Message.objects.all()
-    serializer_class = MessageSerializer
 
-class DefActivityViewSet(viewsets.ModelViewSet):
-    queryset = DefActivity.objects.all()
-    serializer_class = DefActivitySerializer
-
-    """
-        Get method 
-        """
+class PhysicalActivityView(generics.ListAPIView):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser']
+    }
+    queryset = PhysicalActivity.objects.all()
+    serializer_class = PhysicalActivitySerializer
 
     def list(self, request, *args, **kwargs):
-        sent_data = []
-        logger.info(request.user.username)
-        return Response(sent_data, status=status.HTTP_200_OK)
+        queryset = self.get_queryset()
+        serializer = PhysicalActivitySerializer(queryset, fields=("description", "pk"), many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class SocialLeisureView(generics.ListAPIView):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser']
+    }
+    queryset = SocialLeisure.objects.all()
+    serializer_class = SocialLeisureSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = SocialLeisureSerializer(queryset, fields=("description", "pk"), many=True)
+        return Response(serializer.data)
+
+class IndividualLeisureView(generics.ListAPIView):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser']
+    }
+    queryset = IndividualLeisure.objects.all()
+    serializer_class = IndividualLeisureSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = SocialLeisureSerializer(queryset, fields=("description", "pk"), many=True)
+        return Response(serializer.data)
 
 class AuthenticateUserView(generics.ListAPIView):
     queryset = UserAuth.objects.all()

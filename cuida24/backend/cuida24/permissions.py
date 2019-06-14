@@ -29,6 +29,7 @@ class HasGroupPermission(permissions.BasePermission):
     """
     Ensure user is in required groups.
     """
+    logger.info("check permission...")
 
     def has_permission(self, request, view):
         # Get a mapping of methods -> required group.
