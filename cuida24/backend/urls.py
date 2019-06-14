@@ -14,19 +14,23 @@ from .cuida24.views_habits import *
 from .cuida24.views_calendar import *
 
 router = routers.DefaultRouter()
-router.register('calendars', CalendarViewSet)
+# generic
+router.register('backoffice_user', BackofficeUserViewSet)
 router.register('caregivers', CaregiverViewSet)
 router.register('patients', PatientViewSet)
+# calendar
+router.register('calendars', CalendarViewSet)
 router.register('appointments', AppointmentViewSet)
 router.register('appointmentNotes', AppointmentNoteViewSet)
-router.register('backoffice_user', BackofficeUserViewSet)
 router.register('sessions', SessionsViewSet)
 router.register('evaluation', EvaluationViewSet)
 router.register('medicine', MedicineViewSet)
 router.register('prescriptions', MedicationViewSet)
-router.register('physicalActivity', PhysicalActivityViewSet),
-router.register('socialLeisure', SocialLeisureViewSet),
+# habits
+router.register('physicalActivity', PhysicalActivityViewSet)
+router.register('socialLeisure', SocialLeisureViewSet)
 router.register('individualLeisure', IndividualLeisureViewSet)
+router.register('water', WaterViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
 

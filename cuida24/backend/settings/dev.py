@@ -77,7 +77,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 REST_FRAMEWORK = {
   'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
-  'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication',)
+  'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework.authentication.TokenAuthentication',),
+  'DATE_INPUT_FORMATS': ['%Y-%m-%dT%H:%M:%S.%fZ'],
+  'DATE_FORMAT': ['%Y-%m-%dT%H:%M:%S.%fZ']
+  #'DEFAULT_PARSER_CLASSES': (
+  #      'rest_framework.parsers.FormParser',
+  #      'rest_framework.parsers.MultiPartParser'
+  #)
 }
 
 # Database
@@ -132,7 +138,7 @@ PASSWORD_HASHERS = (
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
-USE_L10N = True
+USE_L10N = False
 USE_TZ = True
 
 

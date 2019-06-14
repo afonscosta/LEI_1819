@@ -4,6 +4,7 @@ from django.contrib.auth.models import User as UserAuth
 import logging
 
 from rest_framework.generics import get_object_or_404
+from rest_framework.settings import api_settings
 
 logger = logging.getLogger("mylogger")
 
@@ -65,29 +66,29 @@ class BackofficeUser(models.Model):
 # Historic
 
 class PhysiologicalParam(models.Model):
-    date = models.DateField(auto_now=True)
+    date = models.DateField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class AnalyticalParam(models.Model):
-    date = models.DateField(auto_now=True)
+    date = models.DateField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Water(models.Model):
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField()
     quantity = models.IntegerField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Nap(models.Model):
-    date = models.DateField(auto_now=True)
+    date = models.DateField()
     quantity = models.IntegerField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Sleep(models.Model):
-    date = models.DateField(auto_now=True)
+    date = models.DateField()
     quantity = models.BooleanField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
@@ -103,7 +104,7 @@ class Activity(models.Model):
 
 class Meal(models.Model):
     TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'LancheTarde'), ('JT', 'Jantar'))
-    date = models.DateField(auto_now=True)
+    date = models.DateField()
     realize = models.BooleanField()
     type = models.CharField(max_length=2, choices=TYPE)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
@@ -215,7 +216,7 @@ class Medication(models.Model):
         super(Medication, self).delete()
 
 class Take(models.Model):
-    date = models.DateField(auto_now=True)
+    date = models.DateField()
     medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
 
 

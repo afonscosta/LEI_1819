@@ -152,9 +152,14 @@ class AnalyticalParamSerializer(serializers.ModelSerializer):
 
 
 class WaterSerializer(serializers.ModelSerializer):
+    water = serializers.IntegerField(source='quantity')
+
     class Meta:
         model = Water
-        fields = ('date', 'quantity', 'caregiver', 'pk')
+        fields = ('date', 'water', 'caregiver', 'pk')
+        extra_kwargs = {
+            'date': {'read_only': True}
+        }
 
 
 class NapSerializer(serializers.ModelSerializer):
