@@ -2,10 +2,19 @@
   <div>
     <notifications 
       position="top center"
-      classes="notif"
+      classes="notif-success"
       :speed="500"
       :width="450"
       animation-name="v-fade-top"
+      group="success"
+    />
+    <notifications 
+      position="top center"
+      classes="notif-error"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+      group="error"
     />
 
     <div v-if="usersActive.caregivers.length === 0 && usersActive.patients.length === 0">
@@ -22,7 +31,6 @@
       <b-container>
         <b-row>
           <b-col>
-            <h5><b>Medicamentos</b></h5>
             <ListMedicines 
               :meds="medicines"
               :selected="medicine"
@@ -32,8 +40,8 @@
           </b-col>
         </b-row>
       </b-container>
-      <b-button class="mt-2" variant="success" block @click="confirme(false)">Cancelar</b-button>
-      <b-button class="mt-3" variant="danger" block @click="confirme(true)">Guardar</b-button>
+      <b-button class="mt-2" variant="secondary" block @click="confirme(false)">Cancelar</b-button>
+      <b-button class="mt-3" variant="success" block @click="confirme(true)">Escolher</b-button>
     </b-modal>
 
     <b-container v-if="usersActive.caregivers.length !== 0 || usersActive.patients.length !== 0">
@@ -42,6 +50,8 @@
           <b-card bg-variant="light">
             <b-form align="left">
 
+              <p v-if="medicine.length == 0"><strong>Medicamento:</strong> nenhum escolhido</p>
+              <p v-if="medicine.length > 0"><strong>Medicamento:</strong> {{ medicine[0].activeSubs }}</p>
               <b-button block class="mb-3" @click="$refs['modal-med'].show()">Escolher medicamento</b-button>
 
               <b-form-group
@@ -197,7 +207,7 @@ export default {
         type: Number
       }
     },
-    prescriptionDate: {
+    prescriptionData: {
       pk: {
         default: null,
         type: Number
@@ -216,7 +226,7 @@ export default {
       },
       author: {
         default: null,
-        type: String
+        type: Number
       },
       date: {
         default: null,
@@ -272,6 +282,13 @@ export default {
     this.$store.dispatch('medicines/getMedicines')
     if (this.formData) {
       this.form = this.formData
+      if (this.formData.sched) {
+        this.selectedSchedule = this.formData.sched
+      }
+    }
+    if (this.prescriptionData) {
+      this.prescription = this.prescriptionData
+      this.medicine = [this.getMedicineById(this.prescription.medicine)]
     }
   },
   computed: {
@@ -280,12 +297,13 @@ export default {
       medicines: state => state.medicines.medicines
     }),
     ...mapGetters('calendars', ['calendarMedication']),
+    ...mapGetters('medicines', ['getMedicineById']),
     scheduleChosen () {
       return this.parseScheduleOption(this.selectedSchedule)
     }
   },
   methods: {
-    ...mapActions('prescriptions', ['addPrescription', 'updatePrescription', 'deletePrescription']),
+    ...mapActions('prescriptions', ['addPrescription', 'updatePrescription']),
     parseScheduleOption (option) {
       let result = {}
       let dt = LuxonDateTime.fromISO(this.form.dateValue)
@@ -373,40 +391,64 @@ export default {
       }
       if (payload.event.id) {
         this.updatePrescription(payload)
-        this.$emit('prescriptionUpdated', payload.occurrenceDate)
+          .then(() => {
+            this.$notify({
+              title: 'A prescrição foi atualizada com sucesso.',
+              duration: 3000,
+              group: 'success'
+            })
+            this.$emit('prescriptionUpdated', payload.occurrenceDate)
+          })
+          .catch(() => {
+            this.$notify({
+              title: 'Ocorreu um erro ao atualizar a prescição.',
+              duration: 3000,
+              group: 'error'
+            })
+          })
       } else {
         this.addPrescription(payload)
-        this.$notify({
-          title: 'A prescrição foi adicionada com sucesso.',
-          duration: 3000
-        })
-        this.prescription = {
-          quantity: null,
-          state: 'E',
-          medicine: null,
-          author: null,
-          date: null,
-          pk: null
-        }
-        this.form = {
-          dateValue: '',
-          timeValue: '',
-          allDay: false,
-          duration: 5,
-          durationUnit: 'minutes',
-          local: '',
-          description: '',
-          notify: [],
-          sched: null,
-          id: null
-        }
-        this.medicine = []
-        this.selectedSchedule = 'none'
+          .then(() => {
+            this.$notify({
+              title: 'A prescrição foi adicionada com sucesso.',
+              duration: 3000,
+              group: 'success'
+            })
+            this.prescription = {
+              quantity: null,
+              state: 'E',
+              medicine: null,
+              author: null,
+              date: null,
+              pk: null
+            }
+            this.form = {
+              dateValue: '',
+              timeValue: '',
+              allDay: false,
+              duration: 5,
+              durationUnit: 'minutes',
+              local: '',
+              description: '',
+              notify: [],
+              sched: null,
+              id: null
+            }
+            this.medicine = []
+            this.selectedSchedule = 'none'
+          })
+          .catch(() => {
+            this.$notify({
+              title: 'Ocorreu um erro ao adicionar a prescição.',
+              duration: 3000,
+              group: 'error'
+            })
+          })
       }
     },
     preparePrescription () {
       var payload = this.prescription
-      payload.medicine = this.prescription.medicine[0].pk
+      payload.medicine = this.prescription.medicine
       return payload
     },
     updateNotify () {
@@ -430,25 +472,33 @@ export default {
     },
     confirme (save) {
       if (save) {
-        this.prescription.medicine = this.medicine.length === 1 ? this.medicine : []
+        this.prescription.medicine = this.medicine.length === 1 ? this.medicine[0].pk : null
       } else {
-        this.medicine = this.prescription.medicine
+        this.medicine = [this.getMedicineById(this.prescription.medicine)]
       }
       this.$refs['modal-med'].hide()
-      console.log(this.prescription.medicine)
     }
   }
 }
 </script>
 
 <style>
-.notif {
+.notif-success {
   margin: 10px;
   margin-bottom: 0;
   border-radius: 3px;
   padding: 10px 20px;
   background: #E8F9F0;
   border: 2px solid #D0F2E1;
+}
+
+.notif-error {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #F9E8E8;
+  border: 2px solid #FCF2F2;
 }
 
 .notification-title {

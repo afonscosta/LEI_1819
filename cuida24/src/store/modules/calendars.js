@@ -24,6 +24,7 @@ const getters = {
 
 const mutations = {
   setCalendars (state, calendars) {
+    console.log('calendars', calendars)
     state.calendars = calendars
   }
 }

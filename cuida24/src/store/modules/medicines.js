@@ -38,20 +38,43 @@ const actions = {
       })
   },
   addMedicine ({ commit }, medicine) {
-    medicinesService.postMedicine(medicine)
-      .then(newMedicine => {
-        commit('addMedicine', newMedicine)
-      })
+    return new Promise((resolve, reject) => {
+      medicinesService.postMedicine(medicine)
+        .then(newMedicine => {
+          commit('addMedicine', newMedicine)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   },
   updateMedicine ({ commit }, medicine) {
-    medicinesService.putMedicine(medicine)
-      .then(() => {
-        commit('updateMedicine', medicine)
-      })
+    return new Promise((resolve, reject) => {
+      medicinesService.putMedicine(medicine)
+        .then(() => {
+          commit('updateMedicine', medicine)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   },
   deleteMedicine ({ commit }, medicineID) {
-    medicinesService.deleteMedicine(medicineID)
-    commit('deleteMedicine', medicineID)
+    return new Promise((resolve, reject) => {
+      medicinesService.deleteMedicine(medicineID)
+        .then(() => {
+          commit('deleteMedicine', medicineID)
+        })
+        .then(response => {
+          resolve(response)
+        }, error => {
+          reject(error)
+        })
+    })
   }
 }
 

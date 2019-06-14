@@ -1,5 +1,22 @@
 <template>
   <div>
+    <notifications 
+      position="top center"
+      classes="notif-success"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+      group="success"
+    />
+    <notifications 
+      position="top center"
+      classes="notif-error"
+      :speed="500"
+      :width="450"
+      animation-name="v-fade-top"
+      group="error"
+    />
+
     <b-form @submit.prevent="onSubmit">
       <b-form-textarea
         id="note"
@@ -10,13 +27,13 @@
         placeholder="Insira as notas da consulta aqui"
       ></b-form-textarea>
 
-      <b-button type="submit" variant="primary">Submit</b-button>
+      <b-button type="submit" variant="primary">Submeter</b-button>
     </b-form>
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'formNote',
@@ -33,7 +50,8 @@ export default {
       note: '',
       author: 1,
       appointment: null,
-      category: 'ENF'
+      category: 'ENF',
+      pk: null
     }
   }),
   created () {
@@ -47,16 +65,100 @@ export default {
     })
   },
   methods: {
+    ...mapActions('notes', ['addNote', 'updateNote']),
     onSubmit (evt) {
-      this.note.appointment = this.apptPK
-      this.$emit('returnNote', this.note)
-      this.note = {
-        note: '',
-        author: 1,
-        appointment: null,
-        category: 'ENF'
+      if (this.note.pk == null) {
+        this.note.appointment = this.apptPK
+        this.addNote(this.note)
+          .then(() => {
+            this.$notify({
+              title: 'A nota de consulta foi adicionada com sucesso.',
+              duration: 3000,
+              group: 'success'
+            })
+            // TODO: derivar do user + corrigir no data em cima
+            this.note = {
+              note: '',
+              author: 1,
+              appointment: null,
+              category: 'ENF'
+            }
+          })
+          .catch(() => {
+            this.$notify({
+              title: 'Ocorreu um erro ao adicionar a nota de consulta.',
+              duration: 3000,
+              group: 'error'
+            })
+          })
+      } else {
+        this.updateNote(this.note)
+          .then(() => {
+            this.$emit('disableEditingNote')
+            this.$notify({
+              title: 'A nota de consulta foi atualizada com sucesso.',
+              duration: 3000,
+              group: 'success'
+            })
+            // TODO: derivar do user + corrigir no data em cima
+            this.note = {
+              note: '',
+              author: 1,
+              appointment: null,
+              category: 'ENF',
+              pk: null
+            }
+          })
+          .catch(() => {
+            this.$notify({
+              title: 'Ocorreu um erro ao atualizar a nota de consulta.',
+              duration: 3000,
+              group: 'error'
+            })
+          })
       }
     }
   }
 }
 </script>
+
+<style>
+.notif-success {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #E8F9F0;
+  border: 2px solid #D0F2E1;
+}
+
+.notif-error {
+  margin: 10px;
+  margin-bottom: 0;
+  border-radius: 3px;
+  padding: 10px 20px;
+  background: #F9E8E8;
+  border: 2px solid #FCF2F2;
+}
+
+.notification-title {
+  letter-spacing: 1px;
+  font-size: 17px;
+  text-align: center;
+}
+
+.v-fade-top-enter-active,
+.v-fade-top-leave-active,
+.v-fade-ltopmove {
+  transition: all .5s;
+}
+.v-fade-top-enter,
+.v-fade-top-leave-to {
+  opacity: 0;
+  transform: translateY(-500px) scale(0.2);
+}
+
+.vdatetime-input {
+  width: 100%;
+}
+</style>

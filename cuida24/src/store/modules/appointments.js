@@ -47,23 +47,49 @@ const actions = {
       })
   },
   addAppointment ({ commit }, appointment) {
-    appointmentService.postAppointment(appointment)
-      .then(newAppointment => {
-        commit('addAppointment', newAppointment)
-        this.dispatch('events/addEvent', newAppointment.event)
-      })
+    return new Promise((resolve, reject) => {
+      appointmentService.postAppointment(appointment)
+        .then(newAppointment => {
+          commit('addAppointment', newAppointment)
+          this.dispatch('events/addEvent', newAppointment.event)
+        })
+        .then(() => {
+          resolve()
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
   },
   updateAppointment ({ commit }, appointment) {
-    appointmentService.putAppointment(appointment)
-      .then(() => {
-        commit('updateAppointment', appointment)
-        this.dispatch('events/updateEvent', appointment.event)
-      })
+    return new Promise((resolve, reject) => {
+      appointmentService.putAppointment(appointment)
+        .then(() => {
+          commit('updateAppointment', appointment)
+          this.dispatch('events/updateEvent', appointment.event)
+        })
+        .then(() => {
+          resolve()
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
   },
   deleteAppointment ({ commit }, appointment) {
-    appointmentService.deleteAppointment(appointment.appointmentPK)
-    commit('deleteAppointment', appointment.appointmentPK)
-    this.dispatch('events/deleteEvent', appointment.event.id)
+    return new Promise((resolve, reject) => {
+      appointmentService.deleteAppointment(appointment.appointmentPK)
+        .then(() => {
+          commit('deleteAppointment', appointment.appointmentPK)
+          this.dispatch('events/deleteEvent', appointment.event.id)
+        })
+        .then(() => {
+          resolve()
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    })
   }
 }
 

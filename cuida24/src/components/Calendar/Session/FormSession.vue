@@ -211,7 +211,7 @@
                   <b-button block variant="primary" v-if="form.id !== null" @click="hide">Cancelar</b-button>
                 </b-col>
                 <b-col>
-                  <b-button block type="submit" variant="success">Submit</b-button>
+                  <b-button block type="submit" variant="success">Submeter</b-button>
                 </b-col>
               </b-row>
             </b-form>
@@ -317,9 +317,9 @@ export default {
       users: {},
       id: null
     },
-    selectedSchedule: 'none',
+    selectedSchedule: null,
     optionsSchedule: [
-      { value: 'none', text: 'Não se repete' },
+      { value: null, text: 'Não se repete' },
       { value: 'daily', text: 'Todos os dias' },
       { value: 'weekly', text: 'Semanalmente' },
       { value: 'monthly', text: 'Mensalmente' },
@@ -344,6 +344,9 @@ export default {
     if (this.sessionData) {
       this.session = this.sessionData
       this.form = this.formData
+      if (this.formData) {
+        this.selectedSchedule = this.formData.sched
+      }
     }
   },
   computed: {

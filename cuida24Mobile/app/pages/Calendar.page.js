@@ -17,63 +17,81 @@ import RNCalendarEvents from 'react-native-calendar-events';
 import { sha256 } from 'react-native-sha256';
 import { addMinutes, addDays, addWeeks, addMonths } from 'date-fns';
 import PushNotification from 'react-native-push-notification';
-import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
+import {
+  RadioForm,
+  RadioButton,
+  RadioButtonInput,
+  RadioButtonLabel
+} from 'react-native-simple-radio-button';
 
-const addNewAppointment = async (appt, hash, appointmentCalendar) => {
+const parseSchedule = (event) => {
+	var rec = null;
+	if (event.event.schedule.duration &&
+	event.event.schedule.durationInDays === 0 &&
+	event.event.schedule.durationUnit &&
+	!event.event.schedule.dayOfWeek &&
+	!event.event.schedule.dayOfMonth &&
+	!event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'daily';
+	}
+	else if (!event.event.schedule.durationInDays &&
+	event.event.schedule.dayOfWeek &&
+	!event.event.schedule.dayOfMonth &&
+	!event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'weekly';
+	}
+	else if (!event.event.schedule.durationInDays &&
+	!event.event.schedule.dayOfWeek &&
+	event.event.schedule.dayOfMonth &&
+	!event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'monthly';
+	}
+	else if (!event.event.schedule.durationInDays &&
+	!event.event.schedule.dayOfWeek &&
+	event.event.schedule.dayOfMonth &&
+	event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'yearly';
+	}
+  return rec;
+}
+
+const addNewAppointment = async (appt, hash, appointmentCalendar, eventID) => {
   console.log('Adicionando evento...', appt);
 	var today = new Date();
+	var rec = parseSchedule(appt);
   appt.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
 		if (n > today) {
-			PushNotification.localNotificationSchedule({
-				message: appt.event.data.title + '\n' + 
-					appt.event.data.description + '\n' +
-					appt.event.data.location,
-				date: n
-			});
+      if (rec === 'daily') {
+        PushNotification.localNotificationSchedule({
+          message: appt.event.data.title + '\n' + 
+            appt.event.data.description + '\n' +
+            appt.event.data.location,
+          date: n,
+          repeatType: 'day'
+        });
+      } else if (rec === 'weekly') {
+        PushNotification.localNotificationSchedule({
+          message: appt.event.data.title + '\n' + 
+            appt.event.data.description + '\n' +
+            appt.event.data.location,
+          date: n,
+          repeatType: 'week'
+        });
+      } else {
+        PushNotification.localNotificationSchedule({
+          message: appt.event.data.title + '\n' + 
+            appt.event.data.description + '\n' +
+            appt.event.data.location,
+          date: n
+        });
+      }
 		}
   });
-	var rec = null;
-	if (appt.event.schedule.duration &&
-	appt.event.schedule.durationInDays &&
-	appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
-	!appt.event.schedule.dayOfWeek &&
-	!appt.event.schedule.dayOfMonth &&
-	!appt.event.schedule.month &&
-	!appt.event.schedule.year) {
-		rec = 'daily';
-	}
-	else if (!appt.event.schedule.duration &&
-	!appt.event.schedule.durationInDays &&
-	!appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
-	appt.event.schedule.dayOfWeek &&
-	!appt.event.schedule.dayOfMonth &&
-	!appt.event.schedule.month &&
-	!appt.event.schedule.year) {
-		rec = 'weekly';
-	}
-	else if (!appt.event.schedule.duration &&
-	!appt.event.schedule.durationInDays &&
-	!appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
-	!appt.event.schedule.dayOfWeek &&
-	appt.event.schedule.dayOfMonth &&
-	!appt.event.schedule.month &&
-	!appt.event.schedule.year) {
-		rec = 'monthly';
-	}
-	else if (!appt.event.schedule.duration &&
-	!appt.event.schedule.durationInDays &&
-	!appt.event.schedule.durationUnit &&
-	!appt.event.schedule.times &&
-	!appt.event.schedule.dayOfWeek &&
-	appt.event.schedule.dayOfMonth &&
-	appt.event.schedule.month &&
-	!appt.event.schedule.year) {
-		rec = 'yearly';
-	}
 	var allDay = true;
 	var startDate = new Date(
     appt.occurrenceDate.year,
@@ -93,7 +111,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 			appt.occurrenceDate.year,
 			appt.occurrenceDate.month-1, // Porque os meses são de 0 a 11
 			appt.occurrenceDate.dayOfMonth,
-			parseInt(timeSplit[0])+1, // Porquê que preciso de somar 1???
+			parseInt(timeSplit[0]),
 			parseInt(timeSplit[1]),
 			parseInt(timeSplit[2])
 		);
@@ -113,9 +131,9 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 	else {
 		endDate = startDate;
 	}
-  console.log(JSON.stringify(appt.event));
-  console.log('startDate', JSON.stringify(startDate));
-  console.log('endDate', JSON.stringify(endDate));
+  //console.log(JSON.stringify(appt.event));
+  //console.log('startDate', JSON.stringify(startDate));
+  //console.log('endDate', JSON.stringify(endDate));
 	var eventData = {
 		calendarId: appointmentCalendar.id,
 		startDate: startDate.toISOString(),
@@ -126,6 +144,10 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
 		recurrence: rec
 	};
 
+  if (eventID) { // Para fazer update do event
+    eventData.id = eventID;
+  }
+
 	if (eventData.recurrence == null) {
 		delete eventData.recurrence;
 	}
@@ -134,52 +156,42 @@ const addNewAppointment = async (appt, hash, appointmentCalendar) => {
     appt.event.data.title, 
 		eventData
   ).then(id => { 
-		(async () => {
-			try {
-				await AsyncStorage.setItem(
-					'@appointmentCalendar:' + appt.appointmentPK,
-					JSON.stringify({ 'id': id, 'hash': String(hash) })
-				);
-			} catch (error) {
-				console.warn('AsyncStorage - setItem', error);
-			}
-		})();
+    AsyncStorage.setItem(
+      '@appointmentCalendar:' + appt.appointmentPK,
+      JSON.stringify({ 'id': id, 'hash': String(hash) })
+    ).catch((error) => {
+      console.warn('AsyncStorage - setItem', error);
+    });
   }).catch(error => console.warn('RNCalendarEvents - saveEvent', error));
 }
 
 const handleAppointment = async (appt, hash, appointmentCalendar) => {
-  try {
-    //await AsyncStorage.clear();
-    const oldEvData = await AsyncStorage.getItem('@appointmentCalendar:' + appt.appointmentPK);
-    if (oldEvData == null) { // O evento ainda não existe
-      addNewAppointment(appt, hash, appointmentCalendar);
-    }
-    else { // Já tem o evento. Está atualizado?
-      var oldEvDataParsed = JSON.parse(oldEvData);
-      if (oldEvDataParsed.hash !== hash) { // O evento mudou
-        RNCalendarEvents.removeEvent(oldEvDataParsed.id)
-          .then(() => {
-            (async () => { // Remove a key do asyncStorage
-              try {
-                await AsyncStorage.removeItem('@appointmentCalendar:' + appt.appointmentPK);
-              } catch (error) {
-                console.warn('AsyncStorage - removeItem', error);
-              }
-            })();
-            // Adiciona o evento atualizado
-            addNewAppointment(appt, hash, appointmentCalendar);
-          })
-          .catch(error => {
-            console.log('RNCalendarEvents - removeEvent', error);
-          });
+  //await AsyncStorage.clear();
+  AsyncStorage.getItem('@appointmentCalendar:' + appt.appointmentPK)
+    .then((oldEvData) => {
+      if (oldEvData == null) { // O evento ainda não existe
+        addNewAppointment(appt, hash, appointmentCalendar, null);
       }
-    }
-  } catch (error) {
-    console.warn('AsyncStorage - handleAppointment', error);
-  }
+      else { // Já tem o evento. Está atualizado?
+        var oldEvDataParsed = JSON.parse(oldEvData);
+        if (oldEvDataParsed.hash !== hash) { // O evento mudou
+          AsyncStorage.removeItem('@appointmentCalendar:' + appt.appointmentPK)
+            .then(() => {
+              // Adiciona o evento atualizado
+              addNewAppointment(appt, hash, appointmentCalendar, oldEvDataParsed.id);
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - removeItem', error);
+            });
+        }
+      }
+    })
+    .catch((error) => {
+      console.warn('AsyncStorage - handleAppointment', error);
+    });
 }
 
-const addNewIndivSession = async (is, hash, indivSessionCalendar) => {
+const addNewIndivSession = async (is, hash, indivSessionCalendar, eventID) => {
   console.log('Adicionando indivSession evento...', is);
 	var today = new Date();
   is.event.data.notify.forEach((notif) => {
@@ -193,47 +205,7 @@ const addNewIndivSession = async (is, hash, indivSessionCalendar) => {
 			});
 		}
   });
-	var rec = null;
-	if (is.event.schedule.duration &&
-	is.event.schedule.durationInDays &&
-	is.event.schedule.durationUnit &&
-	!is.event.schedule.times &&
-	!is.event.schedule.dayOfWeek &&
-	!is.event.schedule.dayOfMonth &&
-	!is.event.schedule.month &&
-	!is.event.schedule.year) {
-		rec = 'daily';
-	}
-	else if (!is.event.schedule.duration &&
-	!is.event.schedule.durationInDays &&
-	!is.event.schedule.durationUnit &&
-	!is.event.schedule.times &&
-	is.event.schedule.dayOfWeek &&
-	!is.event.schedule.dayOfMonth &&
-	!is.event.schedule.month &&
-	!is.event.schedule.year) {
-		rec = 'weekly';
-	}
-	else if (!is.event.schedule.duration &&
-	!is.event.schedule.durationInDays &&
-	!is.event.schedule.durationUnit &&
-	!is.event.schedule.times &&
-	!is.event.schedule.dayOfWeek &&
-	is.event.schedule.dayOfMonth &&
-	!is.event.schedule.month &&
-	!is.event.schedule.year) {
-		rec = 'monthly';
-	}
-	else if (!is.event.schedule.duration &&
-	!is.event.schedule.durationInDays &&
-	!is.event.schedule.durationUnit &&
-	!is.event.schedule.times &&
-	!is.event.schedule.dayOfWeek &&
-	is.event.schedule.dayOfMonth &&
-	is.event.schedule.month &&
-	!is.event.schedule.year) {
-		rec = 'yearly';
-	}
+	var rec = parseSchedule(is);
 	var allDay = true;
 	var startDate = new Date(
     is.event.occurrenceDate.year,
@@ -283,6 +255,10 @@ const addNewIndivSession = async (is, hash, indivSessionCalendar) => {
 		recurrence: rec
 	};
 
+  if (eventID) { // Para fazer update do event
+    eventData.id = eventID;
+  }
+
 	if (eventData.recurrence == null) {
 		delete eventData.recurrence;
 	}
@@ -305,38 +281,32 @@ const addNewIndivSession = async (is, hash, indivSessionCalendar) => {
 }
 
 const handleIndivSession = async (is, hash, indivSessionCalendar) => {
-  try {
-    //await AsyncStorage.clear();
-    const oldEvData = await AsyncStorage.getItem('@indivSessionCalendar:' + is.individualSession.pk);
-    if (oldEvData == null) { // O evento ainda não existe
-      addNewIndivSession(is, hash, indivSessionCalendar);
-    }
-    else { // Já tem o evento. Está atualizado?
-      var oldEvDataParsed = JSON.parse(oldEvData);
-      if (oldEvDataParsed.hash !== hash) { // O evento mudou
-        RNCalendarEvents.removeEvent(oldEvDataParsed.id)
-          .then(() => {
-            (async () => { // Remove a key do asyncStorage
-              try {
-                await AsyncStorage.removeItem('@indivSessionCalendar:' + is.individualSession.pk);
-              } catch (error) {
-                console.warn('AsyncStorage - removeItem', error);
-              }
-            })();
-            // Adiciona o evento atualizado
-            addNewIndivSession(is, hash, indivSessionCalendar);
-          })
-          .catch(error => {
-            console.log('RNCalendarEvents - removeEvent', error);
-          });
+  //await AsyncStorage.clear();
+  AsyncStorage.getItem('@indivSessionCalendar:' + is.individualSession.pk)
+    .then((oldEvData) => {
+      if (oldEvData == null) { // O evento ainda não existe
+        addNewIndivSession(is, hash, indivSessionCalendar, null);
       }
-    }
-  } catch (error) {
-    console.warn('AsyncStorage - handleIndivSession', error);
-  }
+      else { // Já tem o evento. Está atualizado?
+        var oldEvDataParsed = JSON.parse(oldEvData);
+        if (oldEvDataParsed.hash !== hash) { // O evento mudou
+          AsyncStorage.removeItem('@indivSessionCalendar:' + is.individualSession.pk)
+            .then(() => {
+              // Adiciona o evento atualizado
+              addNewIndivSession(is, hash, indivSessionCalendar, oldEvDataParsed.id);
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - removeItem', error);
+            });
+        }
+      }
+    })
+    .catch((error) => {
+      console.warn('AsyncStorage - handleIndivSession', error);
+    });
 }
 
-const addNewGroupSession = async (gs, hash, groupSessionCalendar) => {
+const addNewGroupSession = async (gs, hash, groupSessionCalendar, eventID) => {
   console.log('Adicionando groupSession evento...', gs);
 	var today = new Date();
   gs.event.data.notify.forEach((notif) => {
@@ -350,47 +320,7 @@ const addNewGroupSession = async (gs, hash, groupSessionCalendar) => {
 			});
 		}
   });
-	var rec = null;
-	if (gs.event.schedule.duration &&
-	gs.event.schedule.durationInDays &&
-	gs.event.schedule.durationUnit &&
-	!gs.event.schedule.times &&
-	!gs.event.schedule.dayOfWeek &&
-	!gs.event.schedule.dayOfMonth &&
-	!gs.event.schedule.month &&
-	!gs.event.schedule.year) {
-		rec = 'daily';
-	}
-	else if (!gs.event.schedule.duration &&
-	!gs.event.schedule.durationInDays &&
-	!gs.event.schedule.durationUnit &&
-	!gs.event.schedule.times &&
-	gs.event.schedule.dayOfWeek &&
-	!gs.event.schedule.dayOfMonth &&
-	!gs.event.schedule.month &&
-	!gs.event.schedule.year) {
-		rec = 'weekly';
-	}
-	else if (!gs.event.schedule.duration &&
-	!gs.event.schedule.durationInDays &&
-	!gs.event.schedule.durationUnit &&
-	!gs.event.schedule.times &&
-	!gs.event.schedule.dayOfWeek &&
-	gs.event.schedule.dayOfMonth &&
-	!gs.event.schedule.month &&
-	!gs.event.schedule.year) {
-		rec = 'monthly';
-	}
-	else if (!gs.event.schedule.duration &&
-	!gs.event.schedule.durationInDays &&
-	!gs.event.schedule.durationUnit &&
-	!gs.event.schedule.times &&
-	!gs.event.schedule.dayOfWeek &&
-	gs.event.schedule.dayOfMonth &&
-	gs.event.schedule.month &&
-	!gs.event.schedule.year) {
-		rec = 'yearly';
-	}
+	var rec = parseSchedule(gs);
 	var allDay = true;
 	var startDate = new Date(
     gs.event.occurrenceDate.year,
@@ -440,6 +370,10 @@ const addNewGroupSession = async (gs, hash, groupSessionCalendar) => {
 		recurrence: rec
 	};
 
+  if (eventID) { // Para fazer update do event
+    eventData.id = eventID;
+  }
+
 	if (eventData.recurrence == null) {
 		delete eventData.recurrence;
 	}
@@ -462,37 +396,30 @@ const addNewGroupSession = async (gs, hash, groupSessionCalendar) => {
 }
 
 const handleGroupSession = async (gs, hash, groupSessionCalendar) => {
-  try {
-    //await AsyncStorage.clear();
-    const oldEvData = await AsyncStorage.getItem('@groupSessionCalendar:' + gs.groupSession.pk);
-    if (oldEvData == null) { // O evento ainda não existe
-      addNewGroupSession(gs, hash, groupSessionCalendar);
-    }
-    else { // Já tem o evento. Está atualizado?
-      var oldEvDataParsed = JSON.parse(oldEvData);
-      if (oldEvDataParsed.hash !== hash) { // O evento mudou
-        RNCalendarEvents.removeEvent(oldEvDataParsed.id)
-          .then(() => {
-            (async () => { // Remove a key do asyncStorage
-              try {
-                await AsyncStorage.removeItem('@groupSessionCalendar:' + gs.groupSession.pk);
-              } catch (error) {
-                console.warn('AsyncStorage - removeItem', error);
-              }
-            })();
-            // Adiciona o evento atualizado
-            addNewGroupSession(gs, hash, groupSessionCalendar);
-          })
-          .catch(error => {
-            console.log('RNCalendarEvents - removeEvent', error);
-          });
+  //await AsyncStorage.clear();
+  AsyncStorage.getItem('@groupSessionCalendar:' + gs.groupSession.pk)
+    .then((oldEvData) => {
+      if (oldEvData == null) { // O evento ainda não existe
+        addNewGroupSession(gs, hash, groupSessionCalendar, null);
       }
-    }
-  } catch (error) {
-    console.warn('AsyncStorage - handleGroupSession', error);
-  }
+      else { // Já tem o evento. Está atualizado?
+        var oldEvDataParsed = JSON.parse(oldEvData);
+        if (oldEvDataParsed.hash !== hash) { // O evento mudou
+          AsyncStorage.removeItem('@groupSessionCalendar:' + gs.groupSession.pk)
+            .then(() => {
+              // Adiciona o evento atualizado
+              addNewGroupSession(gs, hash, groupSessionCalendar, oldEvDataParsed.id);
+            })
+            .catch((error) => {
+                  console.warn('AsyncStorage - removeItem', error);
+            });
+        }
+      }
+    })
+    .catch((error) => {
+      console.warn('AsyncStorage - handleGroupSession', error);
+    });
 }
-
 
 export default class CalendarPage extends React.Component {
   constructor(props) {
@@ -601,7 +528,7 @@ export default class CalendarPage extends React.Component {
   }
 
   componentDidMount() {
-    //PushNotification.cancelAllLocalNotifications();
+    // PushNotification.cancelAllLocalNotifications();
     const fetchData = async () => {
       try {
         const token_res = await AsyncStorage.getItem('@login:');
@@ -637,7 +564,11 @@ export default class CalendarPage extends React.Component {
           error: null,
           loading: false,
           refreshing: false
-        }, () => this.addCalendars());
+        }, () => {
+          if (res.detail && res.detail !== 'Invalid token.') {
+            this.addCalendars()
+          }
+        });
       })
       .catch(error => {
         this.setState({ error, loading : false });

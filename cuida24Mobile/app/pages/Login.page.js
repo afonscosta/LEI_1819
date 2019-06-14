@@ -12,7 +12,7 @@ export default class LoginPage extends React.Component {
     }
   }
 
-  onPressLoginButton = () => {
+  onPressLoginButton = async () => {
     const url = this.state.base_url + "token/";
 
     console.log('pedido enviado!!!!!!!!!!!!!!!!!!!!')
@@ -40,6 +40,7 @@ export default class LoginPage extends React.Component {
             console.warn('AsyncStorage - setItem', error);
           }
         })();
+        this.props.navigation.navigate('SleepLoading');
       })
       .catch((error) => {
         console.error(error);

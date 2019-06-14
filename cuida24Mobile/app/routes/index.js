@@ -14,12 +14,22 @@ import ChatPage from '../pages/Chat.page'
 import GamesPage from '../pages/Games.page'
 import InfoPage from '../pages/Info.page'
 import LoginPage from '../pages/Login.page'
+import MealPage from '../pages/Habits/Meal.page'
+import IndivLeisurePage from '../pages/Habits/IndivLeisure.page'
+import PhysicalActivityPage from '../pages/Habits/PhysicalActivity.page'
+import SleepPage from '../pages/Habits/Sleep.page'
+import NapPage from '../pages/Habits/Nap.page'
+import SOSPage from '../pages/Habits/SOS.page'
+import SocialLeisurePage from '../pages/Habits/SocialLeisure.page'
+import WaterPage from '../pages/Habits/Water.page'
+import WeeklyGoalsPage from '../pages/Habits/WeeklyGoals.page'
 import {
   createDrawerNavigator,
   createStackNavigator,
   createAppContainer,
   createSwitchNavigator
 } from 'react-navigation';
+import { subDays, differenceInDays } from 'date-fns';
  
 class NavigationDrawerStructure extends Component {
   //Structure for the navigatin Drawer
@@ -50,15 +60,60 @@ class AuthLoadingScreen extends React.Component {
 
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
-    try{
-      const userToken = await AsyncStorage.getItem('@login:');
+    AsyncStorage.getItem('@login:')
+      .then((userToken) => {
+        // This will switch to the App screen or Auth screen and this loading
+        // screen will be unmounted and thrown away.
+        console.log('userToken', userToken);
+        this.props.navigation.navigate(userToken ? 'SleepLoading' : 'Auth');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
-      // This will switch to the App screen or Auth screen and this loading
-      // screen will be unmounted and thrown away.
-      this.props.navigation.navigate(userToken ? 'App' : 'Auth');
-    } catch(error) {
-      console.log(error);
-    }
+  // Render any loading content that you like here
+  render() {
+    return (
+      <View>
+        <ActivityIndicator />
+        <StatusBar barStyle="default" />
+      </View>
+    );
+  }
+}
+
+class SleepLoadingScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this._bootstrapAsync();
+  }
+
+  // Fetch the token from storage then navigate to our appropriate place
+  _bootstrapAsync = async () => {
+    AsyncStorage.getItem('@sleep')
+      .then((lastSleepStr) => {
+        console.log('entrou');
+        var today = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        var lastSleepObj = JSON.parse(lastSleepStr);
+        if (!lastSleepObj) {
+          this.props.navigation.navigate('Sleep');
+        } else {
+          lastSleep = new Date(lastSleepObj.lastSleep);
+          if (Math.abs(differenceInDays(lastSleep.lastSleep, today)) > 1) {
+            this.props.navigation.navigate('Sleep');
+          } else {
+            this.props.navigation.navigate('App');
+          }
+        }
+      })
+      .catch((error) => {
+        console.log('error get sleep', error);
+      });
   };
 
   // Render any loading content that you like here
@@ -175,6 +230,86 @@ const Habits_StackNavigator = createStackNavigator({
       headerTintColor: htColor,
     }),
   },
+	Meal: {
+		screen: MealPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Alimentação',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	IndivLeisure: {
+		screen: IndivLeisurePage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Lazer Individual',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	PhysicalActivity: {
+		screen: PhysicalActivityPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Atividade Física',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	Nap: {
+		screen: NapPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Sestas',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	SOS: {
+		screen: SOSPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'SOS',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	SocialLeisure: {
+		screen: SocialLeisurePage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Lazer Social',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	Water: {
+		screen: WaterPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Água',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	WeeklyGoals: {
+		screen: WeeklyGoalsPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Objetivos',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	}
 });
 
 const Chat_StackNavigator = createStackNavigator({
@@ -301,7 +436,9 @@ export default createAppContainer(createSwitchNavigator(
   {
     AuthLoading: AuthLoadingScreen,
     App: DrawerNavigator,
-    Auth: DrawerNavigatorNoLogin,
+    SleepLoading: SleepLoadingScreen,
+    Sleep: SleepPage,
+    Auth: DrawerNavigatorNoLogin
   },
   {
     initialRouteName: 'AuthLoading',

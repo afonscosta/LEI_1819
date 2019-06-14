@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '../store'
 
 // Miscellaneous
 import Home from '@/components/Home'
@@ -37,7 +38,7 @@ import InfoApoio from '@/components/Info/InfoApoio'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     // Miscellaneous
     {
@@ -154,3 +155,13 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  console.log('from', from)
+  console.log('to', to)
+  console.log('next', next)
+  console.log(store.getters['login/accesstoken'])
+  next()
+})
+
+export default router
