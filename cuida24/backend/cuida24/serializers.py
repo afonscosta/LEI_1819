@@ -157,9 +157,11 @@ class WaterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Water
         fields = ('date', 'water', 'caregiver', 'pk')
-        extra_kwargs = {
-            'date': {'read_only': True}
-        }
+
+    def update(self, instance, validated_data):
+        instance.quantity = validated_data.get("quantity", instance.quantity)
+        instance.save()
+        return instance
 
 
 class NapSerializer(serializers.ModelSerializer):
@@ -174,9 +176,11 @@ class SleepSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sleep
         fields = ('date', 'quantity', 'caregiver', 'pk')
-        extra_kwargs = {
-            'date': {'read_only': True}
-        }
+
+    def update(self, instance, validated_data):
+        instance.quality = validated_data.get("quality", instance.quality)
+        instance.save()
+        return instance
 
 
 class ActivitySerializer(serializers.ModelSerializer):
