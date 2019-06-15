@@ -1,5 +1,6 @@
 
 export const POST_WATER = 'POST_WATER';
+export const POST_MEAL = 'POST_MEAL';
 export const POST_NAPS = 'POST_NAPS';
 export const POST_SLEEP = 'POST_SLEEP';
 export const POST_SOS = 'POST_SOS';
@@ -30,6 +31,29 @@ export const postWater = ({token, water, date}) => {
           },
           body: JSON.stringify({
             water: water,
+            date: date,
+          })
+        }
+      }
+    }
+  }
+}
+
+export const postMeal = ({token, meal, date}) => {
+  return {
+    type: POST_MEAL,
+    payload: { token: token, meal: meal, date: date },
+    meta: {
+      offline: {
+        effect: {
+          url: ROOT_URL + 'meal/',
+          method: 'POST',
+          headers: {
+            'Authorization': 'Token ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            meal: meal,
             date: date,
           })
         }

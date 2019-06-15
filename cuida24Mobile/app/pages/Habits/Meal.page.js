@@ -2,17 +2,14 @@ import React from 'react';
 import { StyleSheet, Text, View, Image } from 'react-native';
 import { CheckBox, Button } from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
+import { postMeal } from '../../redux/actions/index'
+import { connect } from 'react-redux';
 
-export default class MealPage extends React.Component {
+class MealPage extends React.Component {
   constructor(props) {
     super(props);
     this.state  = {
       token: '',
-      base_url: "http://10.0.2.2:8000/cuida24/",
-      water: 0,
-      apptFilterSelected: false,
-      gsFilterSelected: false,
-      isFilterSelected: false,
 			types: [
 				{ value: 'CB', title: 'Carnes Brancas', selected: false },
 				{ value: 'FT', title: 'Fruta', selected: false },
@@ -36,24 +33,21 @@ export default class MealPage extends React.Component {
   }
 
   saveMeal = () => {
-    const url = this.state.base_url + "meal/";
+    const token = this.state.token;
+    var date = new Date();
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
     var meal = this.state.types.filter((m) => m.selected).map((m) => {
 			return m.value
-		})
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Token ' + this.state.token,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        meal: meal
-      }),
-    }).then(() => {
-      this.props.navigation.goBack();
-    }).catch((error) => {
-      console.log('POST meal: ', error);
-    });
+		});
+    console.log(JSON.stringify({
+      date: date,
+      meal: meal
+    }));
+    this.props.postMeal({token, meal, date});
+    this.props.navigation.goBack();
   }
 
 
@@ -150,3 +144,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#343f4b'
   },
 })
+
+export default connect(
+  null,
+  { postMeal }
+)(MealPage);

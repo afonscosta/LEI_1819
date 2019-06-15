@@ -1,5 +1,6 @@
 import {
   POST_WATER,
+  POST_MEAL,
   POST_NAPS,
   POST_SLEEP,
   POST_SOS,
@@ -24,6 +25,9 @@ export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     // Water
     case POST_WATER:
+      return action.payload
+    // Meals
+    case POST_MEAL:
       return action.payload
     // Naps
     case POST_NAPS:
