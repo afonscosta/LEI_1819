@@ -9,6 +9,6 @@ from backend.cuida24.serializers import *
 
 logger = logging.getLogger("mylogger")
 
-def waterFrontToBackJSON(request_data, user):
+def habitsFrontToBackJSON(request_data, user):
     request_data['caregiver'] = get_object_or_404(Caregiver, info=user.pk).pk
     return request_data

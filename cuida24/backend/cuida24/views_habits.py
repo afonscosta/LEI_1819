@@ -84,7 +84,7 @@ class WaterViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         logger.info("POST WATER")
         logger.info(request)
-        req_data = waterFrontToBackJSON(request.data, request.user)
+        req_data = habitsFrontToBackJSON(request.data, request.user)
         query_set = Water.objects.filter(caregiver_id=req_data['caregiver'], date=req_data['date'])
         if query_set:
             water = get_object_or_404(Water, caregiver_id=req_data['caregiver'], date=req_data['date'])
@@ -103,7 +103,7 @@ class WaterViewSet(viewsets.ModelViewSet):
     def put(self, request):
         logger.info("PUT WATER")
         logger.info(request.data)
-        req_data = waterFrontToBackJSON(request.data, request.user)
+        req_data = habitsFrontToBackJSON(request.data, request.user)
         water = get_object_or_404(Water, pk=req_data['pk'])
         serializer = WaterSerializer(instance=water, data=req_data)
         if serializer.is_valid(raise_exception=False):
@@ -124,4 +124,59 @@ class WaterViewSet(viewsets.ModelViewSet):
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
         query_set = Water.objects.filter(caregiver_id=caregiver)
         serializer = WaterSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class SleepViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'POST': ['caregiver', 'backofficeUser'],
+        'DELETE': ['caregiver', 'backofficeUser'],
+        'PUT': ['caregiver', 'backofficeUser']
+    }
+    queryset = Sleep.objects.all()
+    serializer_class = SleepSerializer
+
+    def create(self, request, *args, **kwargs):
+        logger.info("POST SLEEP")
+        logger.info(request)
+        req_data = habitsFrontToBackJSON(request.data, request.user)
+        query_set = Sleep.objects.filter(caregiver_id=req_data['caregiver'], date=req_data['date'])
+        if query_set:
+            sleep = get_object_or_404(Sleep, caregiver_id=req_data['caregiver'], date=req_data['date'])
+            serializer = SleepSerializer(instance=sleep, data=req_data)
+        else:
+            serializer = SleepSerializer(data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        logger.info("PUT SLEEP")
+        logger.info(request.data)
+        req_data = habitsFrontToBackJSON(request.data, request.user)
+        sleep = get_object_or_404(Sleep, pk=req_data['pk'])
+        serializer = SleepSerializer(instance=sleep, data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    Get method by user id
+    """
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET SLEEP")
+        logger.info(request.GET)
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = Sleep.objects.filter(caregiver_id=caregiver)
+        serializer = SleepSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

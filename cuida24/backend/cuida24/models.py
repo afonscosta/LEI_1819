@@ -66,12 +66,12 @@ class BackofficeUser(models.Model):
 # Historic
 
 class PhysiologicalParam(models.Model):
-    date = models.DateField()
+    date = models.DateTimeField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class AnalyticalParam(models.Model):
-    date = models.DateField()
+    date = models.DateTimeField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
@@ -82,20 +82,20 @@ class Water(models.Model):
 
 
 class Nap(models.Model):
-    date = models.DateField()
+    date = models.DateTimeField()
     quantity = models.IntegerField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Sleep(models.Model):
-    date = models.DateField()
-    quantity = models.BooleanField()
+    date = models.DateTimeField(unique=True)
+    quality = models.BooleanField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Activity(models.Model):
     TYPE = (('AF', 'Atividade Fisica'), ('LS', 'Lazer Social'), ('LI', 'Lazer Individual'))
-    date = models.DateField()
+    date = models.DateTimeField()
     type = models.CharField(max_length=2, choices=TYPE)
     specificActivity = models.TextField(null=True, blank=True)
     duration = models.TimeField()
@@ -104,7 +104,7 @@ class Activity(models.Model):
 
 class Meal(models.Model):
     TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'LancheTarde'), ('JT', 'Jantar'))
-    date = models.DateField()
+    date = models.DateTimeField()
     realize = models.BooleanField()
     type = models.CharField(max_length=2, choices=TYPE)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
@@ -197,7 +197,7 @@ class Medicine(models.Model):
 
 
 class Prescription(models.Model):
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     author = models.ForeignKey(UserAuth, on_delete=models.CASCADE)
 
@@ -216,7 +216,7 @@ class Medication(models.Model):
         super(Medication, self).delete()
 
 class Take(models.Model):
-    date = models.DateField()
+    date = models.DateTimeField()
     medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
 
 

@@ -169,9 +169,14 @@ class NapSerializer(serializers.ModelSerializer):
 
 
 class SleepSerializer(serializers.ModelSerializer):
+    quantity = serializers.BooleanField(source="quality")
+
     class Meta:
         model = Sleep
         fields = ('date', 'quantity', 'caregiver', 'pk')
+        extra_kwargs = {
+            'date': {'read_only': True}
+        }
 
 
 class ActivitySerializer(serializers.ModelSerializer):
