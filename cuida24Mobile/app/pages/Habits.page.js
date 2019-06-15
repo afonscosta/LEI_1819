@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Image, Card, List, ListItem, CheckBox, Button } from 'react-native-elements';
-import { getPhyAct } from '../redux/actions/index'
+import { getPhyAct, getIndLei } from '../redux/actions/index'
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -19,8 +19,8 @@ class HabitsPage extends React.Component {
   async componentDidMount() {
     AsyncStorage.getItem('@login:')
       .then((token) => {
-        const url = "http://10.0.2.2:8000/cuida24/physicalActivity/";
-        this.props.getPhyAct({url, token});
+        this.props.getPhyAct({token});
+        this.props.getIndLei({token});
       })
       .catch((error) => {
         console.warn('AsyncStorage - getItem: login', error);
@@ -150,5 +150,5 @@ const styles = StyleSheet.create({
 
 export default connect(
   null,
-  { getPhyAct }
+  { getPhyAct, getIndLei }
 )(HabitsPage);

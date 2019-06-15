@@ -5,7 +5,10 @@ import {
   POST_SOS,
   POST_PHYACT,
   GET_PHYACT,
-  GET_PHYACT_COMMIT
+  GET_PHYACT_COMMIT,
+  POST_INDLEI,
+  GET_INDLEI,
+  GET_INDLEI_COMMIT
 } from '../actions/index';
 import AsyncStorage from '@react-native-community/async-storage';
 import { sha256 } from 'react-native-sha256';
@@ -34,6 +37,18 @@ export default (state = INITIAL_STATE, action) => {
         JSON.stringify(action.payload)
       ).catch((error) => {
         console.warn('AsyncStorage - setItem: activities', error);
+      });
+      return action.payload
+    case POST_INDLEI:
+      return action.payload
+    case GET_INDLEI:
+      return action.payload
+    case GET_INDLEI_COMMIT:
+      AsyncStorage.setItem(
+        '@indivLeisure',
+        JSON.stringify(action.payload)
+      ).catch((error) => {
+        console.warn('AsyncStorage - setItem: indivLeisure', error);
       });
       return action.payload
     default:

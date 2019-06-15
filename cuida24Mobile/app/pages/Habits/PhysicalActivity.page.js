@@ -10,7 +10,6 @@ class PhysicalActivityPage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      base_url: "http://10.0.2.2:8000/cuida24/",
       duration1020: false,
       duration2030: false,
       duration3040: false,
@@ -157,13 +156,12 @@ class PhysicalActivityPage extends React.Component {
   }
 
   savePhyAct = () => {
-    const url = this.state.base_url + "physicalActivity/";
     const token = this.state.token;
     const date = new Date();
     const type = 'AF';
     const act = this.state.act;
     const duration = this.parseDuration();
-    this.props.postPhyAct({url, token, date, type, act, duration});
+    this.props.postPhyAct({token, date, type, act, duration});
   }
 
   render() {

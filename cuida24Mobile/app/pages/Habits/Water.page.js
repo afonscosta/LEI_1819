@@ -10,7 +10,6 @@ class WaterPage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      base_url: "http://10.0.2.2:8000/cuida24/",
       water: 0
     }
   }
@@ -41,7 +40,6 @@ class WaterPage extends React.Component {
   }
 
   saveWater = () => {
-    const url = this.state.base_url + "water/";
     const token = this.state.token;
     const water = this.state.water;
     var date = new Date();
@@ -49,7 +47,7 @@ class WaterPage extends React.Component {
     date.setMinutes(0);
     date.setSeconds(0);
     date.setMilliseconds(0);
-    this.props.postWater({url, token, water, date});
+    this.props.postWater({token, water, date});
   }
 
   render() {

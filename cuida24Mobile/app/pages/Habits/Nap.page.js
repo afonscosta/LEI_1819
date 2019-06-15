@@ -10,7 +10,6 @@ class NapPage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      base_url: "http://10.0.2.2:8000/cuida24/",
       naps: 0,
       date: null
     }
@@ -43,11 +42,10 @@ class NapPage extends React.Component {
   }
 
   saveNaps = () => {
-    const url = this.state.base_url + "nap/";
     const token = this.state.token;
     const naps = this.state.naps;
     const today = this.state.date;
-    this.props.postNaps({url, token, naps, today});
+    this.props.postNaps({token, naps, today});
   }
 
   render() {

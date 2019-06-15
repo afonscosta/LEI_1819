@@ -10,7 +10,6 @@ class SOSPage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      base_url: "http://10.0.2.2:8000/cuida24/",
       sos: 0,
       date: null
     }
@@ -43,11 +42,10 @@ class SOSPage extends React.Component {
   }
 
   saveSOS = () => {
-    const url = this.state.base_url + "sos/";
     const token = this.state.token;
     const sos = this.state.sos;
     const today = this.state.date;
-    this.props.postSOS({url, token, sos, today});
+    this.props.postSOS({token, sos, today});
   }
 
   render() {

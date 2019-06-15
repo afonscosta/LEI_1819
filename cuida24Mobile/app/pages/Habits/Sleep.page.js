@@ -11,7 +11,6 @@ class SleepPage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      base_url: "http://10.0.2.2:8000/cuida24/",
       sleepLess7: false,
       sleepMore7: false,
       remainSleep: []
@@ -73,11 +72,10 @@ class SleepPage extends React.Component {
 
 
   saveSleep = () => {
-    const url = this.state.base_url + "sleep/";
     const token = this.state.token;
     const sleep = this.state.sleepMore7;
     const date = this.state.remainSleep[0].toISOString();
-    this.props.postSleep({url, token, sleep, date});
+    this.props.postSleep({token, sleep, date});
     AsyncStorage.setItem(
       '@sleep',
       JSON.stringify({ 'lastSleep': this.state.remainSleep[0] })
