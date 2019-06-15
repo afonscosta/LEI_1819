@@ -165,9 +165,11 @@ class WaterSerializer(serializers.ModelSerializer):
 
 
 class NapSerializer(serializers.ModelSerializer):
+    naps = serializers.IntegerField(source='quantity')
+
     class Meta:
         model = Nap
-        fields = ('date', 'quantity', 'caregiver', 'pk')
+        fields = ('date', 'naps', 'caregiver', 'pk')
 
 
 class SleepSerializer(serializers.ModelSerializer):

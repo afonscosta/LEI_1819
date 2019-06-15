@@ -32,6 +32,7 @@ router.register('socialLeisure', SocialLeisureViewSet)
 router.register('individualLeisure', IndividualLeisureViewSet)
 router.register('water', WaterViewSet)
 router.register('sleep', SleepViewSet)
+router.register('nap', NapViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
 

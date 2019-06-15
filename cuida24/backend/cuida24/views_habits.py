@@ -185,3 +185,62 @@ class SleepViewSet(viewsets.ModelViewSet):
         query_set = Sleep.objects.filter(caregiver_id=caregiver)
         serializer = SleepSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class NapViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'POST': ['caregiver', 'backofficeUser'],
+        'DELETE': ['caregiver', 'backofficeUser'],
+        'PUT': ['caregiver', 'backofficeUser']
+    }
+    queryset = Nap.objects.all()
+    serializer_class = NapSerializer
+
+    def create(self, request, *args, **kwargs):
+        logger.info("POST NAP")
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
+        logger.info(req_data)
+        query_set = Nap.objects.filter(caregiver_id=req_data['caregiver'], date=req_data['date'])
+        if query_set:
+            nap = get_object_or_404(Nap, caregiver_id=req_data['caregiver'], date=req_data['date'])
+            req_data['naps'] = int(req_data['naps']) + nap.quantity
+            logger.info(req_data)
+            serializer = NapSerializer(instance=nap, data=req_data)
+        else:
+            serializer = NapSerializer(data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        logger.info("PUT NAP")
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
+        nap = get_object_or_404(Water, pk=req_data['pk'])
+        serializer = WaterSerializer(instance=nap, data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    Get method by user id
+    """
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET WATER")
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = Nap.objects.filter(caregiver_id=caregiver)
+        serializer = NapSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
