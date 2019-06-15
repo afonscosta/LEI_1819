@@ -46,6 +46,7 @@ class SOSPage extends React.Component {
     const sos = this.state.sos;
     const today = this.state.date;
     this.props.postSOS({token, sos, today});
+    this.props.navigation.goBack();
   }
 
   render() {

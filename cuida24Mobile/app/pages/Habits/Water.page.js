@@ -48,6 +48,7 @@ class WaterPage extends React.Component {
     date.setSeconds(0);
     date.setMilliseconds(0);
     this.props.postWater({token, water, date});
+    this.props.navigation.goBack();
   }
 
   render() {

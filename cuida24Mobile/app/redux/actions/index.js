@@ -9,6 +9,9 @@ export const GET_PHYACT_COMMIT = 'GET_PHYACT_COMMIT';
 export const POST_INDLEI = 'POST_INDLEI';
 export const GET_INDLEI = 'GET_INDLEI';
 export const GET_INDLEI_COMMIT = 'GET_INDLEI_COMMIT';
+export const POST_SOCLEI = 'POST_SOCLEI';
+export const GET_SOCLEI = 'GET_SOCLEI';
+export const GET_SOCLEI_COMMIT = 'GET_SOCLEI_COMMIT';
 
 const ROOT_URL = 'http://10.0.2.2:8000/cuida24/';
 
@@ -204,6 +207,59 @@ export const getIndLei = ({token}) => {
         },
         commit: {
           type: GET_INDLEI_COMMIT
+        }
+      }
+    }
+  }
+}
+
+export const postSocLei = ({token, date, type, act, duration}) => {
+  return {
+    type: POST_SOCLEI,
+    payload: {
+      token: token,
+      date: date,
+      type: type,
+      act: act,
+      duration: duration,
+    },
+    meta: {
+      offline: {
+        effect: {
+          url: ROOT_URL + 'socialLeisure/',
+          method: 'POST',
+          headers: {
+            'Authorization': 'Token ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            date: date,
+            type: type,
+            act: act,
+            duration: duration
+          })
+        }
+      }
+    }
+  }
+}
+
+export const getSocLei = ({token}) => {
+  return {
+    type: GET_SOCLEI,
+    payload: [],
+    meta: {
+      offline: {
+        effect: {
+          url: ROOT_URL + 'socialLeisure/',
+          method: 'GET',
+          headers: {
+            'Authorization': 'Token ' + token,
+            'Content-Type': 'application/json',
+          }
+        },
+        commit: {
+          type: GET_SOCLEI_COMMIT
         }
       }
     }

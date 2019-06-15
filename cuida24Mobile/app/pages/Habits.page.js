@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Image, Card, List, ListItem, CheckBox, Button } from 'react-native-elements';
-import { getPhyAct, getIndLei } from '../redux/actions/index'
+import { getPhyAct, getIndLei, getSocLei } from '../redux/actions/index'
 import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -21,6 +21,7 @@ class HabitsPage extends React.Component {
       .then((token) => {
         this.props.getPhyAct({token});
         this.props.getIndLei({token});
+        this.props.getSocLei({token});
       })
       .catch((error) => {
         console.warn('AsyncStorage - getItem: login', error);
@@ -150,5 +151,5 @@ const styles = StyleSheet.create({
 
 export default connect(
   null,
-  { getPhyAct, getIndLei }
+  { getPhyAct, getIndLei, getSocLei }
 )(HabitsPage);

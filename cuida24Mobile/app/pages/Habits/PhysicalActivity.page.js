@@ -162,6 +162,7 @@ class PhysicalActivityPage extends React.Component {
     const act = this.state.act;
     const duration = this.parseDuration();
     this.props.postPhyAct({token, date, type, act, duration});
+    this.props.navigation.goBack();
   }
 
   render() {
@@ -232,13 +233,32 @@ class PhysicalActivityPage extends React.Component {
             :
           null
         }
+        <View style={{ flexDirection: 'row' }}>
+          <View style={styles.buttonItem}>
+            <Button
+              onPress={() => this.props.navigation.goBack()}
+              title="Cancelar"
+              titleStyle={styles.titles}
+              buttonStyle={styles.buttonCancel}
+              accessibilityLabel="Volta para a página dos hábitos."
+            />
+          </View>
+          <View style={styles.buttonItem}>
+            <Button
+              onPress={() => this.savePhyAct()}
+              disabled={ !this.areBothSelected() }
+              title="Guardar"
+              titleStyle={styles.titles}
+              buttonStyle={styles.buttonSave}
+              accessibilityLabel="Submete a atividade física realizada."
+            />
+          </View>
+        </View>
         <Button
-          onPress={() => this.savePhyAct()}
-          disabled={ !this.areBothSelected() }
-          title="Guardar"
-          titleStyle={styles.titles}
-          buttonStyle={styles.buttonSave}
-          accessibilityLabel="Submete a atividade física realizada."
+          onPress={() => alert('Histórico')}
+          title="Histórico"
+          buttonStyle={styles.buttonHistoric}
+          accessibilityLabel="Histórico dos descansos realizados."
         />
       </View>
     )
@@ -275,6 +295,9 @@ const styles = StyleSheet.create({
   },
   buttonSave: {
     backgroundColor: '#14D2B8'
+  },
+  buttonHistoric: {
+    backgroundColor: '#343f4b'
   },
 })
 

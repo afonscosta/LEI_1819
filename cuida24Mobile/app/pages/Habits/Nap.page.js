@@ -46,6 +46,7 @@ class NapPage extends React.Component {
     const naps = this.state.naps;
     const today = this.state.date;
     this.props.postNaps({token, naps, today});
+    this.props.navigation.goBack();
   }
 
   render() {
