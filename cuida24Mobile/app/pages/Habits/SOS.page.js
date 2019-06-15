@@ -10,16 +10,14 @@ class SOSPage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      sos: 0,
-      date: null
+      sos: 0
     }
   }
 
   async componentDidMount() {
     AsyncStorage.getItem('@login:')
       .then((token_res) => {
-        var today = new Date();
-        this.setState({ token: token_res, date: today });
+        this.setState({ token: token_res });
       })
       .catch((error) => {
         console.warn('AsyncStorage - getItem: eventsToRemove', error);
@@ -44,8 +42,12 @@ class SOSPage extends React.Component {
   saveSOS = () => {
     const token = this.state.token;
     const sos = this.state.sos;
-    const today = this.state.date;
-    this.props.postSOS({token, sos, today});
+    var date = new Date();
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    this.props.postSOS({token, sos, date});
     this.props.navigation.goBack();
   }
 
