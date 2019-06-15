@@ -83,12 +83,15 @@ class WaterViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         logger.info("POST WATER")
-        logger.info(request)
-        req_data = habitsFrontToBackJSON(request.data, request.user)
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
+        logger.info(req_data)
         query_set = Water.objects.filter(caregiver_id=req_data['caregiver'], date=req_data['date'])
         if query_set:
             water = get_object_or_404(Water, caregiver_id=req_data['caregiver'], date=req_data['date'])
             req_data['water'] = int(req_data['water']) + water.quantity
+            logger.info(req_data)
             serializer = WaterSerializer(instance=water, data=req_data)
         else:
             serializer = WaterSerializer(data=req_data)
@@ -102,8 +105,9 @@ class WaterViewSet(viewsets.ModelViewSet):
 
     def put(self, request):
         logger.info("PUT WATER")
-        logger.info(request.data)
-        req_data = habitsFrontToBackJSON(request.data, request.user)
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
         water = get_object_or_404(Water, pk=req_data['pk'])
         serializer = WaterSerializer(instance=water, data=req_data)
         if serializer.is_valid(raise_exception=False):
@@ -120,7 +124,6 @@ class WaterViewSet(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         logger.info("GET WATER")
-        logger.info(request.GET)
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
         query_set = Water.objects.filter(caregiver_id=caregiver)
         serializer = WaterSerializer(query_set, many=True)
@@ -139,8 +142,9 @@ class SleepViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         logger.info("POST SLEEP")
-        logger.info(request)
-        req_data = habitsFrontToBackJSON(request.data, request.user)
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
         query_set = Sleep.objects.filter(caregiver_id=req_data['caregiver'], date=req_data['date'])
         if query_set:
             sleep = get_object_or_404(Sleep, caregiver_id=req_data['caregiver'], date=req_data['date'])
@@ -157,8 +161,9 @@ class SleepViewSet(viewsets.ModelViewSet):
 
     def put(self, request):
         logger.info("PUT SLEEP")
-        logger.info(request.data)
-        req_data = habitsFrontToBackJSON(request.data, request.user)
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
         sleep = get_object_or_404(Sleep, pk=req_data['pk'])
         serializer = SleepSerializer(instance=sleep, data=req_data)
         if serializer.is_valid(raise_exception=False):

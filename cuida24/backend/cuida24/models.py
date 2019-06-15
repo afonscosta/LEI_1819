@@ -88,7 +88,7 @@ class Nap(models.Model):
 
 
 class Sleep(models.Model):
-    date = models.DateTimeField(unique=True)
+    date = models.DateTimeField()
     quality = models.BooleanField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
