@@ -1,8 +1,11 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Image, Card, List, ListItem, CheckBox, Button } from 'react-native-elements';
+import { getPhyAct } from '../redux/actions/index'
+import { connect } from 'react-redux';
+import AsyncStorage from '@react-native-community/async-storage';
 
-export default class HabitsPage extends React.Component {
+class HabitsPage extends React.Component {
   static navigationOptions = {
     drawerLabel: 'Habits page',
     drawerIcon: () => (
@@ -11,6 +14,17 @@ export default class HabitsPage extends React.Component {
         style={{width: 30, height: 30, borderRadius: 15}}
       />
     )
+  }
+
+  async componentDidMount() {
+    AsyncStorage.getItem('@login:')
+      .then((token) => {
+        const url = "http://10.0.2.2:8000/cuida24/physicalActivity/";
+        this.props.getPhyAct({url, token});
+      })
+      .catch((error) => {
+        console.warn('AsyncStorage - getItem: login', error);
+      });
   }
 
   render() {
@@ -133,3 +147,8 @@ const styles = StyleSheet.create({
     width: '33%'
   }
 })
+
+export default connect(
+  null,
+  { getPhyAct }
+)(HabitsPage);

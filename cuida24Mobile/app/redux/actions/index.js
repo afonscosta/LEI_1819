@@ -3,6 +3,9 @@ export const POST_WATER = "POST_WATER";
 export const POST_NAPS = "POST_NAPS";
 export const POST_SLEEP = "POST_SLEEP";
 export const POST_SOS = "POST_SOS";
+export const POST_PHYACT = "POST_PHYACT";
+export const GET_PHYACT = "GET_PHYACT";
+export const GET_PHYACT_COMMIT = "GET_PHYACT_COMMIT";
 
 export const postWater = ({url, token, water, date}) => {
   return {
@@ -90,6 +93,59 @@ export const postSOS = ({url, token, sos, date}) => {
             sos: sos,
             date: date
           })
+        }
+      }
+    }
+  }
+}
+
+export const postPhyAct = ({url, token, date, type, act, duration}) => {
+  return {
+    type: POST_PHYACT,
+    payload: {
+      token: token,
+      date: date,
+      type: type,
+      act: act,
+      duration: duration,
+    },
+    meta: {
+      offline: {
+        effect: {
+          url: url,
+          method: 'POST',
+          headers: {
+            'Authorization': 'Token ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            date: date,
+            type: type,
+            act: act,
+            duration: duration
+          })
+        }
+      }
+    }
+  }
+}
+
+export const getPhyAct = ({url, token}) => {
+  return {
+    type: GET_PHYACT,
+    payload: [],
+    meta: {
+      offline: {
+        effect: {
+          url: url,
+          method: 'GET',
+          headers: {
+            'Authorization': 'Token ' + token,
+            'Content-Type': 'application/json',
+          }
+        },
+        commit: {
+          type: GET_PHYACT_COMMIT
         }
       }
     }
