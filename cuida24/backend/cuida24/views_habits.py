@@ -315,6 +315,8 @@ class SOSViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ActivityViewSet(viewsets.ModelViewSet):
+    queryset = Activity.objects.all()
+    serializer_class = ActivitySerializer
 
     @action(detail=False, methods=['get'])
     def duration(self, request):
