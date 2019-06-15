@@ -1,6 +1,7 @@
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
 from rest_framework import status, generics, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from backend.cuida24.permissions import *
@@ -10,6 +11,7 @@ from .services_habits import *
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
+
 
 class PhysicalActivityViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
@@ -24,6 +26,7 @@ class PhysicalActivityViewSet(viewsets.ModelViewSet):
     '''
     Get physical activities, it's not important return goal associate
     '''
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = PhysicalActivitySerializer(queryset, fields=("description", "pk"), many=True)
@@ -44,10 +47,12 @@ class SocialLeisureViewSet(viewsets.ModelViewSet):
     '''
         Get physical activities, it's not important return goal associate
     '''
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = SocialLeisureSerializer(queryset, fields=("description", "pk"), many=True)
         return Response(serializer.data)
+
 
 class IndividualLeisureViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
@@ -63,11 +68,11 @@ class IndividualLeisureViewSet(viewsets.ModelViewSet):
     '''
         Get physical activities, it's not important return goal associate
     '''
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = SocialLeisureSerializer(queryset, fields=("description", "pk"), many=True)
         return Response(serializer.data)
-
 
 
 class WaterViewSet(viewsets.ModelViewSet):
@@ -129,6 +134,7 @@ class WaterViewSet(viewsets.ModelViewSet):
         serializer = WaterSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class SleepViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
@@ -186,6 +192,7 @@ class SleepViewSet(viewsets.ModelViewSet):
         serializer = SleepSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class NapViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
@@ -224,8 +231,8 @@ class NapViewSet(viewsets.ModelViewSet):
         request_data = json.loads(request.body.decode())
         logger.info(request_data)
         req_data = habitsFrontToBackJSON(request_data, request.user)
-        nap = get_object_or_404(Water, pk=req_data['pk'])
-        serializer = WaterSerializer(instance=nap, data=req_data)
+        nap = get_object_or_404(Nap, pk=req_data['pk'])
+        serializer = NapSerializer(instance=nap, data=req_data)
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
@@ -244,3 +251,76 @@ class NapViewSet(viewsets.ModelViewSet):
         query_set = Nap.objects.filter(caregiver_id=caregiver)
         serializer = NapSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SOSViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'POST': ['caregiver', 'backofficeUser'],
+        'DELETE': ['caregiver', 'backofficeUser'],
+        'PUT': ['caregiver', 'backofficeUser']
+    }
+    queryset = SOS.objects.all()
+    serializer_class = SOSSerializer
+
+    def create(self, request, *args, **kwargs):
+        logger.info("POST SOS")
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = SOSFrontToBackJSON(request_data, request.user)
+        logger.info(req_data)
+        query_set = SOS.objects.filter(caregiver=req_data['caregiver'], date=req_data['date'],
+                                       patient=req_data['patient'])
+        if query_set:
+            sos = get_object_or_404(SOS, caregiver=req_data['caregiver'], date=req_data['date'],
+                                    patient=req_data['patient'])
+            req_data['sos'] = int(req_data['sos']) + sos.quantity
+            logger.info(req_data)
+            serializer = SOSSerializer(instance=sos, data=req_data)
+        else:
+            serializer = SOSSerializer(data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request):
+        logger.info("PUT SOS")
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = SOSFrontToBackJSON(request_data, request.user)
+        sos = get_object_or_404(SOS, pk=req_data['pk'])
+        serializer = SOSSerializer(instance=sos, data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+    Get method by user id
+    """
+
+    def list(self, request, *args, **kwargs):
+        logger.info("GET SOS")
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = SOS.objects.filter(caregiver_id=caregiver)
+        serializer = SOSSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class ActivityViewSet(viewsets.ModelViewSet):
+
+    @action(detail=False, methods=['get'])
+    def duration(self, request):
+        logger.info("GET DURATION")
+        choices_value = Activity.DURATION
+        enum_values = []
+        for choice in choices_value:
+            enum_values.append(choice[1])
+        return Response(enum_values)

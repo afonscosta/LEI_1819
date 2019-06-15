@@ -171,6 +171,12 @@ class NapSerializer(serializers.ModelSerializer):
         model = Nap
         fields = ('date', 'naps', 'caregiver', 'pk')
 
+class SOSSerializer(serializers.ModelSerializer):
+    sos = serializers.IntegerField(source='quantity')
+
+    class Meta:
+        model = SOS
+        fields = ('date', 'sos', 'caregiver', 'patient', 'pk')
 
 class SleepSerializer(serializers.ModelSerializer):
     quantity = serializers.BooleanField(source="quality")
