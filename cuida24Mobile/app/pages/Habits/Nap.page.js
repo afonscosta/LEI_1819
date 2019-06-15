@@ -10,16 +10,14 @@ class NapPage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      naps: 0,
-      date: null
+      naps: 0
     }
   }
 
   async componentDidMount() {
     AsyncStorage.getItem('@login:')
       .then((token_res) => {
-        var today = new Date();
-        this.setState({ token: token_res, date: today });
+        this.setState({ token: token_res });
       })
       .catch((error) => {
         console.warn('AsyncStorage - getItem: eventsToRemove', error);
@@ -44,8 +42,12 @@ class NapPage extends React.Component {
   saveNaps = () => {
     const token = this.state.token;
     const naps = this.state.naps;
-    const today = this.state.date;
-    this.props.postNaps({token, naps, today});
+    var date = new Date();
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+    this.props.postNaps({token, naps, date});
     this.props.navigation.goBack();
   }
 
