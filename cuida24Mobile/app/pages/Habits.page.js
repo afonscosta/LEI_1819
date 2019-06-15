@@ -1,8 +1,11 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Image, Card, List, ListItem, CheckBox, Button } from 'react-native-elements';
+import { getPhyAct, getIndLei, getSocLei } from '../redux/actions/index'
+import { connect } from 'react-redux';
+import AsyncStorage from '@react-native-community/async-storage';
 
-export default class HabitsPage extends React.Component {
+class HabitsPage extends React.Component {
   static navigationOptions = {
     drawerLabel: 'Habits page',
     drawerIcon: () => (
@@ -11,6 +14,18 @@ export default class HabitsPage extends React.Component {
         style={{width: 30, height: 30, borderRadius: 15}}
       />
     )
+  }
+
+  async componentDidMount() {
+    AsyncStorage.getItem('@login:')
+      .then((token) => {
+        this.props.getPhyAct({token});
+        this.props.getIndLei({token});
+        this.props.getSocLei({token});
+      })
+      .catch((error) => {
+        console.warn('AsyncStorage - getItem: login', error);
+      });
   }
 
   render() {
@@ -133,3 +148,8 @@ const styles = StyleSheet.create({
     width: '33%'
   }
 })
+
+export default connect(
+  null,
+  { getPhyAct, getIndLei, getSocLei }
+)(HabitsPage);
