@@ -25,6 +25,7 @@ class SleepPage extends React.Component {
     today.setMilliseconds(0);
     AsyncStorage.getItem('@sleep')
       .then((lastSleepStr) => {
+        console.log('lastSleepStr', lastSleepStr);
         var remainSleep = [];
         if (lastSleepStr) {
           var lastSleep = new Date(JSON.parse(lastSleepStr).lastSleep);
@@ -86,7 +87,7 @@ class SleepPage extends React.Component {
         remainSleep: remainSleepUpdated
       }, () => {
         if (this.state.remainSleep.length === 0) {
-          this.props.navigation.navigate('App');
+          this.props.navigation.navigate('MealLoading');
         } else {
           this.setState({
             sleepLess7: false,
@@ -126,14 +127,27 @@ class SleepPage extends React.Component {
             />
           </View>
         </View>
-        <Button
-          onPress={() => this.saveSleep()}
-          disabled={ !this.state.sleepLess7 && !this.state.sleepMore7 }
-          title="Guardar"
-          titleStyle={styles.titles}
-          buttonStyle={styles.buttonSave}
-          accessibilityLabel="Submete os alimentos ingeridos."
-        />
+        <View style={{ flexDirection: 'row' }}>
+          <View style={styles.buttonItem}>
+            <Button
+              onPress={() => this.props.navigation.navigate('App')}
+              title="Preencher mais tarde"
+              titleStyle={styles.titles}
+              buttonStyle={styles.buttonCancel}
+              accessibilityLabel="Volta para a página dos hábitos."
+            />
+          </View>
+          <View style={styles.buttonItem}>
+            <Button
+              onPress={() => this.saveSleep()}
+              disabled={ !this.state.sleepLess7 && !this.state.sleepMore7 }
+              title="Guardar"
+              titleStyle={styles.titles}
+              buttonStyle={styles.buttonSave}
+              accessibilityLabel="Submete os alimentos ingeridos."
+            />
+          </View>
+        </View>
       </View>
     )
   }
