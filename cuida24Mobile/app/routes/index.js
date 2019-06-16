@@ -29,7 +29,7 @@ import {
   createAppContainer,
   createSwitchNavigator
 } from 'react-navigation';
-import { subDays, differenceInDays } from 'date-fns';
+import { subDays, isBefore, differenceInDays } from 'date-fns';
  
 class NavigationDrawerStructure extends Component {
   //Structure for the navigatin Drawer
@@ -93,7 +93,6 @@ class SleepLoadingScreen extends React.Component {
   _bootstrapAsync = async () => {
     AsyncStorage.getItem('@sleep')
       .then((lastSleepStr) => {
-        console.log('entrou');
         var today = new Date();
         today.setHours(0);
         today.setMinutes(0);
@@ -107,12 +106,86 @@ class SleepLoadingScreen extends React.Component {
           if (Math.abs(differenceInDays(lastSleep.lastSleep, today)) > 1) {
             this.props.navigation.navigate('Sleep');
           } else {
-            this.props.navigation.navigate('App');
+            this.props.navigation.navigate('MealLoading');
           }
         }
       })
       .catch((error) => {
         console.log('error get sleep', error);
+      });
+  };
+
+  // Render any loading content that you like here
+  render() {
+    return (
+      <View>
+        <ActivityIndicator />
+        <StatusBar barStyle="default" />
+      </View>
+    );
+  }
+}
+
+class MealLoadingScreen extends React.Component {
+  constructor(props) {
+    super(props);
+    this._bootstrapAsync();
+  }
+
+  lastToFill() {
+    var today = new Date();
+    var h = today.getHours();
+    if (h > 19) {
+      today.setHours(19);
+    } else if (h > 16) {
+      today.setHours(16);
+    } else if (h > 12) {
+      today.setHours(12);
+    } else if (h > 10) {
+      today.setHours(10);
+    } else if (h > 7) {
+      today.setHours(7);
+    }
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
+    return today;
+  }
+
+  todayBreakfast() {
+    var today = new Date();
+    var h = today.getHours();
+    if (h > 7) {
+      today.setHours(7);
+      today.setMinutes(0);
+      today.setSeconds(0);
+      today.setMilliseconds(0);
+      return today;
+    }
+    return null;
+  }
+
+  // Fetch the token from storage then navigate to our appropriate place
+  _bootstrapAsync = async () => {
+    AsyncStorage.getItem('@meal')
+      .then((lastMealStr) => {
+        var lastMealObj = JSON.parse(lastMealStr);
+        if (!lastMealObj && this.todayBreakfast()) {
+          this.props.navigation.navigate('Meal');
+        } else if (lastMealObj) {
+          lastMeal = new Date(lastMealObj.lastMeal);
+          var lastToFill = this.lastToFill();
+          if (isBefore(lastMeal, lastToFill)) {
+            this.props.navigation.navigate('Meal');
+          } else {
+            this.props.navigation.navigate('App');
+          }
+        } else {
+          this.props.navigation.navigate('App');
+        }
+      })
+      .catch((error) => {
+        console.log('error get meal', error);
       });
   };
 
@@ -147,6 +220,8 @@ class Logout extends React.Component {
   _bootstrapAsync = async () => {
     try{
       const tokenRemoved = await this.removeItemValue('@login:');
+
+      await AsyncStorage.clear();
 
       console.log(tokenRemoved);
 
@@ -230,16 +305,6 @@ const Habits_StackNavigator = createStackNavigator({
       headerTintColor: htColor,
     }),
   },
-	Meal: {
-		screen: MealPage,
-    navigationOptions: ({ navigation }) => ({
-      title: 'Alimentação',
-      headerStyle: {
-        backgroundColor: bgColor,
-      },
-      headerTintColor: htColor,
-    }),
-	},
 	IndivLeisure: {
 		screen: IndivLeisurePage,
     navigationOptions: ({ navigation }) => ({
@@ -438,6 +503,8 @@ export default createAppContainer(createSwitchNavigator(
     App: DrawerNavigator,
     SleepLoading: SleepLoadingScreen,
     Sleep: SleepPage,
+    MealLoading: MealLoadingScreen,
+    Meal: MealPage,
     Auth: DrawerNavigatorNoLogin
   },
   {

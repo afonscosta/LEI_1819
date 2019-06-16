@@ -39,10 +39,10 @@ export const postWater = ({token, water, date}) => {
   }
 }
 
-export const postMeal = ({token, meal, date}) => {
+export const postMeal = ({token, type, food, done, date}) => {
   return {
     type: POST_MEAL,
-    payload: { token: token, meal: meal, date: date },
+    payload: { token: token, type: type, food: food, done: done, date: date },
     meta: {
       offline: {
         effect: {
@@ -53,8 +53,10 @@ export const postMeal = ({token, meal, date}) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            meal: meal,
-            date: date,
+            type: type,
+            done: done,
+            food: food,
+            date: date
           })
         }
       }

@@ -1,6 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View, Image, TextInput, Dimensions, TouchableOpacity, KeyboardAvoidingView } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage';
+import { isAfter } from 'date-fns';
 
 export default class LoginPage extends React.Component {
   constructor(props) {
@@ -10,6 +11,81 @@ export default class LoginPage extends React.Component {
       password: '',
       base_url: "http://10.0.2.2:8000/cuida24/"
     }
+  }
+
+  getLastSleep(sleeps) {
+    var lastSleep = new Date(sleeps[0].date);
+    for (var i = 1; i < sleeps.length; i++) {
+      var s = new Date(sleeps[i].date);
+      if (isAfter(s, lastSleep)) {
+        lastSleep = s;
+      }
+    }
+    return lastSleep;
+  }
+
+  fetchSleep(token) {
+    const url = this.state.base_url + "sleep/";
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(sleep => sleep.json())
+      .then(sleep => {
+        console.log('sleep', sleep);
+        if (sleep.length > 0) {
+          var lastSleep = this.getLastSleep(sleep);
+          console.log('lastSleep', lastSleep);
+          AsyncStorage.setItem(
+            '@sleep',
+            JSON.stringify({ 'lastSleep': lastSleep })
+          )
+            .then(() => {
+              console.log('lastSleep escrito!');
+              this.props.navigation.navigate('SleepLoading');
+              // this.fetchMeal(token);
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: sleep', error);
+            });
+        } else {
+          this.props.navigation.navigate('SleepLoading');
+          // this.fetchMeal(token);
+        }
+      })
+      .catch((error) => {
+        console.warn('fetchSleep: ', error);
+      });
+  }
+
+  fetchMeal(token) {
+    const url = this.state.base_url + "meal/";
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    }).then(meal => meal.json())
+      .then(meal => {
+        if (meal.length > 0) {
+          AsyncStorage.setItem('@meal', meal)
+            .then(() => {
+              // this.props.navigation.navigate('SleepLoading');
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: meal', error);
+            });
+        } else {
+          // this.props.navigation.navigate('SleepLoading');
+        }
+      })
+      .catch((error) => {
+        console.warn('fetchMeal: ', error);
+      });
   }
 
   onPressLoginButton = async () => {
@@ -30,17 +106,14 @@ export default class LoginPage extends React.Component {
     }).then(res => res.json())
       .then(res => {
         console.log(res.token);
-        (async () => {
-          try {
-            await AsyncStorage.setItem(
-              '@login:',
-              res.token
-            );
-          } catch (error) {
-            console.warn('AsyncStorage - setItem', error);
-          }
-        })();
-        this.props.navigation.navigate('SleepLoading');
+        var token = res.token;
+        AsyncStorage.setItem('@login:', token)
+          .then(() => {
+            this.fetchSleep(token);
+          })
+          .catch((error) => {
+            console.warn('AsyncStorage - setItem: login', error);
+          });
       })
       .catch((error) => {
         console.error(error);
