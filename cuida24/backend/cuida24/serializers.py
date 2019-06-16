@@ -165,10 +165,18 @@ class WaterSerializer(serializers.ModelSerializer):
 
 
 class NapSerializer(serializers.ModelSerializer):
+    naps = serializers.IntegerField(source='quantity')
+
     class Meta:
         model = Nap
-        fields = ('date', 'quantity', 'caregiver', 'pk')
+        fields = ('date', 'naps', 'caregiver', 'pk')
 
+class SOSSerializer(serializers.ModelSerializer):
+    sos = serializers.IntegerField(source='quantity')
+
+    class Meta:
+        model = SOS
+        fields = ('date', 'sos', 'caregiver', 'patient', 'pk')
 
 class SleepSerializer(serializers.ModelSerializer):
     quantity = serializers.BooleanField(source="quality")
@@ -189,7 +197,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = ('date', 'type', 'specificActivity', 'duration', 'caregiver', 'pk')
 
 
-class MealSerializers(serializers.ModelSerializer):
+class MealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meal
         fields = ('date', 'realize', 'type', 'caregiver', 'pk')

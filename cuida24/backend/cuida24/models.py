@@ -92,18 +92,25 @@ class Sleep(models.Model):
     quality = models.BooleanField()
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
+class SOS(models.Model):
+    date = models.DateTimeField()
+    quantity = models.IntegerField()
+    caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
 class Activity(models.Model):
     TYPE = (('AF', 'Atividade Fisica'), ('LS', 'Lazer Social'), ('LI', 'Lazer Individual'))
+    DURATION = (('12', '10-20 min'), ('23', '20-30 min'), ('34', '30-40 min'), ('45', '40-50 min'),
+                ('56', '50-60 min'), ('6', '+ 60 min'))
     date = models.DateTimeField()
     type = models.CharField(max_length=2, choices=TYPE)
     specificActivity = models.TextField(null=True, blank=True)
-    duration = models.TimeField()
+    duration = models.CharField(max_length=2, choices=DURATION)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
 
 class Meal(models.Model):
-    TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'LancheTarde'), ('JT', 'Jantar'))
+    TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'Lanche Tarde'), ('JT', 'Jantar'))
     date = models.DateTimeField()
     realize = models.BooleanField()
     type = models.CharField(max_length=2, choices=TYPE)
