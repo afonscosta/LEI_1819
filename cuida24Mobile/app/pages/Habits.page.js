@@ -1,11 +1,9 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Image, Card, List, ListItem, CheckBox, Button } from 'react-native-elements';
-import { getPhyAct, getIndLei, getSocLei } from '../redux/actions/index'
-import { connect } from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 
-class HabitsPage extends React.Component {
+export default class HabitsPage extends React.Component {
   static navigationOptions = {
     drawerLabel: 'Habits page',
     drawerIcon: () => (
@@ -16,12 +14,140 @@ class HabitsPage extends React.Component {
     )
   }
 
+  constructor(props) {
+    super(props);
+    this.state  = {
+      base_url: 'http://10.0.2.2:8000/cuida24/'
+    }
+  }
+
+  getDurations(token) {
+    const url = this.state.base_url + "activity/duration/";
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(durations => durations.json())
+      .then(durations => {
+        console.log('durations', durations);
+        if (durations.length > 0) {
+          AsyncStorage.setItem(
+            '@durations',
+            JSON.stringify(durations)
+          )
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: durations', error);
+            });
+        } else {
+          this.props.navigation.navigate('SleepLoading');
+          // this.fetchMeal(token);
+        }
+      })
+      .catch((error) => {
+        console.warn('getDurations: ', error);
+      });
+  }
+
+  getPhyAct(token) {
+    const url = this.state.base_url + 'physicalActivity/';
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(activities => activities.json())
+      .then(activities => {
+        console.log('activities', activities);
+        if (activities.length > 0) {
+          AsyncStorage.setItem(
+            '@activities',
+            JSON.stringify(activities)
+          )
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: activities', error);
+            });
+        } else {
+          this.props.navigation.navigate('SleepLoading');
+          // this.fetchMeal(token);
+        }
+      })
+      .catch((error) => {
+        console.warn('getPhyAct: ', error);
+      });
+  }
+
+  getIndLei(token) {
+    const url = this.state.base_url + 'individualLeisure/';
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(activities => activities.json())
+      .then(activities => {
+        console.log('indivLeisure', activities);
+        if (activities.length > 0) {
+          AsyncStorage.setItem(
+            '@indivLeisure',
+            JSON.stringify(activities)
+          )
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: indivLeisure', error);
+            });
+        } else {
+          this.props.navigation.navigate('SleepLoading');
+          // this.fetchMeal(token);
+        }
+      })
+      .catch((error) => {
+        console.warn('getIndLei: ', error);
+      });
+  }
+
+  getSocLei(token) {
+    const url = this.state.base_url + 'socialLeisure/';
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(activities => activities.json())
+      .then(activities => {
+        console.log('socialLeisure', activities);
+        if (activities.length > 0) {
+          AsyncStorage.setItem(
+            '@socialLeisure',
+            JSON.stringify(activities)
+          )
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: socialLeisure', error);
+            });
+        } else {
+          this.props.navigation.navigate('SleepLoading');
+          // this.fetchMeal(token);
+        }
+      })
+      .catch((error) => {
+        console.warn('getSocLei: ', error);
+      });
+  }
+
   async componentDidMount() {
     AsyncStorage.getItem('@login:')
       .then((token) => {
-        this.props.getPhyAct({token});
-        this.props.getIndLei({token});
-        this.props.getSocLei({token});
+        this.getPhyAct(token);
+        this.getIndLei(token);
+        this.getSocLei(token);
+        this.getDurations(token);
       })
       .catch((error) => {
         console.warn('AsyncStorage - getItem: login', error);
@@ -148,8 +274,3 @@ const styles = StyleSheet.create({
     width: '33%'
   }
 })
-
-export default connect(
-  null,
-  { getPhyAct, getIndLei, getSocLei }
-)(HabitsPage);

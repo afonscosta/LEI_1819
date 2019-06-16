@@ -77,6 +77,17 @@ export default (state = INITIAL_STATE, action) => {
         console.warn('AsyncStorage - setItem: socialLeisure', error);
       });
       return action.payload
+    // Durations
+    case GET_SOCLEI:
+      return action.payload
+    case GET_SOCLEI_COMMIT:
+      AsyncStorage.setItem(
+        '@socialLeisure',
+        JSON.stringify(action.payload)
+      ).catch((error) => {
+        console.warn('AsyncStorage - setItem: socialLeisure', error);
+      });
+      return action.payload
 
     default:
       return state
