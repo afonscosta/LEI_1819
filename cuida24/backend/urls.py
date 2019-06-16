@@ -35,6 +35,7 @@ router.register('sleep', SleepViewSet)
 router.register('nap', NapViewSet)
 router.register('sos', SOSViewSet)
 router.register('activity', ActivityViewSet)
+router.register('meal', MealViewSet)
 
 noteCategory = AppointmentNoteViewSet.as_view({'get': 'noteCategory'})
 
@@ -58,7 +59,7 @@ urlpatterns = [
     path('cuida24/admin/', admin.site.urls),
 
     # extra action on appointmentNotes
-    path('cuida24/appointmentNotes/', noteCategory),
+    path('cuida24/appointmentNotes/noteCategory/', noteCategory),
 
     # foi necessário criar um superuser para conseguir pedir o token (python manage.py createsuperuser)
 

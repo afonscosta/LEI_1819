@@ -324,5 +324,21 @@ class ActivityViewSet(viewsets.ModelViewSet):
         choices_value = Activity.DURATION
         enum_values = []
         for choice in choices_value:
-            enum_values.append(choice[1])
+            dict = {'value': choice[0], 'title': choice[1]}
+            enum_values.append(dict)
+        return Response(enum_values)
+
+
+class MealViewSet(viewsets.ModelViewSet):
+    queryset = Meal.objects.all()
+    serializer_class = MealSerializer
+
+    @action(detail=False, methods=['get'])
+    def constitution(self, request):
+        logger.info("GET CONSTITUTION")
+        choices_value = Constitution.TYPE
+        enum_values = []
+        for choice in choices_value:
+            dict = {'value': choice[0], 'title': choice[1]}
+            enum_values.append(dict)
         return Response(enum_values)

@@ -197,7 +197,7 @@ class ActivitySerializer(serializers.ModelSerializer):
         fields = ('date', 'type', 'specificActivity', 'duration', 'caregiver', 'pk')
 
 
-class MealSerializers(serializers.ModelSerializer):
+class MealSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meal
         fields = ('date', 'realize', 'type', 'caregiver', 'pk')

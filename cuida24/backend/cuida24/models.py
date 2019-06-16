@@ -110,7 +110,7 @@ class Activity(models.Model):
 
 
 class Meal(models.Model):
-    TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'LancheTarde'), ('JT', 'Jantar'))
+    TYPE = (('PA', 'Pequeno Almoço'), ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'Lanche Tarde'), ('JT', 'Jantar'))
     date = models.DateTimeField()
     realize = models.BooleanField()
     type = models.CharField(max_length=2, choices=TYPE)

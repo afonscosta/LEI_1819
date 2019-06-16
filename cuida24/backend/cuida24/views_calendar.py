@@ -135,7 +135,8 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
         choices_value = AppointmentNote.CATEGORY
         enum_values = []
         for choice in choices_value:
-            enum_values.append(choice[1])
+            dict = {'value': choice[0], 'title': choice[1]}
+            enum_values.append(dict)
         return Response(enum_values)
 
     """
