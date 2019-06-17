@@ -146,7 +146,7 @@ export const postPhyAct = ({token, date, type, act, duration}) => {
     meta: {
       offline: {
         effect: {
-          url: ROOT_URL + 'physicalActivity/',
+          url: ROOT_URL + 'activity/',
           method: 'POST',
           headers: {
             'Authorization': 'Token ' + token,
@@ -199,7 +199,7 @@ export const postIndLei = ({token, date, type, act, duration}) => {
     meta: {
       offline: {
         effect: {
-          url: ROOT_URL + 'individualLeisure/',
+          url: ROOT_URL + 'activity/',
           method: 'POST',
           headers: {
             'Authorization': 'Token ' + token,
@@ -252,7 +252,7 @@ export const postSocLei = ({token, date, type, act, duration}) => {
     meta: {
       offline: {
         effect: {
-          url: ROOT_URL + 'socialLeisure/',
+          url: ROOT_URL + 'activity/',
           method: 'POST',
           headers: {
             'Authorization': 'Token ' + token,

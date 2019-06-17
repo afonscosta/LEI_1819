@@ -328,6 +328,30 @@ class ActivityViewSet(viewsets.ModelViewSet):
             enum_values.append(dict)
         return Response(enum_values)
 
+    def create(self, request, *args, **kwargs):
+        logger.info("POST ACTIVITY")
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
+        logger.info(req_data)
+        serializer = ActivitySerializer(data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+       Get method by user id
+     """
+    def list(self, request, *args, **kwargs):
+        logger.info("GET SOS")
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = SOS.objects.filter(caregiver_id=caregiver)
+        serializer = SOSSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()

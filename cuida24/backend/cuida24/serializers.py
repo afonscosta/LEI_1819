@@ -192,10 +192,15 @@ class SleepSerializer(serializers.ModelSerializer):
 
 
 class ActivitySerializer(serializers.ModelSerializer):
+    act = serializers.IntegerField(source="specificActivity")
+    duration = serializers.SerializerMethodField()
+
     class Meta:
         model = Activity
-        fields = ('date', 'type', 'specificActivity', 'duration', 'caregiver', 'pk')
+        fields = ('date', 'type', 'act', 'duration', 'caregiver', 'pk')
 
+    def get_duration(self, obj):
+        return obj.get_duration_display()
 
 class MealSerializer(serializers.ModelSerializer):
     class Meta:
