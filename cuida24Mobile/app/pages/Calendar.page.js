@@ -963,253 +963,267 @@ export default class CalendarPage extends React.Component {
   render() {
     return (
 
-      <View>
-        <Button
-          onPress={this.openCalendar}
-          title="Abrir calendário"
-					buttonStyle={styles.calButton}
-          accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
-        />
+      <View style={{flex:1}}>
+        <View style={{flex:0.2}}>
+          <Button
+            onPress={this.openCalendar}
+            title="Abrir calendário"
+            buttonStyle={styles.calButton}
+            accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
+          />
 
-				<CheckBox
-					title='Consultas'
-					checked={this.state.apptFilterSelected}
-					onPress={() => this.setState({apptFilterSelected: !this.state.apptFilterSelected})}
-				/>
-				<CheckBox
-					title='Sessões de grupo'
-					checked={this.state.gsFilterSelected}
-					onPress={() => this.setState({gsFilterSelected: !this.state.gsFilterSelected})}
-				/>
-				<CheckBox
-					title='Sessões individuais'
-					checked={this.state.isFilterSelected}
-					onPress={() => this.setState({isFilterSelected: !this.state.isFilterSelected})}
-				/>
-
-				{
-					this.state.apptFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
-						?
-					<FlatList
-						data={this.state.appointments}
-						refreshing={this.state.refreshing}
-						ListEmptyComponent={this._listApptEmptyComponent}
-						onRefresh={() => this.onRefresh()}
-						keyExtractor={item => String(item.appointmentPK)}
-						renderItem={({ item }) => (
-							<Card title="Consulta">
-								<View>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Especialiade:{' '}</Text>
-										{ item.event.data.description }
-									</Text>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
-										{ item.occurrenceDate.dayOfMonth + '/' + 
-											item.occurrenceDate.month + '/' + 
-											item.occurrenceDate.year }
-									</Text>
-									{
-										item.event.schedule.times != null
-											?
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
-											{ item.event.schedule.times[0] }
-										</Text>
-											:
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-											todo o dia
-										</Text>
-									}
-									{
-										item.event.schedule.duration != null
-											?
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-											{ item.event.schedule.duration + " " +
-												this.durationUnitTranslated(item.event.schedule.durationUnit) }
-										</Text>
-											:
-										null
-									}
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
-										{ item.event.data.location }
-									</Text>
-								</View>
-							</Card>
-						)}
-					/>
-						:
-					null
-				}
-				{
-					this.state.gsFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
-						?
-					<FlatList
-						data={this.state.groupSessions}
-						refreshing={this.state.refreshing}
-						onRefresh={() => this.onRefresh()}
-						ListEmptyComponent={this._listGSEmptyComponent}
-						keyExtractor={item => String(item.groupSession.pk)}
-						renderItem={({ item }) => (
-							<Card title="Sessões de Grupo">
-								<View>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Tema:{' '}</Text>
-										{ item.groupSession.theme }
-									</Text>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Descrição:{' '}</Text>
-										{ item.groupSession.description }
-									</Text>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Objetivos:{' '}</Text>
-									</Text>
-                  {
-                    item.groupSession.goals.map((g) => (
-                      <ListItem
-                        key={g}
-                        title={<Text>{`\u2022 ${g}`}</Text>}
-                      />
-                    ))
-                  }
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Material necessário:{' '}</Text>
-									</Text>
-                  {
-                    item.groupSession.materials.map((m) => (
-                      <ListItem
-                        key={m}
-                        title={<Text>{`\u2022 ${m}`}</Text>}
-                      />
-                    ))
-                  }
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
-										{ item.event.occurrenceDate.dayOfMonth + '/' + 
-											item.event.occurrenceDate.month + '/' + 
-											item.event.occurrenceDate.year }
-									</Text>
-									{
-										item.event.schedule.times != null
-											?
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
-											{ item.event.schedule.times[0] }
-										</Text>
-											:
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-											todo o dia
-										</Text>
-									}
-									{
-										item.event.schedule.duration != null
-											?
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-											{ item.event.schedule.duration + " " +
-												this.durationUnitTranslated(item.event.schedule.durationUnit) }
-										</Text>
-											:
-										null
-									}
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
-										{ item.event.data.location }
-									</Text>
-								</View>
-							</Card>
-						)}
-					/>
-						:
-					null
-				}
-				{
-					this.state.isFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
-						?
-					<FlatList
-						data={this.state.indivSessions}
-						refreshing={this.state.refreshing}
-						onRefresh={() => this.onRefresh()}
-						ListEmptyComponent={this._listISEmptyComponent}
-						keyExtractor={item => String(item.individualSession.pk)}
-						renderItem={({ item }) => (
-							<Card title="Sessões Individuais">
-								<View>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Tema:{' '}</Text>
-										{ item.individualSession.theme }
-									</Text>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Descrição:{' '}</Text>
-										{ item.individualSession.description }
-									</Text>
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Objetivos:{' '}</Text>
-									</Text>
-                  {
-                    item.individualSession.goals.map((g) => (
-                      <ListItem
-                        key={g}
-                        title={<Text>{`\u2022 ${g}`}</Text>}
-                      />
-                    ))
-                  }
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Material necessário:{' '}</Text>
-									</Text>
-                  {
-                    item.individualSession.materials.map((m) => (
-                      <ListItem
-                        key={m}
-                        title={<Text>{`\u2022 ${m}`}</Text>}
-                      />
-                    ))
-                  }
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
-										{ item.event.occurrenceDate.dayOfMonth + '/' + 
-											item.event.occurrenceDate.month + '/' + 
-											item.event.occurrenceDate.year }
-									</Text>
-									{
-										item.event.schedule.times != null
-											?
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
-											{ item.event.schedule.times[0] }
-										</Text>
-											:
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-											todo o dia
-										</Text>
-									}
-									{
-										item.event.schedule.duration != null
-											?
-										<Text>
-											<Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
-											{ item.event.schedule.duration + " " +
-												this.durationUnitTranslated(item.event.schedule.durationUnit) }
-										</Text>
-											:
-										null
-									}
-									<Text>
-										<Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
-										{ item.event.data.location }
-									</Text>
-								</View>
-							</Card>
-						)}
-					/>
-						:
-					null
-				}
+          <View style={{ flex:1, flexDirection: 'row' }}>
+            <View style={{flexDirection: 'column', width:'31%'}}>
+              <CheckBox
+                title='Consultas'
+                containerStyle={{marginRight:0, marginTop: 0, height: '100%'}}
+                checked={this.state.apptFilterSelected}
+                onPress={() => this.setState({apptFilterSelected: !this.state.apptFilterSelected})}
+              />
+            </View>
+            <View style={{flexDirection: 'column', width:'33%'}}>
+              <CheckBox
+                title='Sessões de grupo'
+                containerStyle={{marginRight:0, marginTop: 0, height: '100%'}}
+                checked={this.state.gsFilterSelected}
+                onPress={() => this.setState({gsFilterSelected: !this.state.gsFilterSelected})}
+              />
+            </View>
+            <View style={{flexDirection: 'column', width:'35%'}}>
+              <CheckBox
+                title='Sessões individuais'
+                containerStyle={{height: '100%', marginTop: 0}}
+                checked={this.state.isFilterSelected}
+                onPress={() => this.setState({isFilterSelected: !this.state.isFilterSelected})}
+              />
+            </View>
+          </View>
+        </View>
+        <View style={{flex:0.8}}>
+          {
+            this.state.apptFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
+              ?
+            <FlatList
+              data={this.state.appointments}
+              refreshing={this.state.refreshing}
+              ListEmptyComponent={this._listApptEmptyComponent}
+              onRefresh={() => this.onRefresh()}
+              keyExtractor={item => String(item.appointmentPK)}
+              renderItem={({ item }) => (
+                <Card title="Consulta">
+                  <View>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Especialiade:{' '}</Text>
+                      { item.event.data.description }
+                    </Text>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
+                      { item.occurrenceDate.dayOfMonth + '/' + 
+                        item.occurrenceDate.month + '/' + 
+                        item.occurrenceDate.year }
+                    </Text>
+                    {
+                      item.event.schedule.times != null
+                        ?
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
+                        { item.event.schedule.times[0] }
+                      </Text>
+                        :
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+                        todo o dia
+                      </Text>
+                    }
+                    {
+                      item.event.schedule.duration != null
+                        ?
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+                        { item.event.schedule.duration + " " +
+                          this.durationUnitTranslated(item.event.schedule.durationUnit) }
+                      </Text>
+                        :
+                      null
+                    }
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
+                      { item.event.data.location }
+                    </Text>
+                  </View>
+                </Card>
+              )}
+            />
+              :
+            null
+          }
+          {
+            this.state.gsFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
+              ?
+            <FlatList
+              data={this.state.groupSessions}
+              refreshing={this.state.refreshing}
+              onRefresh={() => this.onRefresh()}
+              ListEmptyComponent={this._listGSEmptyComponent}
+              keyExtractor={item => String(item.groupSession.pk)}
+              renderItem={({ item }) => (
+                <Card title="Sessões de Grupo">
+                  <View>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Tema:{' '}</Text>
+                      { item.groupSession.theme }
+                    </Text>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Descrição:{' '}</Text>
+                      { item.groupSession.description }
+                    </Text>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Objetivos:{' '}</Text>
+                    </Text>
+                    {
+                      item.groupSession.goals.map((g) => (
+                        <ListItem
+                          key={g}
+                          title={<Text>{`\u2022 ${g}`}</Text>}
+                        />
+                      ))
+                    }
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Material necessário:{' '}</Text>
+                    </Text>
+                    {
+                      item.groupSession.materials.map((m) => (
+                        <ListItem
+                          key={m}
+                          title={<Text>{`\u2022 ${m}`}</Text>}
+                        />
+                      ))
+                    }
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
+                      { item.event.occurrenceDate.dayOfMonth + '/' + 
+                        item.event.occurrenceDate.month + '/' + 
+                        item.event.occurrenceDate.year }
+                    </Text>
+                    {
+                      item.event.schedule.times != null
+                        ?
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
+                        { item.event.schedule.times[0] }
+                      </Text>
+                        :
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+                        todo o dia
+                      </Text>
+                    }
+                    {
+                      item.event.schedule.duration != null
+                        ?
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+                        { item.event.schedule.duration + " " +
+                          this.durationUnitTranslated(item.event.schedule.durationUnit) }
+                      </Text>
+                        :
+                      null
+                    }
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
+                      { item.event.data.location }
+                    </Text>
+                  </View>
+                </Card>
+              )}
+            />
+              :
+            null
+          }
+          {
+            this.state.isFilterSelected || (!this.state.apptFilterSelected && !this.state.gsFilterSelected && !this.state.isFilterSelected)
+              ?
+            <FlatList
+              data={this.state.indivSessions}
+              refreshing={this.state.refreshing}
+              onRefresh={() => this.onRefresh()}
+              ListEmptyComponent={this._listISEmptyComponent}
+              keyExtractor={item => String(item.individualSession.pk)}
+              renderItem={({ item }) => (
+                <Card title="Sessões Individuais">
+                  <View>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Tema:{' '}</Text>
+                      { item.individualSession.theme }
+                    </Text>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Descrição:{' '}</Text>
+                      { item.individualSession.description }
+                    </Text>
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Objetivos:{' '}</Text>
+                    </Text>
+                    {
+                      item.individualSession.goals.map((g) => (
+                        <ListItem
+                          key={g}
+                          title={<Text>{`\u2022 ${g}`}</Text>}
+                        />
+                      ))
+                    }
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Material necessário:{' '}</Text>
+                    </Text>
+                    {
+                      item.individualSession.materials.map((m) => (
+                        <ListItem
+                          key={m}
+                          title={<Text>{`\u2022 ${m}`}</Text>}
+                        />
+                      ))
+                    }
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Data:{' '}</Text>
+                      { item.event.occurrenceDate.dayOfMonth + '/' + 
+                        item.event.occurrenceDate.month + '/' + 
+                        item.event.occurrenceDate.year }
+                    </Text>
+                    {
+                      item.event.schedule.times != null
+                        ?
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Hora:{' '}</Text>
+                        { item.event.schedule.times[0] }
+                      </Text>
+                        :
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+                        todo o dia
+                      </Text>
+                    }
+                    {
+                      item.event.schedule.duration != null
+                        ?
+                      <Text>
+                        <Text style={{fontWeight: 'bold'}}>Duração:{' '}</Text>
+                        { item.event.schedule.duration + " " +
+                          this.durationUnitTranslated(item.event.schedule.durationUnit) }
+                      </Text>
+                        :
+                      null
+                    }
+                    <Text>
+                      <Text style={{fontWeight: 'bold'}}>Localização:{' '}</Text>
+                      { item.event.data.location }
+                    </Text>
+                  </View>
+                </Card>
+              )}
+            />
+              :
+            null
+          }
+        </View>
       </View>
     )
   }
