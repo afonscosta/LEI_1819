@@ -69,30 +69,15 @@ class IndivLeisurePage extends React.Component {
     this.setState({ durations: durations });
   }
 
-  parseDuration() {
-    if (this.state.duration1020) {
-      return "10-20 min";
-    } else if (this.state.duration2030) {
-      return "20-30 min";
-    } else if (this.state.duration3040) {
-      return "30-40 min";
-    } else if (this.state.duration4050) {
-      return "40-50 min";
-    } else if (this.state.duration5060) {
-      return "50-60 min";
-    } else if (this.state.duration60) {
-      return "+ 60 min";
-    }
-  }
-
   saveIndLei = () => {
     const token = this.state.token;
     const date = new Date();
     const type = 'LI';
     const act = this.state.act;
-    const duration = this.state.durations.filter((d) => d.selected).map((d) => {
+    var duration = this.state.durations.filter((d) => d.selected).map((d) => {
 			return d.value
 		});
+    duration = duration[0];
     this.props.postIndLei({token, date, type, act, duration});
     this.props.navigation.goBack();
   }
