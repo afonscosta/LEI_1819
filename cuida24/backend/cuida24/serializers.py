@@ -40,44 +40,28 @@ class StaticPagesSerializer(serializers.ModelSerializer):
 
 # Activity defines by Backoffice
 
-class DefActivitySerializer(serializers.ModelSerializer):
+class GoalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DefActivity
-        fields = ('goal', 'pk')
+        model = Goal
+        fields = ('goal', 'type', 'pk')
 
 
-class GameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Game
-        fields = ('activity', 'pk')
-
-
-class PhysicalActivitySerializer(DynamicFieldsModelSerializer):
+class PhysicalActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = PhysicalActivity
-        fields = ('description', 'activity', 'pk')
+        fields = ('description', 'pk')
 
 
-    def create(self, validated_data):
-        logger.info("VALIDATED DATA POST SESSION")
-        logger.info(validated_data)
-
-        activity_data = validated_data.pop('activity')
-        activity = DefActivity.objects.create(**activity_data)
-        physicalActivity = PhysicalActivity.objects.create(activity=activity, **validated_data)
-
-        return physicalActivity
-
-class SocialLeisureSerializer(DynamicFieldsModelSerializer):
+class SocialLeisureSerializer(serializers.ModelSerializer):
     class Meta:
         model = SocialLeisure
-        fields = ('description', 'activity', 'pk')
+        fields = ('description', 'pk')
 
 
-class IndividualLeisureSerializer(DynamicFieldsModelSerializer):
+class IndividualLeisureSerializer(serializers.ModelSerializer):
     class Meta:
         model = IndividualLeisure
-        fields = ('description', 'activity', 'pk')
+        fields = ('description', 'pk')
 
 
 # User

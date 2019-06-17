@@ -12,6 +12,27 @@ from .services_habits import *
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
 
+class GoalViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'POST': ['backofficeUser'],
+        'DELETE': ['backofficeUser'],
+        'PUT': ['backofficeUser']
+    }
+    queryset = Goal.objects.all()
+    serializer_class = GoalSerializer
+
+    @action(detail=False, methods=['get'])
+    def typeGoal(self, request):
+        logger.info("GET TYPE GOAL")
+        choices_value = Goal.TYPE
+        enum_values = []
+        for choice in choices_value:
+            dict = {'value': choice[0], 'title': choice[1]}
+            enum_values.append(dict)
+        return Response(enum_values)
+
 
 class PhysicalActivityViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
@@ -23,14 +44,6 @@ class PhysicalActivityViewSet(viewsets.ModelViewSet):
     }
     queryset = PhysicalActivity.objects.all()
     serializer_class = PhysicalActivitySerializer
-    '''
-    Get physical activities, it's not important return goal associate
-    '''
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = PhysicalActivitySerializer(queryset, fields=("description", "pk"), many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SocialLeisureViewSet(viewsets.ModelViewSet):
@@ -44,15 +57,6 @@ class SocialLeisureViewSet(viewsets.ModelViewSet):
     queryset = SocialLeisure.objects.all()
     serializer_class = SocialLeisureSerializer
 
-    '''
-        Get physical activities, it's not important return goal associate
-    '''
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = SocialLeisureSerializer(queryset, fields=("description", "pk"), many=True)
-        return Response(serializer.data)
-
 
 class IndividualLeisureViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
@@ -64,15 +68,6 @@ class IndividualLeisureViewSet(viewsets.ModelViewSet):
     }
     queryset = IndividualLeisure.objects.all()
     serializer_class = IndividualLeisureSerializer
-
-    '''
-        Get physical activities, it's not important return goal associate
-    '''
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = SocialLeisureSerializer(queryset, fields=("description", "pk"), many=True)
-        return Response(serializer.data)
 
 
 class WaterViewSet(viewsets.ModelViewSet):

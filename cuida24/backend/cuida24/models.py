@@ -22,27 +22,25 @@ class StaticPages(models.Model):
 
 # Activity defines by Backoffice
 
-class DefActivity(models.Model):
+class Goal(models.Model):
+    TYPE = (('AF', 'Atividade Fisica'), ('LS', 'Lazer Social'), ('LI', 'Lazer Individual'), ('GM', 'Jogo'),
+            ('WT', 'Agua'), ('NP', 'Sesta'), ('SP', 'Dormir'), ('SS', 'SOS'), ('PA', 'Pequeno Almoço'),
+            ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'Lanche Tarde'), ('JT', 'Jantar'),
+            ('CB', 'Carnes Brancas'), ('FT', 'Fruta'), ('VG', 'Vegetais'), ('FB', 'Fibras'),
+            ('PC', 'Pré-cozinhados'), ('RF', 'Refrigerantes'), ('AL', 'Alcool'))
+    type = models.CharField(max_length=2, choices=TYPE)
     goal = models.IntegerField()
-
-
-class Game(models.Model):
-    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
 
 
 class PhysicalActivity(models.Model):
     description = models.TextField()
-    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
 
 
 class SocialLeisure(models.Model):
     description = models.TextField()
-    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
-
 
 class IndividualLeisure(models.Model):
     description = models.TextField()
-    activity = models.ForeignKey(DefActivity, on_delete=models.CASCADE)
 
 
 # User
