@@ -348,10 +348,10 @@ class ActivityViewSet(viewsets.ModelViewSet):
      """
     def list(self, request, *args, **kwargs):
         logger.info("GET ACTIVITY")
-        request_data = json.loads(request.body.decode())
-        logger.info(request_data)
+        logger.info(request.GET)
+        request_type = dict(request.GET)['type'][0]
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
-        query_set = Activity.objects.filter(caregiver_id=caregiver, type=request_data['type'])
+        query_set = Activity.objects.filter(caregiver_id=caregiver, type=request_type)
         serializer = ActivitySerializer(query_set, many=True)
         for activity in serializer.data:
             type = activity['type']

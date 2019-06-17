@@ -141,7 +141,7 @@ class PhysicalActivityPage extends React.Component {
           </View>
         </View>
         <Button
-          onPress={() => alert('Histórico')}
+          onPress={() => this.props.navigation.navigate('HistoricPhysicalActivity')}
           title="Histórico"
           buttonStyle={styles.buttonHistoric}
           accessibilityLabel="Histórico dos descansos realizados."

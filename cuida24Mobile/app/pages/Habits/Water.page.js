@@ -97,7 +97,7 @@ class WaterPage extends React.Component {
           </View>
         </View>
         <Button
-          onPress={() => alert('Histórico')}
+          onPress={() => this.props.navigation.navigate('HistoricWater')}
           title="Histórico"
           buttonStyle={styles.buttonHistoric}
           accessibilityLabel="Histórico dos copos de água ingeridos."
