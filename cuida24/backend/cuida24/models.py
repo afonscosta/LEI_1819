@@ -104,7 +104,7 @@ class Activity(models.Model):
                 ('56', '50-60 min'), ('6', '+ 60 min'))
     date = models.DateTimeField()
     type = models.CharField(max_length=2, choices=TYPE)
-    specificActivity = models.TextField(null=True, blank=True)
+    specificActivity = models.IntegerField()
     duration = models.CharField(max_length=2, choices=DURATION)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
@@ -115,6 +115,10 @@ class Meal(models.Model):
     realize = models.BooleanField()
     type = models.CharField(max_length=2, choices=TYPE)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
+
+    def delete(self, using=None, keep_parents=False):
+        Constitution.objects.filter(meal=self).delete()
+        super(Meal, self).delete()
 
 
 class Constitution(models.Model):
