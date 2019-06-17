@@ -58,13 +58,11 @@ class AuthLoadingScreen extends React.Component {
     this._bootstrapAsync();
   }
 
+
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
     AsyncStorage.getItem('@login:')
       .then((userToken) => {
-        // This will switch to the App screen or Auth screen and this loading
-        // screen will be unmounted and thrown away.
-        console.log('userToken', userToken);
         this.props.navigation.navigate(userToken ? 'SleepLoading' : 'Auth');
       })
       .catch((error) => {
@@ -87,10 +85,137 @@ class SleepLoadingScreen extends React.Component {
   constructor(props) {
     super(props);
     this._bootstrapAsync();
+    this.state = {
+      base_url: "http://10.0.2.2:8000/cuida24/"
+    }
+  }
+
+  getLastSleep(sleeps) {
+    var lastSleep = new Date(sleeps[0].date);
+    for (var i = 1; i < sleeps.length; i++) {
+      var s = new Date(sleeps[i].date);
+      if (isAfter(s, lastSleep)) {
+        lastSleep = s;
+      }
+    }
+    return lastSleep;
+  }
+
+  fetchSleep(token) {
+    const url = this.state.base_url + "sleep/";
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(sleep => sleep.json())
+      .then(sleep => {
+        console.log('sleep', sleep);
+        if (sleep.length > 0) {
+          var lastSleep = this.getLastSleep(sleep);
+          console.log('lastSleep', lastSleep);
+          AsyncStorage.setItem(
+            '@sleep',
+            JSON.stringify({ 'lastSleep': lastSleep })
+          )
+            .then(() => {
+              this.fetchMealTypes(token);
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: sleep', error);
+            });
+        } else {
+          this.fetchMealTypes(token);
+        }
+      })
+      .catch((error) => {
+        this.fetchMealTypes(token);
+      });
+  }
+
+  fetchMealTypes(token) {
+    const url = this.state.base_url + "meal/constitution/";
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(meals => meals.json())
+      .then(meals => {
+        console.log('meals', meals);
+        var mealsReady = meals.map(function(meal) {
+          var m = Object.assign({}, meal);
+          m.selected = false;
+          return m;
+        })
+        if (mealsReady.length > 0) {
+          AsyncStorage.setItem(
+            '@meals',
+            JSON.stringify(mealsReady)
+          )
+            .then(() => {
+              // this.fetchMeal(token);
+              // this.props.navigation.navigate('SleepLoading');
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: meals', error);
+            });
+        } else {
+          // this.fetchMeal(token);
+          // this.props.navigation.navigate('SleepLoading');
+        }
+      })
+      .catch((error) => {
+        // this.fetchMeal(token);
+        // this.props.navigation.navigate('SleepLoading');
+      });
+  }
+
+  fetchMeal(token) {
+    const url = this.state.base_url + "meal/";
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Token ' + token,
+        'Content-Type': 'application/json',
+      }
+    }).then(meal => meal.json())
+      .then(meal => {
+        if (meal.length > 0) {
+          AsyncStorage.setItem('@meal', meal)
+            .then(() => {
+              // this.props.navigation.navigate('SleepLoading');
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - setItem: meal', error);
+            });
+        } else {
+          // this.props.navigation.navigate('SleepLoading');
+        }
+      })
+      .catch((error) => {
+        console.warn('fetchMeal: ', error);
+        // this.props.navigation.navigate('SleepLoading');
+      });
+  }
+
+  async fetchs() {
+    AsyncStorage.getItem('@login:')
+      .then((token) => {
+        this.fetchSleep(token);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
+    await this.fetchs(); // Acabar de colocar seguido!
     AsyncStorage.getItem('@sleep')
       .then((lastSleepStr) => {
         var today = new Date();
@@ -99,6 +224,7 @@ class SleepLoadingScreen extends React.Component {
         today.setSeconds(0);
         today.setMilliseconds(0);
         var lastSleepObj = JSON.parse(lastSleepStr);
+        console.log('lastSleepObj', lastSleepObj);
         if (!lastSleepObj) {
           this.props.navigation.navigate('Sleep');
         } else {

@@ -14,16 +14,7 @@ class MealPage extends React.Component {
       dateNextMeal: null,
       lastToFill: null,
       done: false,
-			types: [
-				{ value: 'CB', title: 'Carnes Brancas', selected: false },
-				{ value: 'FT', title: 'Fruta', selected: false },
-				{ value: 'VG', title: 'Vegetais', selected: false },
-				{ value: 'FB', title: 'Fibras', selected: false },
-				{ value: 'PC', title: 'Pré-cozinhados', selected: false },
-        { value: 'RF', title: 'Refrigerantes', selected: false },
-				{ value: 'AL', title: 'Álcool', selected: false },
-				{ value: 'OU', title: 'Outro', selected: false }
-			]
+			meals: null
     }
   }
 
@@ -93,6 +84,19 @@ class MealPage extends React.Component {
       });
   }
 
+  async getMeals() {
+    AsyncStorage.getItem('@meals')
+      .then((mealsStr) => {
+        console.log('mealsStr', mealsStr);
+        var meals = JSON.parse(mealsStr);
+        console.log('meals', meals);
+        this.setState({ meals: meals });
+      })
+      .catch((error) => {
+        console.warn('AsyncStorage - getItem sleep', error);
+      });
+  }
+
   async componentDidMount() {
     AsyncStorage.getItem('@login:')
       .then((token_res) => {
@@ -101,6 +105,7 @@ class MealPage extends React.Component {
       .catch((error) => {
         console.warn('AsyncStorage - getItem: eventsToRemove', error);
       });
+    this.getMeals();
     this.getNextMeal();
     this.lastToFill();
   }
@@ -134,7 +139,7 @@ class MealPage extends React.Component {
     const date = this.state.dateNextMeal;
     const done = this.processDone();
     const type = this.typeMeal().value;
-    var food = this.state.types.filter((m) => m.selected).map((m) => {
+    var food = this.state.meals.filter((m) => m.selected).map((m) => {
 			return m.value
 		});
     console.log('done', done);
@@ -147,18 +152,10 @@ class MealPage extends React.Component {
         if (isEqual(this.state.dateNextMeal, this.state.lastToFill)) {
           this.props.navigation.navigate('App');
         } else {
+          this.getMeals();
           this.setState({
             dateNextMeal: this.nextMeal(this.state.dateNextMeal),
-            done: false,
-            types: [
-              { value: 'CB', title: 'Carnes Brancas', selected: false },
-              { value: 'FT', title: 'Fruta', selected: false },
-              { value: 'VG', title: 'Vegetais', selected: false },
-              { value: 'FB', title: 'Fibras', selected: false },
-              { value: 'PC', title: 'Pré-cozinhados', selected: false },
-              { value: 'RF', title: 'Refrigerantes', selected: false },
-              { value: 'AL', title: 'Alcool', selected: false }
-            ]
+            done: false
           });
         }
       })
@@ -168,13 +165,20 @@ class MealPage extends React.Component {
   }
 
   isOneSelected() {
-    var selected = this.state.types.filter((m) => m.selected);
-    return selected.length > 0;
+    if (this.state.dateNextMeal !== null && ['PA', 'LM', 'LT'].includes(this.typeMeal().value)) {
+      return true;
+    } else {
+      if (this.state.meals) {
+        var selected = this.state.meals.filter((m) => m.selected);
+        return selected.length > 0;
+      }
+    }
+    return false;
   }
 
 
   render() {
-    const types = this.state.types;
+    const meals = this.state.meals;
     const done = this.state.done;
     return (
       <View style={styles.container}>
@@ -196,7 +200,7 @@ class MealPage extends React.Component {
           this.state.dateNextMeal !== null && ['PA', 'LM', 'LT'].includes(this.typeMeal().value)
             ?
           <CheckBox
-            title='Tomei'
+            title='Sim'
             checked={done}
             onPress={() => 
               this.setState({done: !done})
@@ -229,20 +233,20 @@ class MealPage extends React.Component {
         {
           this.state.dateNextMeal !== null && !['PA', 'LM', 'LT'].includes(this.typeMeal().value)
             ?
-          types.map((type, key) => (
+          meals.map((meal, key) => (
             <CheckBox
               key={key}
-              title={type.title}
-              checked={type.selected}
+              title={meal.title}
+              checked={meal.selected}
               onPress={() => 
-                this.setState(({types}) => ({
-                  types: [
-                    ...types.slice(0,key),
+                this.setState(({meals}) => ({
+                  meals: [
+                    ...meals.slice(0,key),
                     {
-                      ...types[key],
-                      selected: !type.selected,
+                      ...meals[key],
+                      selected: !meal.selected,
                     },
-                    ...types.slice(key+1)
+                    ...meals.slice(key+1)
                   ]
                 }))
               }

@@ -2,6 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Image, Card, List, ListItem, CheckBox, Button } from 'react-native-elements';
 import AsyncStorage from '@react-native-community/async-storage';
+import NetInfo from "@react-native-community/netinfo";
 
 export default class HabitsPage extends React.Component {
   static navigationOptions = {
@@ -33,10 +34,15 @@ export default class HabitsPage extends React.Component {
       .then(durations => durations.json())
       .then(durations => {
         console.log('durations', durations);
-        if (durations.length > 0) {
+        var durationsReady = durations.map(function(duration) {
+          var d = Object.assign({}, duration);
+          d.selected = false;
+          return d;
+        })
+        if (durationsReady.length > 0) {
           AsyncStorage.setItem(
             '@durations',
-            JSON.stringify(durations)
+            JSON.stringify(durationsReady)
           )
             .catch((error) => {
               console.warn('AsyncStorage - setItem: durations', error);
@@ -50,6 +56,7 @@ export default class HabitsPage extends React.Component {
         console.warn('getDurations: ', error);
       });
   }
+
 
   getPhyAct(token) {
     const url = this.state.base_url + 'physicalActivity/';
@@ -144,10 +151,14 @@ export default class HabitsPage extends React.Component {
   async componentDidMount() {
     AsyncStorage.getItem('@login:')
       .then((token) => {
-        this.getPhyAct(token);
-        this.getIndLei(token);
-        this.getSocLei(token);
-        this.getDurations(token);
+        NetInfo.fetch().then(state => {
+          if (state.isConnected) {
+            this.getPhyAct(token);
+            this.getIndLei(token);
+            this.getSocLei(token);
+            this.getDurations(token);
+          }
+        });
       })
       .catch((error) => {
         console.warn('AsyncStorage - getItem: login', error);

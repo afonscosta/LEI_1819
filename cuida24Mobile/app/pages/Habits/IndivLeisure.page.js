@@ -10,15 +10,23 @@ class IndivLeisurePage extends React.Component {
     super(props);
     this.state  = {
       token: '',
-      duration1020: false,
-      duration2030: false,
-      duration3040: false,
-      duration4050: false,
-      duration5060: false,
-      duration60: false,
+      durations: null,
       activities: [],
       act: 1
     }
+  }
+
+  async getDurations() {
+    AsyncStorage.getItem('@durations')
+      .then((durationsStr) => {
+        console.log('durationsStr', durationsStr);
+        var durations = JSON.parse(durationsStr);
+        console.log('durations', durations);
+        this.setState({ durations: durations });
+      })
+      .catch((error) => {
+        console.warn('AsyncStorage - getItem durations', error);
+      });
   }
 
   async componentWillMount() {
@@ -38,105 +46,27 @@ class IndivLeisurePage extends React.Component {
       .catch((error) => {
         console.warn('AsyncStorage - getItem: login', error);
       });
+    this.getDurations();
   }
 
   areBothSelected() {
-    return (this.state.duration1020 ||
-      this.state.duration2030 ||
-      this.state.duration3040 ||
-      this.state.duration4050 ||
-      this.state.duration5060 ||
-      this.state.duration60) && this.state.act !== null;
+    if (this.state.durations != null) {
+      const duration = this.state.durations.filter((d) => d.selected)
+      return duration.length > 0 && this.state.act !== null;
+    }
+    return false;
   }
 
-  setDuration1020 = () => {
-    if (this.state.duration1020) {
-      this.setState({ duration1020: false })
-    } else {
-      this.setState({
-        duration1020: true,
-        duration2030: false,
-        duration3040: false,
-        duration4050: false,
-        duration5060: false,
-        duration60: false,
-      })
-    }
-  }
-
-  setDuration2030 = () => {
-    if (this.state.duration2030) {
-      this.setState({ duration2030: false })
-    } else {
-      this.setState({
-        duration1020: false,
-        duration2030: true,
-        duration3040: false,
-        duration4050: false,
-        duration5060: false,
-        duration60: false,
-      })
-    }
-  }
-
-  setDuration3040 = () => {
-    if (this.state.duration3040) {
-      this.setState({ duration3040: false })
-    } else {
-      this.setState({
-        duration1020: false,
-        duration2030: false,
-        duration3040: true,
-        duration4050: false,
-        duration5060: false,
-        duration60: false,
-      })
-    }
-  }
-
-  setDuration4050 = () => {
-    if (this.state.duration4050) {
-      this.setState({ duration4050: false })
-    } else {
-      this.setState({
-        duration1020: false,
-        duration2030: false,
-        duration3040: false,
-        duration4050: true,
-        duration5060: false,
-        duration60: false,
-      })
-    }
-  }
-
-  setDuration5060 = () => {
-    if (this.state.duration5060) {
-      this.setState({ duration5060: false })
-    } else {
-      this.setState({
-        duration1020: false,
-        duration2030: false,
-        duration3040: false,
-        duration4050: false,
-        duration5060: true,
-        duration60: false,
-      })
-    }
-  }
-
-  setDuration60 = () => {
-    if (this.state.duration60) {
-      this.setState({ duration60: false })
-    } else {
-      this.setState({
-        duration1020: false,
-        duration2030: false,
-        duration3040: false,
-        duration4050: false,
-        duration5060: false,
-        duration60: true,
-      })
-    }
+  setDuration(value) {
+    durations = this.state.durations.map((d) => {
+      if (d.value === value) {
+        d.selected = true;
+      } else {
+        d.selected = false;
+      }
+			return d;
+		});
+    this.setState({ durations: durations });
   }
 
   parseDuration() {
@@ -160,61 +90,32 @@ class IndivLeisurePage extends React.Component {
     const date = new Date();
     const type = 'LI';
     const act = this.state.act;
-    const duration = this.parseDuration();
+    const duration = this.state.durations.filter((d) => d.selected).map((d) => {
+			return d.value
+		});
     this.props.postIndLei({token, date, type, act, duration});
     this.props.navigation.goBack();
   }
 
   render() {
+    const durations = this.state.durations;
     return (
       <View style={styles.container}>
         <Text>Duração:</Text>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={styles.buttonItem}>
+        {
+          this.state.durations
+            ?
+          durations.map((duration, key) => (
             <CheckBox
-              title='10-20 min'
-              checked={this.state.duration1020}
-              onPress={() => this.setDuration1020()}
+              key={key}
+              title={duration.title}
+              checked={duration.selected}
+              onPress={() => this.setDuration(duration.value) }
             />
-          </View>
-          <View style={styles.buttonItem}>
-            <CheckBox
-              title='20-30 min'
-              checked={this.state.duration2030}
-              onPress={() => this.setDuration2030()}
-            />
-          </View>
-          <View style={styles.buttonItem}>
-            <CheckBox
-              title='30-40 min'
-              checked={this.state.duration3040}
-              onPress={() => this.setDuration3040()}
-            />
-          </View>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <View style={styles.buttonItem}>
-            <CheckBox
-              title='40-50 min'
-              checked={this.state.duration4050}
-              onPress={() => this.setDuration4050()}
-            />
-          </View>
-          <View style={styles.buttonItem}>
-            <CheckBox
-              title='50-60 min'
-              checked={this.state.duration5060}
-              onPress={() => this.setDuration5060()}
-            />
-          </View>
-          <View style={styles.buttonItem}>
-            <CheckBox
-              title='+ 60 min'
-              checked={this.state.duration60}
-              onPress={() => this.setDuration60()}
-            />
-          </View>
-        </View>
+          ))
+            :
+          null
+        }
         {
           this.state.activities && this.state.activities.length > 0
             ?
