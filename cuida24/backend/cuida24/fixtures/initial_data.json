@@ -345,73 +345,68 @@
     }
   },
   {
-    "model": "cuida24.DefActivity",
+    "model": "cuida24.Goal",
     "pk": 1,
     "fields": {
-        "goal": "2"
+        "goal": "2",
+        "type": "AF"
     }
   },
   {
-    "model": "cuida24.DefActivity",
+    "model": "cuida24.Goal",
     "pk": 2,
     "fields": {
-        "goal": "3"
+        "goal": "3",
+        "type": "LS"
     }
   },
   {
     "model": "cuida24.PhysicalActivity",
     "pk": 1,
     "fields": {
-        "description": "Caminhada",
-        "activity": "2"
+        "description": "Caminhada"
     }
   },
   {
     "model": "cuida24.PhysicalActivity",
     "pk": 2,
     "fields": {
-        "description": "Ginástica",
-        "activity": "1"
+        "description": "Ginástica"
     }
   },
   {
     "model": "cuida24.SocialLeisure",
     "pk": 1,
     "fields": {
-        "description": "Café",
-        "activity": "1"
+        "description": "Café"
     }
   },
   {
     "model": "cuida24.SocialLeisure",
     "pk": 2,
     "fields": {
-        "description": "Compras",
-        "activity": "1"
+        "description": "Compras"
     }
   },
   {
     "model": "cuida24.SocialLeisure",
     "pk": 3,
     "fields": {
-        "description": "Serviços religiosos",
-        "activity": "2"
+        "description": "Serviços religiosos"
     }
   },
   {
     "model": "cuida24.IndividualLeisure",
     "pk": 1,
     "fields": {
-        "description": "Televisao",
-        "activity": "2"
+        "description": "Televisao"
     }
   },
   {
     "model": "cuida24.IndividualLeisure",
     "pk": 2,
     "fields": {
-        "description": "Leitura",
-        "activity": "2"
+        "description": "Leitura"
     }
   }
 ]
