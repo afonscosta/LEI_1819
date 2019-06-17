@@ -122,8 +122,11 @@ export default class HistoricNapPage extends React.Component {
         console.log('dateNap', dateNap);
         return isSameDay(dateSleep, dateNap);
       });
-      return nap.naps;
+      if (nap) {
+        return nap.naps;
+      }
     }
+    return 0;
   }
 
   printDate(date) {
