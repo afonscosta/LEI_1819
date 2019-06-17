@@ -13,6 +13,8 @@ export const GET_INDLEI_COMMIT = 'GET_INDLEI_COMMIT';
 export const POST_SOCLEI = 'POST_SOCLEI';
 export const GET_SOCLEI = 'GET_SOCLEI';
 export const GET_SOCLEI_COMMIT = 'GET_SOCLEI_COMMIT';
+export const GET_DURATIONS = 'GET_DURATIONS';
+export const GET_DURATIONS_COMMIT = 'GET_DURATIONS_COMMIT';
 
 const ROOT_URL = 'http://10.0.2.2:8000/cuida24/';
 
