@@ -159,19 +159,19 @@ class SleepLoadingScreen extends React.Component {
           )
             .then(() => {
               // this.fetchMeal(token);
-              // this.props.navigation.navigate('SleepLoading');
+              this.processSleep();
             })
             .catch((error) => {
               console.warn('AsyncStorage - setItem: meals', error);
             });
         } else {
           // this.fetchMeal(token);
-          // this.props.navigation.navigate('SleepLoading');
+          this.processSleep();
         }
       })
       .catch((error) => {
         // this.fetchMeal(token);
-        // this.props.navigation.navigate('SleepLoading');
+        this.processSleep();
       });
   }
 
@@ -188,18 +188,44 @@ class SleepLoadingScreen extends React.Component {
         if (meal.length > 0) {
           AsyncStorage.setItem('@meal', meal)
             .then(() => {
-              // this.props.navigation.navigate('SleepLoading');
+              // this.processSleep();
             })
             .catch((error) => {
               console.warn('AsyncStorage - setItem: meal', error);
             });
         } else {
-          // this.props.navigation.navigate('SleepLoading');
+          // this.processSleep();
         }
       })
       .catch((error) => {
         console.warn('fetchMeal: ', error);
-        // this.props.navigation.navigate('SleepLoading');
+        // this.processSleep();
+      });
+  }
+
+  processSleep() {
+    AsyncStorage.getItem('@sleep')
+      .then((lastSleepStr) => {
+        var today = new Date();
+        today.setHours(0);
+        today.setMinutes(0);
+        today.setSeconds(0);
+        today.setMilliseconds(0);
+        var lastSleepObj = JSON.parse(lastSleepStr);
+        console.log('lastSleepObj', lastSleepObj);
+        if (!lastSleepObj) {
+          this.props.navigation.navigate('Sleep');
+        } else {
+          lastSleep = new Date(lastSleepObj.lastSleep);
+          if (Math.abs(differenceInDays(lastSleep, today)) > 1) {
+            this.props.navigation.navigate('Sleep');
+          } else {
+            this.props.navigation.navigate('MealLoading');
+          }
+        }
+      })
+      .catch((error) => {
+        console.log('error get sleep', error);
       });
   }
 
@@ -215,30 +241,7 @@ class SleepLoadingScreen extends React.Component {
 
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
-    await this.fetchs(); // Acabar de colocar seguido!
-    AsyncStorage.getItem('@sleep')
-      .then((lastSleepStr) => {
-        var today = new Date();
-        today.setHours(0);
-        today.setMinutes(0);
-        today.setSeconds(0);
-        today.setMilliseconds(0);
-        var lastSleepObj = JSON.parse(lastSleepStr);
-        console.log('lastSleepObj', lastSleepObj);
-        if (!lastSleepObj) {
-          this.props.navigation.navigate('Sleep');
-        } else {
-          lastSleep = new Date(lastSleepObj.lastSleep);
-          if (Math.abs(differenceInDays(lastSleep.lastSleep, today)) > 1) {
-            this.props.navigation.navigate('Sleep');
-          } else {
-            this.props.navigation.navigate('MealLoading');
-          }
-        }
-      })
-      .catch((error) => {
-        console.log('error get sleep', error);
-      });
+    this.fetchs();
   };
 
   // Render any loading content that you like here
