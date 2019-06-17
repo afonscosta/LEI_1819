@@ -13,93 +13,6 @@ export default class LoginPage extends React.Component {
     }
   }
 
-  getLastSleep(sleeps) {
-    var lastSleep = new Date(sleeps[0].date);
-    for (var i = 1; i < sleeps.length; i++) {
-      var s = new Date(sleeps[i].date);
-      if (isAfter(s, lastSleep)) {
-        lastSleep = s;
-      }
-    }
-    return lastSleep;
-  }
-
-  fetchSleep(token) {
-    const url = this.state.base_url + "sleep/";
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Token ' + token,
-        'Content-Type': 'application/json',
-      }
-    })
-      .then(sleep => sleep.json())
-      .then(sleep => {
-        console.log('sleep', sleep);
-        if (sleep.length > 0) {
-          var lastSleep = this.getLastSleep(sleep);
-          console.log('lastSleep', lastSleep);
-          AsyncStorage.setItem(
-            '@sleep',
-            JSON.stringify({ 'lastSleep': lastSleep })
-          )
-            .then(() => {
-              console.log('lastSleep escrito!');
-              this.fetchMealTypes(token);
-            })
-            .catch((error) => {
-              console.warn('AsyncStorage - setItem: sleep', error);
-            });
-        } else {
-          this.fetchMealTypes(token);
-        }
-      })
-      .catch((error) => {
-        console.warn('fetchSleep: ', error);
-      });
-  }
-
-  fetchMealTypes(token) {
-    const url = this.state.base_url + "meal/";
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Token ' + token,
-        'Content-Type': 'application/json',
-      }
-    })
-      .then(meals => meals.json())
-      .then(meals => {
-        console.log('meals', meals);
-        var mealsReady = meals.map(function(meal) {
-          var m = Object.assign({}, meal);
-          m.selected = false;
-          return m;
-        })
-        if (mealsReady.length > 0) {
-          AsyncStorage.setItem(
-            '@meals',
-            JSON.stringify(mealsReady)
-          )
-            .then(() => {
-              // this.fetchMeal(token);
-              this.props.navigation.navigate('SleepLoading');
-            })
-            .catch((error) => {
-              console.warn('AsyncStorage - setItem: meals', error);
-            });
-        } else {
-          // this.fetchMeal(token);
-          this.props.navigation.navigate('SleepLoading');
-        }
-      })
-      .catch((error) => {
-        console.warn('getMeals: ', error);
-      });
-  }
-
-
-
   onPressLoginButton = async () => {
     const url = this.state.base_url + "token/";
 
@@ -112,14 +25,15 @@ export default class LoginPage extends React.Component {
       body: JSON.stringify({
         username: this.state.email,
         password: this.state.password,
-        // username: 'admin',
-        // password: 'admin'
       }),
     }).then(res => res.json())
       .then(res => {
         console.log(res.token);
         var token = res.token;
         AsyncStorage.setItem('@login:', token)
+          .then(() => {
+            this.props.navigation.navigate('SleepLoading');
+          })
           .catch((error) => {
             console.warn('AsyncStorage - setItem: login', error);
           });
