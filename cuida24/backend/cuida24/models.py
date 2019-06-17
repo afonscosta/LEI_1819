@@ -116,6 +116,10 @@ class Meal(models.Model):
     type = models.CharField(max_length=2, choices=TYPE)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
+    def delete(self, using=None, keep_parents=False):
+        Constitution.objects.filter(meal=self).delete()
+        super(Meal, self).delete()
+
 
 class Constitution(models.Model):
     TYPE = (('CB', 'Carnes Brancas'), ('FT', 'Fruta'), ('VG', 'Vegetais'), ('FB', 'Fibras'), ('PC', 'Pré-cozinhados'),

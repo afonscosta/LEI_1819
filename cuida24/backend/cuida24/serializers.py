@@ -193,26 +193,37 @@ class SleepSerializer(serializers.ModelSerializer):
 
 class ActivitySerializer(serializers.ModelSerializer):
     act = serializers.IntegerField(source="specificActivity")
-    duration = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
         fields = ('date', 'type', 'act', 'duration', 'caregiver', 'pk')
-
-    def get_duration(self, obj):
-        return obj.get_duration_display()
-
-class MealSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Meal
-        fields = ('date', 'realize', 'type', 'caregiver', 'pk')
-
 
 class ConstitutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Constitution
         fields = ('food', 'meal', 'pk')
 
+
+class MealSerializer(serializers.ModelSerializer):
+    done = serializers.BooleanField(source="realize")
+
+    class Meta:
+        model = Meal
+        fields = ('date', 'done', 'type', 'caregiver', 'pk')
+
+    def create(self, validated_data):
+        logger.info("VALIDATED DATA POST MEAL")
+        logger.info(validated_data)
+
+        #constitution_data = validated_data.pop('food')
+        constitution_data = self.context.get('request')['food']
+        logger.info(constitution_data)
+        meal = Meal.objects.create(**validated_data)
+        for constitution in constitution_data:
+            constitution_req_data = {'food': constitution, 'meal': meal}
+            Constitution.objects.create(**constitution_req_data)
+
+        return meal
 
 # Event
 

@@ -347,15 +347,65 @@ class ActivityViewSet(viewsets.ModelViewSet):
        Get method by user id
      """
     def list(self, request, *args, **kwargs):
-        logger.info("GET SOS")
+        logger.info("GET ACTIVITY")
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
-        query_set = SOS.objects.filter(caregiver_id=caregiver)
-        serializer = SOSSerializer(query_set, many=True)
+        query_set = Activity.objects.filter(caregiver_id=caregiver, type=request_data['type'])
+        serializer = ActivitySerializer(query_set, many=True)
+        for activity in serializer.data:
+            type = activity['type']
+            if type == 'LI':
+                act = IndividualLeisure.objects.get(pk=activity['act']).description
+                activity['act'] = act
+            elif type == 'LS':
+                act = SocialLeisure.objects.get(pk=activity['act']).description
+                activity['act'] = act
+            elif type == 'AF':
+                act = PhysicalActivity.objects.get(pk=activity['act']).description
+                activity['act'] = act
+            else:
+                Response(status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()
     serializer_class = MealSerializer
+
+    def create(self, request, *args, **kwargs):
+        logger.info("POST MEAL")
+        request_data = json.loads(request.body.decode())
+        logger.info(request_data)
+        req_data = habitsFrontToBackJSON(request_data, request.user)
+        logger.info(req_data)
+        serializer = MealSerializer(data=req_data,  context={'request': req_data})
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    """
+       Get method by user id
+     """
+    def list(self, request, *args, **kwargs):
+        logger.info("GET MEAL")
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = Meal.objects.filter(caregiver_id=caregiver)
+        serializer = MealSerializer(query_set, many=True)
+        food = []
+        for meal in serializer.data:
+            logger.info(meal)
+            query_set2 = Constitution.objects.filter(meal=meal['pk']).values('food')
+            for const in query_set2:
+                food.append(const['food'])
+            meal['food'] = food
+            logger.info(food)
+            food = []
+        logger.info(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'])
     def constitution(self, request):
