@@ -65,20 +65,14 @@ export default {
   },
   methods: {
     ...mapActions('calendar', ['addEvent', 'updateEvent', 'deleteEvent']),
-    removeSelectedCaregiver (userPK) {
-      this.caregiversSelected = this.caregiversSelected.filter(u => u.pk !== userPK)
-      this.usersActive.caregivers = this.usersActive.caregivers.filter(pk => pk !== userPK)
-    },
-    addSelectedCaregiver (user) {
-      this.caregiversSelected.push(user)
-      this.usersActive.caregivers.push(user.pk)
-    },
     removeSelectedPatient (userPK) {
       this.patientsSelected = this.patientsSelected.filter(u => u.pk !== userPK)
       this.usersActive.patients = this.usersActive.patients.filter(pk => pk !== userPK)
     },
     addSelectedPatient (user) {
+      this.patientsSelected = []
       this.patientsSelected.push(user)
+      this.usersActive.patients = []
       this.usersActive.patients.push(user.pk)
     },
     goToPrescriptions () {

@@ -474,7 +474,11 @@ export default {
       if (save) {
         this.prescription.medicine = this.medicine.length === 1 ? this.medicine[0].pk : null
       } else {
-        this.medicine = [this.getMedicineById(this.prescription.medicine)]
+        if (this.prescription.medicine) {
+          this.medicine = [this.getMedicineById(this.prescription.medicine)]
+        } else {
+          this.medicine = []
+        }
       }
       this.$refs['modal-med'].hide()
     }

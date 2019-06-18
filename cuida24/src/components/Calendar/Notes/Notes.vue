@@ -28,8 +28,6 @@ export default {
     FormNote,
     ListNotes
   },
-  data: () => ({
-  }),
   computed: {
     ...mapState({
       usersActive: state => state.users.usersActive

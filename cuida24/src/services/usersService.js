@@ -42,5 +42,12 @@ export default {
         Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
+  },
+  fetchUserAuth () {
+    return cuida24.get(`authenticateUser/`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
   }
 }

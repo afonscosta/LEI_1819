@@ -31,6 +31,7 @@ export default {
         password: this.password
       }).then((response) => {
         this.$router.push('/')
+        this.$store.dispatch('users/getUserAuth')
       }).catch((error) => {
         console.log(error)
       })

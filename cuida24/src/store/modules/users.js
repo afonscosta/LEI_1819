@@ -9,7 +9,8 @@ const state = {
   usersActive: {
     caregivers: [],
     patients: []
-  }
+  },
+  userAuth: {}
 }
 
 const getters = {
@@ -42,6 +43,9 @@ const getters = {
   },
   backoffice: state => {
     return state.users.backoffice
+  },
+  userAuth: state => {
+    return state.userAuth
   }
 }
 
@@ -54,6 +58,9 @@ const mutations = {
   },
   setBackoffice (state, backoffice) {
     state.users.backoffice = backoffice
+  },
+  setUserAuth (state, userAuth) {
+    state.userAuth = userAuth
   }
 }
 
@@ -92,6 +99,13 @@ const actions = {
       .then(backoffice => {
         console.log('backoffice', backoffice)
         commit('setBackoffice', backoffice)
+      })
+  },
+  getUserAuth ({ commit }) {
+    usersService.fetchUserAuth()
+      .then(user => {
+        console.log('get userAuth', user)
+        commit('setUserAuth', user)
       })
   }
 }

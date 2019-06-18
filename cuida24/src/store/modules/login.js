@@ -1,7 +1,7 @@
 import loginService from '../../services/loginService'
 
 const state = {
-  accesstoken: ''
+  accesstoken: null
 }
 
 const getters = {
@@ -13,11 +13,25 @@ const getters = {
 const mutations = {
   setToken (state, response) {
     state.accesstoken = response.token
-    console.log('teste mutations ' + state.accesstoken)
+    localStorage.setItem('token', response.token)
+  },
+  setPlainToken (state, token) {
+    state.accesstoken = token
+    localStorage.setItem('token', token)
+  },
+  deleteToken (state) {
+    state.accesstoken = null
+    localStorage.removeItem('token')
   }
 }
 
 const actions = {
+  setPlainToken ({ commit }, token) {
+    commit('setPlainToken', token)
+  },
+  deleteToken ({ commit }) {
+    commit('deleteToken')
+  },
   getToken ({ commit }, credencials) {
     return new Promise((resolve, reject) => {
       loginService.getToken(credencials)
