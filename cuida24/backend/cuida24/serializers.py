@@ -114,7 +114,6 @@ class PatientSerializer(serializers.ModelSerializer):
 
 class BackofficeUserSerializer(serializers.ModelSerializer):
     info = UserSerializer()
-    type = serializers.CharField(source='get_type_display')
 
     class Meta:
         model = BackofficeUser
