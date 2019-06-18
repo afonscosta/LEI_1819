@@ -22,6 +22,7 @@
     "luxon": "^1.12.1",
     "popper.js": "^1.14.7",
     "vue": "^2.6.10",
+    "vue-airbnb-style-datepicker": "^2.7.1",
     "vue-burger-menu": "^2.0.1",
     "vue-datetime": "^1.0.0-beta.10",
     "vue-form-wizard": "^0.8.4",

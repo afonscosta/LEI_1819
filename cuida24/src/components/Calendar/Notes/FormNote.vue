@@ -17,6 +17,7 @@
       group="error"
     />
 
+    <h5>Adicionar nota de consulta</h5>
     <b-form @submit.prevent="onSubmit">
       <b-form-textarea
         id="note"
@@ -27,7 +28,7 @@
         placeholder="Insira as notas da consulta aqui"
       ></b-form-textarea>
 
-      <b-button type="submit" variant="primary">Submeter</b-button>
+      <b-button class="mb-3" type="submit" variant="primary">Submeter</b-button>
     </b-form>
   </div>
 </template>
@@ -57,11 +58,15 @@ export default {
   created () {
     if (this.noteData) {
       this.note = this.noteData
+    } else {
+      this.note.category = this.getCategoryFromAuthUser()
     }
+    this.note.author = this.userAuth.pk
   },
   computed: {
     ...mapState({
-      apptPK: state => state.notes.apptPK
+      apptPK: state => state.notes.apptPK,
+      userAuth: state => state.users.userAuth
     })
   },
   methods: {
@@ -77,11 +82,13 @@ export default {
               group: 'success'
             })
             // TODO: derivar do user + corrigir no data em cima
+            console.log('userAuth', this.userAuth)
             this.note = {
               note: '',
-              author: 1,
+              author: this.userAuth.pk,
               appointment: null,
-              category: 'ENF'
+              category: this.getCategoryFromAuthUser(),
+              pk: null
             }
           })
           .catch(() => {
@@ -103,9 +110,9 @@ export default {
             // TODO: derivar do user + corrigir no data em cima
             this.note = {
               note: '',
-              author: 1,
+              author: this.userAuth.pk,
               appointment: null,
-              category: 'ENF',
+              category: this.getCategoryFromAuthUser(),
               pk: null
             }
           })
@@ -117,6 +124,21 @@ export default {
             })
           })
       }
+    },
+    getCategoryFromAuthUser () {
+      var category = ''
+      if (this.userAuth.type === 'Coordenador') {
+        category = 'OTR'
+      } else if (this.userAuth.type === 'Profissional Saúde') {
+        category = 'OTR'
+      } else if (this.userAuth.type === 'Médico') {
+        category = 'CLI'
+      } else if (this.userAuth.type === 'Enfermeiro') {
+        category = 'ENF'
+      } else if (this.userAuth.type === 'Psicólogo') {
+        category = 'PSI'
+      }
+      return category
     }
   }
 }

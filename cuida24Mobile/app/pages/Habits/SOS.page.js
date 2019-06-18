@@ -97,7 +97,7 @@ class SOSPage extends React.Component {
           </View>
         </View>
         <Button
-          onPress={() => alert('Histórico')}
+          onPress={() => this.props.navigation.navigate('HistoricSOS')}
           title="Histórico"
           buttonStyle={styles.buttonHistoric}
           accessibilityLabel="Histórico dos descansos realizados."

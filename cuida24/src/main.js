@@ -27,8 +27,18 @@ import { Settings } from 'luxon'
 
 import Notifications from 'vue-notification'
 
+// import component and stylesheet
+import AirbnbStyleDatepicker from 'vue-airbnb-style-datepicker'
+import 'vue-airbnb-style-datepicker/dist/vue-airbnb-style-datepicker.min.css'
+
 import setupNotifications from '@/assets/firebase_notifications.js'
 Vue.prototype.$messaging = setupNotifications.initFirebase()
+
+// see docs for available options
+const datepickerOptions = {}
+
+// make sure we can use it in our components
+Vue.use(AirbnbStyleDatepicker, datepickerOptions)
 
 Vue.config.productionTip = false
 

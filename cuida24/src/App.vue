@@ -27,19 +27,14 @@ export default {
   methods: {
   },
   created () {
-    this.$messaging
-      .requestPermission()
-      .then(() => this.$messaging.getToken())
-      .then((token) => {
-        console.log(token) // Receiver Token to use in the notification
-      })
-      .catch(function (err) {
-        console.log('Unable to get permission to notify.', err)
-      })
-
-    this.$messaging.onMessage(function (payload) {
-      console.log('Message received. ', payload)
-    })
+    var token = localStorage.getItem('token')
+    if (token) {
+      // Verificar a validade
+      this.$store.dispatch('login/setPlainToken', token)
+      this.$router.push('/')
+    } else {
+      this.$router.push({ name: 'login' })
+    }
   }
 }
 </script>

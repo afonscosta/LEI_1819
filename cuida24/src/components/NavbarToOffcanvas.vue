@@ -15,31 +15,54 @@
           <!--</router-link>-->
         <!--</li>-->
         <li class="nav-item" v-bind:class="{ active: calendarCurrent }">
-          <router-link class="nav-link" :to="{ name: 'calendar' }" @click.native="toggleoffcanvas() + currentUpdate('calendar')">
+          <router-link
+            class="nav-link"
+            :to="{ name: 'calendar' }"
+            @click.native="toggleoffcanvas() + currentUpdate('calendar')"
+            :disabled="!token"
+            :event="(!token ? '' : 'click')"
+          >
             Calendário
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
         <li class="nav-item" v-bind:class="{ active: medicationCurrent }">
-          <router-link class="nav-link" :to="{ name: 'medication' }" @click.native="toggleoffcanvas() + currentUpdate('medication')">
+          <router-link
+            class="nav-link"
+            :to="{ name: 'medication' }"
+            :disabled="!token"
+            :event="(!token ? '' : 'click')"
+            @click.native="toggleoffcanvas() + currentUpdate('medication')">
             Medicação
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
-        <li class="nav-item" v-bind:class="{ active: habitosCurrent }">
-          <router-link class="nav-link" :to="{ name: 'habitos' }" @click.native="toggleoffcanvas() + currentUpdate('habitos')">
+        <li class="nav-item" v-bind:class="{ active: habitsCurrent }">
+          <router-link class="nav-link"
+            :to="{ name: 'habits' }"
+            :disabled="!token"
+            :event="(!token ? '' : 'click')"
+            @click.native="toggleoffcanvas() + currentUpdate('habits')">
             Hábitos
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
         <li class="nav-item" v-bind:class="{ active: chatCurrent }">
-          <router-link class="nav-link" :to="{ name: 'chat' }" @click.native="toggleoffcanvas() + currentUpdate('chat')">
+          <router-link class="nav-link"
+            :to="{ name: 'chat' }"
+            :disabled="!token"
+            :event="(!token ? '' : 'click')"
+            @click.native="toggleoffcanvas() + currentUpdate('chat')">
             Chat
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
         <li class="nav-item" v-bind:class="{ active: jogosCurrent }">
-          <router-link class="nav-link" :to="{ name: 'jogos' }" @click.native="toggleoffcanvas() + currentUpdate('jogos')">
+          <router-link class="nav-link"
+            :to="{ name: 'jogos' }"
+            :disabled="!token"
+            :event="(!token ? '' : 'click')"
+            @click.native="toggleoffcanvas() + currentUpdate('jogos')">
             Jogos
             <span class="sr-only">(current)</span>
           </router-link>
@@ -56,10 +79,10 @@
           </b-dropdown-item>
         </b-nav-item-dropdown>
       </ul>
-      <router-link v-if="this.$store.state.login.accesstoken == ''" class="btn btn-primary" :to="{ name: 'login' }">
+      <router-link v-if="!token && $route.name != 'login'" class="btn btn-primary" :to="{ name: 'login' }">
         Login
       </router-link>
-      {{ this.$store.state.login.accesstoken }}
+      <b-button v-if="token" @click="logout">Logout</b-button>
     </div>
   </nav>
 
@@ -67,6 +90,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
   name: 'NavbarToOffcanvas',
   data () {
@@ -75,11 +100,16 @@ export default {
       calendarioCurrent: false,
       calendarCurrent: false,
       medicationCurrent: false,
-      habitosCurrent: false,
+      habitsCurrent: false,
       chatCurrent: false,
       jogosCurrent: false,
       infoCurrent: false
     }
+  },
+  computed: {
+    ...mapState({
+      token: state => state.login.accesstoken
+    })
   },
   methods: {
     toggleoffcanvas: function () {
@@ -94,7 +124,7 @@ export default {
       this.calendarioCurrent = false
       this.calendarCurrent = false
       this.medicationCurrent = false
-      this.habitosCurrent = false
+      this.habitsCurrent = false
       this.chatCurrent = false
       this.jogosCurrent = false
       this.infoCurrent = false
@@ -102,8 +132,8 @@ export default {
         this.calendarCurrent = true
       } else if (page === 'medication') {
         this.medicationCurrent = true
-      } else if (page === 'habitos') {
-        this.habitosCurrent = true
+      } else if (page === 'habits') {
+        this.habitsCurrent = true
       } else if (page === 'chat') {
         this.chatCurrent = true
       } else if (page === 'jogos') {
@@ -111,6 +141,11 @@ export default {
       } else if (page === 'info') {
         this.infoCurrent = true
       }
+    },
+    logout () {
+      // Terminar sessão no django
+      this.$store.dispatch('login/deleteToken')
+      this.$router.push({ name: 'login' })
     }
   }
 }

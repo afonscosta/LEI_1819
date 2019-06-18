@@ -15,13 +15,20 @@ import GamesPage from '../pages/Games.page'
 import InfoPage from '../pages/Info.page'
 import LoginPage from '../pages/Login.page'
 import MealPage from '../pages/Habits/Meal.page'
+import HistoricMealPage from '../pages/Habits/Historic/Meal.page'
 import IndivLeisurePage from '../pages/Habits/IndivLeisure.page'
+import HistoricIndivLeisurePage from '../pages/Habits/Historic/IndivLeisure.page'
 import PhysicalActivityPage from '../pages/Habits/PhysicalActivity.page'
+import HistoricPhysicalActivityPage from '../pages/Habits/Historic/PhysicalActivity.page'
 import SleepPage from '../pages/Habits/Sleep.page'
 import NapPage from '../pages/Habits/Nap.page'
+import HistoricNapPage from '../pages/Habits/Historic/Nap.page'
 import SOSPage from '../pages/Habits/SOS.page'
+import HistoricSOSPage from '../pages/Habits/Historic/SOS.page'
 import SocialLeisurePage from '../pages/Habits/SocialLeisure.page'
+import HistoricSocialLeisurePage from '../pages/Habits/Historic/SocialLeisure.page'
 import WaterPage from '../pages/Habits/Water.page'
+import HistoricWaterPage from '../pages/Habits/Historic/Water.page'
 import WeeklyGoalsPage from '../pages/Habits/WeeklyGoals.page'
 import {
   createDrawerNavigator,
@@ -434,10 +441,30 @@ const Habits_StackNavigator = createStackNavigator({
       headerTintColor: htColor,
     }),
   },
+  HistoricMeal: {
+		screen: HistoricMealPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Histórico - Refeições',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
 	IndivLeisure: {
 		screen: IndivLeisurePage,
     navigationOptions: ({ navigation }) => ({
       title: 'Lazer Individual',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	HistoricIndivLeisure: {
+		screen: HistoricIndivLeisurePage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Histórico - Lazer Individual',
       headerStyle: {
         backgroundColor: bgColor,
       },
@@ -454,10 +481,30 @@ const Habits_StackNavigator = createStackNavigator({
       headerTintColor: htColor,
     }),
 	},
+	HistoricPhysicalActivity: {
+		screen: HistoricPhysicalActivityPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Histórico - Atividade Física',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
 	Nap: {
 		screen: NapPage,
     navigationOptions: ({ navigation }) => ({
-      title: 'Sestas',
+      title: 'Descanso',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	HistoricNap: {
+		screen: HistoricNapPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Histórico - Descanso',
       headerStyle: {
         backgroundColor: bgColor,
       },
@@ -474,6 +521,16 @@ const Habits_StackNavigator = createStackNavigator({
       headerTintColor: htColor,
     }),
 	},
+	HistoricSOS: {
+		screen: HistoricSOSPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Histórico - SOS',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
 	SocialLeisure: {
 		screen: SocialLeisurePage,
     navigationOptions: ({ navigation }) => ({
@@ -484,10 +541,30 @@ const Habits_StackNavigator = createStackNavigator({
       headerTintColor: htColor,
     }),
 	},
+	HistoricSocialLeisure: {
+		screen: HistoricSocialLeisurePage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Histórico - Lazer Social',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
 	Water: {
 		screen: WaterPage,
     navigationOptions: ({ navigation }) => ({
       title: 'Água',
+      headerStyle: {
+        backgroundColor: bgColor,
+      },
+      headerTintColor: htColor,
+    }),
+	},
+	HistoricWater: {
+		screen: HistoricWaterPage,
+    navigationOptions: ({ navigation }) => ({
+      title: 'Histórico - Água',
       headerStyle: {
         backgroundColor: bgColor,
       },

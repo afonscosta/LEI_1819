@@ -20,7 +20,7 @@ const getters = {
     return state.notes.filter(n => n.category === 'PSI')
   },
   notesOut: state => {
-    return state.notes.filter(n => n.category === 'OUT')
+    return state.notes.filter(n => n.category === 'OTR')
   },
   apptPK: state => {
     return state.apptPK

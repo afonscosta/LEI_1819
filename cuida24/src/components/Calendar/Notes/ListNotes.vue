@@ -43,7 +43,7 @@
               v-for="note in notesEnf"
               :key="note.pk"
               border-variant="dark"
-              header="Nota de consulta"
+              :header="'Autor(a): ' + getBackofficeUserById(note.author).info.name"
             >
               <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
               <div v-if="editingNote != note.pk">
@@ -66,7 +66,7 @@
               v-for="note in notesCli"
               :key="note.pk"
               border-variant="dark"
-              header="Nota de consulta"
+              :header="'Autor(a): ' + getBackofficeUserById(note.author).info.name"
             >
               <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
               <div v-if="editingNote != note.pk">
@@ -89,7 +89,7 @@
               v-for="note in notesPsi"
               :key="note.pk"
               border-variant="dark"
-              header="Nota de consulta"
+              :header="'Autor(a): ' + getBackofficeUserById(note.author).info.name"
             >
               <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
               <div v-if="editingNote != note.pk">
@@ -112,7 +112,7 @@
               v-for="note in notesOut"
               :key="note.pk"
               border-variant="dark"
-              header="Nota de consulta"
+              :header="'Autor(a): ' + getBackofficeUserById(note.author).info.name"
             >
               <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
               <div v-if="editingNote != note.pk">
@@ -157,7 +157,8 @@ export default {
       'notesCli',
       'notesPsi',
       'notesOut'
-    ])
+    ]),
+    ...mapGetters('users', ['getBackofficeUserById'])
   },
   methods: {
     ...mapActions('notes', ['updateNote', 'deleteNote']),

@@ -215,8 +215,8 @@ export default class HabitsPage extends React.Component {
         <View style={{ flexDirection: 'row' }}>
           <View style={styles.buttonItem}>
             <Button
-              onPress={() => this.props.navigation.navigate('Meal')}
-              title="Alimentação"
+              onPress={() => this.props.navigation.navigate('HistoricMeal')}
+              title="Alimentação (histórico)"
               titleStyle={styles.titles}
               buttonStyle={styles.button}
               accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"
@@ -234,7 +234,7 @@ export default class HabitsPage extends React.Component {
           <View style={styles.buttonItem}>
             <Button
               onPress={() => this.props.navigation.navigate('Nap')}
-              title="Sestas"
+              title="Descanso"
               titleStyle={styles.titles}
               buttonStyle={styles.button}
               accessibilityLabel="Abrir o calendário para uma visão detalhada dos eventos"

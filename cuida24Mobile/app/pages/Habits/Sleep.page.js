@@ -107,7 +107,7 @@ class SleepPage extends React.Component {
         {
           this.state.remainSleep.length > 0
             ?
-          <Text>Assinale a opção consoante as horas que dormiu na noite de { this.state.remainSleep[0].toDateString() } para { addDays(this.state.remainSleep[0], 1).toDateString() }</Text>
+          <Text>Assinale a opção consoante as horas que dormiu na noite de { this.state.remainSleep[0].toLocaleDateString('en-GB') } para { addDays(this.state.remainSleep[0], 1).toLocaleDateString('en-GB') }</Text>
             :
           null
         }

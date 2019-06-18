@@ -24,8 +24,20 @@
         </b-col>
       </b-row>
     </b-container>
-    <b-button @click="goToAppointments">Consultas</b-button>
-    <b-button @click="goToSessions">Sessões de Grupo / Individual</b-button>
+    <b-button
+      @click="goToAppointments"
+      :disabled="
+            (usersActive.caregivers.length + usersActive.patients.length) === 0 ||
+            (usersActive.caregivers.length + usersActive.patients.length) > 1 ||
+            usersActive.caregivers.length > 1 ||
+            usersActive.patients.length > 1"
+    >Consultas</b-button>
+    <b-button
+      @click="goToSessions"
+      :disabled="
+            (usersActive.caregivers.length + usersActive.patients.length) === 0 ||
+            (usersActive.caregivers.length > 0 && usersActive.patients.length > 0)"
+    >Sessões de Grupo / Individual</b-button>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import store from '../store'
+// import store from '../store'
 
 // Miscellaneous
 import Home from '@/components/Home'
@@ -22,7 +22,9 @@ import Prescriptions from '@/components/Medication/Prescriptions/Prescriptions'
 import FormPrescription from '@/components/Medication/Prescriptions/FormPrescription'
 
 // Habits
-import Habitos from '@/components/Habits/Habitos'
+import Habits from '@/components/Habits/Habits'
+import Goals from '@/components/Habits/Goals/Goals'
+import Activities from '@/components/Habits/Activities/Activities'
 
 // Chat
 import Chat from '@/components/Chat/Chat'
@@ -108,9 +110,19 @@ const router = new Router({
 
     // Habits
     {
-      path: '/habitos',
-      name: 'habitos',
-      component: Habitos
+      path: '/habits',
+      name: 'habits',
+      component: Habits
+    },
+    {
+      path: '/habits/goals',
+      name: 'goals',
+      component: Goals
+    },
+    {
+      path: '/habits/activities',
+      name: 'activities',
+      component: Activities
     },
 
     // Chat
@@ -154,14 +166,6 @@ const router = new Router({
       component: Registar
     }
   ]
-})
-
-router.beforeEach((to, from, next) => {
-  console.log('from', from)
-  console.log('to', to)
-  console.log('next', next)
-  console.log(store.getters['login/accesstoken'])
-  next()
 })
 
 export default router
