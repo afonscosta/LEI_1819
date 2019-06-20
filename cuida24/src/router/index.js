@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-// import store from '../store'
+import store from '../store'
 
 // Miscellaneous
 import Home from '@/components/Home'
@@ -34,15 +34,17 @@ import Jogos from '@/components/Games/Jogos'
 
 // Information
 import Info from '@/components/Info/Info'
-import InfoIadem from '@/components/Info/InfoIadem'
-import InfoDemencia from '@/components/Info/InfoDemencia'
-import InfoApoio from '@/components/Info/InfoApoio'
 
 Vue.use(Router)
 
 const router = new Router({
   routes: [
     // Miscellaneous
+    {
+      path: '*',
+      name: 'all',
+      component: Home
+    },
     {
       path: '/',
       name: 'home',
@@ -58,85 +60,190 @@ const router = new Router({
     {
       path: '/calendar',
       name: 'calendar',
-      component: Calendar
+      component: Calendar,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/menuCalendar/appointments',
       name: 'appointments',
-      component: Appointments
+      component: Appointments,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/menuCalendar/appointments/formAppoint',
       name: 'formAppoint',
-      component: FormAppoint
+      component: FormAppoint,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/menuCalendar/notes',
       name: 'notes',
-      component: Notes
+      component: Notes,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/menuCalendar/sessions',
       name: 'sessions',
-      component: Session
+      component: Session,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/menuCalendar/sessions/formSession',
       name: 'formSession',
-      component: FormSession
+      component: FormSession,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/menuCalendar/sessions/evaluation',
       name: 'evaluation',
-      component: UserEvaluation
+      component: UserEvaluation,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
 
     // Medication
     {
       path: '/medication',
       name: 'medication',
-      component: Medication
+      component: Medication,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/medication/prescriptions',
       name: 'prescriptions',
-      component: Prescriptions
+      component: Prescriptions,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/medication/prescriptions/formPrescription',
       name: 'formPrescription',
-      component: FormPrescription
+      component: FormPrescription,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
 
     // Habits
     {
       path: '/habits',
       name: 'habits',
-      component: Habits
+      component: Habits,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/habits/goals',
       name: 'goals',
-      component: Goals
+      component: Goals,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
     {
       path: '/habits/activities',
       name: 'activities',
-      component: Activities
+      component: Activities,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
 
     // Chat
     {
       path: '/chat',
       name: 'chat',
-      component: Chat
+      component: Chat,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
 
     // Games
     {
       path: '/jogos',
       name: 'jogos',
-      component: Jogos
+      component: Jogos,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     },
 
     // Information
@@ -146,24 +253,16 @@ const router = new Router({
       component: Info
     },
     {
-      path: '/info-iadem',
-      name: 'info-iadem',
-      component: InfoIadem
-    },
-    {
-      path: '/info-demencia',
-      name: 'info-demencia',
-      component: InfoDemencia
-    },
-    {
-      path: '/info-apoio',
-      name: 'info-apoio',
-      component: InfoApoio
-    },
-    {
       path: '/registar',
       name: 'registar',
-      component: Registar
+      component: Registar,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
     }
   ]
 })

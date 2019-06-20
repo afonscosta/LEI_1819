@@ -12,6 +12,7 @@ const getters = {
 
 const mutations = {
   setToken (state, response) {
+    console.log(response.token)
     state.accesstoken = response.token
     localStorage.setItem('token', response.token)
   },

@@ -474,7 +474,7 @@ export default class MedicationPage extends React.Component {
     this.setState({ loading: true });
 
 		const encodedValue = encodeURIComponent(
-			JSON.stringify({caregivers: [], patients: [1]})
+			JSON.stringify({caregivers: [], patients: [1]}) // TODO: Não mandar argumento?
 		);
 
     fetch(url + `?users=${encodedValue}`, {

@@ -31,9 +31,6 @@ import Notifications from 'vue-notification'
 import AirbnbStyleDatepicker from 'vue-airbnb-style-datepicker'
 import 'vue-airbnb-style-datepicker/dist/vue-airbnb-style-datepicker.min.css'
 
-import setupNotifications from '@/assets/firebase_notifications.js'
-Vue.prototype.$messaging = setupNotifications.initFirebase()
-
 // see docs for available options
 const datepickerOptions = {}
 

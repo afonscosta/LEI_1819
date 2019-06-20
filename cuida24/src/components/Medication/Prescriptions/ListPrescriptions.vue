@@ -29,6 +29,16 @@
         <b-button class="mt-3" variant="danger" block @click="confirme(true)">Sim</b-button>
       </b-modal>
     </div>
+
+    <b-modal 
+      ref="modal-takes"
+      hide-footer title="Histórico de tomas"
+    >
+      <b-card>
+        <p>ITEM</p>
+      </b-card>
+    </b-modal>
+
     <b-container>
       <b-row class="justify-content-md-center">
         <b-col xl="8" lg="8" md="8" sm="12" cols="12">
@@ -76,11 +86,12 @@
             </b-card-text>
             
             <b-card-text align="left">
-              <b>Data de prescrição:</b> {{ presc.prescription.date }}
+              <b>Data de prescrição:</b> {{ (new Date(presc.prescription.date)).toLocaleDateString('en-GB') }}
             </b-card-text>
 
             <b-button variant="danger" @click="remove(presc)">Eliminar</b-button>
             <b-button @click="$emit('editPrescription', presc)">Editar</b-button>
+            <b-button @click="$refs['modal-takes'].show()">Histórico de tomas</b-button>
           </b-card>
         </b-col>
       </b-row>
@@ -172,27 +183,20 @@ export default {
       !presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
       !presc.event.schedule.year) {
-        console.log('XXXXX')
         rec = 'diariamente'
-      } else if (!presc.event.schedule.duration &&
-      !presc.event.schedule.durationInDays &&
-      !presc.event.schedule.durationUnit &&
+      } else if (!presc.event.schedule.durationInDays &&
       presc.event.schedule.dayOfWeek &&
       !presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
       !presc.event.schedule.year) {
         rec = 'semanalmente'
-      } else if (!presc.event.schedule.duration &&
-      !presc.event.schedule.durationInDays &&
-      !presc.event.schedule.durationUnit &&
+      } else if (!presc.event.schedule.durationInDays &&
       !presc.event.schedule.dayOfWeek &&
       presc.event.schedule.dayOfMonth &&
       !presc.event.schedule.month &&
       !presc.event.schedule.year) {
         rec = 'mensalmente'
-      } else if (!presc.event.schedule.duration &&
-      !presc.event.schedule.durationInDays &&
-      !presc.event.schedule.durationUnit &&
+      } else if (!presc.event.schedule.durationInDays &&
       !presc.event.schedule.dayOfWeek &&
       presc.event.schedule.dayOfMonth &&
       presc.event.schedule.month &&
