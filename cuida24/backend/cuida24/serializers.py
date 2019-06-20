@@ -111,6 +111,15 @@ class PatientSerializer(serializers.ModelSerializer):
         model = Patient
         fields = ('info', 'caregiver', 'pk')
 
+    def create(self, validated_data):
+        logger.info(validated_data)
+        user_data = validated_data.pop('info')
+        user_data['password'] = make_password(user_data['password'])
+        logger.info(user_data)
+        info = UserAuth.objects.create(**user_data)
+        caregiver = Caregiver.objects.get(pk=validated_data['caregiver'])
+        patient = Patient.objects.create(info=info,caregiver=caregiver);
+        return patient
 
 class BackofficeUserSerializer(serializers.ModelSerializer):
     info = UserSerializer()
@@ -119,6 +128,14 @@ class BackofficeUserSerializer(serializers.ModelSerializer):
         model = BackofficeUser
         fields = ('type', 'info', 'pk')
 
+    def create(self, validated_data):
+        logger.info(validated_data)
+        user_data = validated_data.pop('info')
+        user_data['password'] = make_password(user_data['password'])
+        logger.info(user_data)
+        info = UserAuth.objects.create(**user_data)
+        backoffice_user = BackofficeUser.objects.create(info=info, **validated_data)
+        return backoffice_user
 
 # Historic
 
