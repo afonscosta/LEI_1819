@@ -473,11 +473,7 @@ export default class MedicationPage extends React.Component {
 
     this.setState({ loading: true });
 
-		const encodedValue = encodeURIComponent(
-			JSON.stringify({caregivers: [], patients: [1]})
-		);
-
-    fetch(url + `?users=${encodedValue}`, {
+    fetch(url, {
       headers: new Headers({
         'Authorization': 'Token ' + token,
         'Content-Type': 'application/json'
