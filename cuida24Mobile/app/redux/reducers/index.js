@@ -1,4 +1,5 @@
 import {
+  POST_TAKE,
   POST_WATER,
   POST_MEAL,
   POST_NAPS,
@@ -23,6 +24,9 @@ const INITIAL_STATE = [
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
+    // Take
+    case POST_TAKE:
+      return action.payload
     // Water
     case POST_WATER:
       return action.payload

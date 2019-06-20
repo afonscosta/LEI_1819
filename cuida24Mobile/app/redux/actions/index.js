@@ -15,8 +15,32 @@ export const GET_SOCLEI = 'GET_SOCLEI';
 export const GET_SOCLEI_COMMIT = 'GET_SOCLEI_COMMIT';
 export const GET_DURATIONS = 'GET_DURATIONS';
 export const GET_DURATIONS_COMMIT = 'GET_DURATIONS_COMMIT';
+export const POST_TAKE = 'POST_TAKE';
 
 const ROOT_URL = 'http://10.0.2.2:8000/cuida24/';
+
+export const postTake = ({token, medication, date}) => {
+  return {
+    type: POST_TAKE,
+    payload: { token: token, medication: medication, date: date },
+    meta: {
+      offline: {
+        effect: {
+          url: ROOT_URL + 'take/',
+          method: 'POST',
+          headers: {
+            'Authorization': 'Token ' + token,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            date: date,
+            medication: medication
+          })
+        }
+      }
+    }
+  }
+}
 
 export const postWater = ({token, water, date}) => {
   return {
