@@ -391,16 +391,41 @@ class MedicationViewSet(viewsets.ModelViewSet):
         logger.info("GET PRESCRIPTION")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
-        if data['patients'][0]:
-            serializer_data = getPrescriptions(data['patients'][0])
-            # associar o backoffice user à pk auth
-            for medication in serializer_data:
-                author_user = medication['prescription']['author']
-                medication['prescription']['author'] = get_object_or_404(BackofficeUser, info=author_user).pk
-            sent_data = getPrescriptionBackToFrontJSON(serializer_data)
-            return Response(sent_data, status=status.HTTP_200_OK)
+        if data:
+            if data['patients'][0]:
+                logger.info("GET PRESCRIPTION BY ARGUMENTS")
+                serializer_data = getPrescriptions(data['patients'][0])
+                # associar o backoffice user à pk auth
+                for medication in serializer_data:
+                    author_user = medication['prescription']['author']
+                    medication['prescription']['author'] = get_object_or_404(BackofficeUser, info=author_user).pk
+                    takes = Take.objects.filter(medication=medication['pk'])
+                    serializer_take = TakeSerializer(takes, many=True)
+                    logger.info(serializer_take.data)
+                    medication['prescription']['take'] = serializer_take.data
+                sent_data = getPrescriptionBackToFrontJSON(serializer_data)
+                return Response(sent_data, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            logger.info("GET PRESCRIPTION BY TOKEN")
+            caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+            patients = Patient.objects.filter(caregiver=caregiver)
+            data = []
+            for patient in patients:
+                serializer_data = getPrescriptions(patient)
+                # associar o backoffice user à pk auth
+                for medication in serializer_data:
+                    author_user = medication['prescription']['author']
+                    medication['prescription']['author'] = get_object_or_404(BackofficeUser, info=author_user).pk
+                    takes = Take.objects.filter(medication=medication['pk'])
+                    serializer_take = TakeSerializer(takes, many=True)
+                    logger.info(serializer_take.data)
+                    medication['prescription']['take'] = serializer_take.data
+                data.append(serializer_data)
+            sent_data = getPrescriptionBackToFrontJSON(data)
+            return Response(sent_data, status=status.HTTP_200_OK)
+
 
 class TakeViewSet(viewsets.ModelViewSet):
     queryset = Take.objects.all()

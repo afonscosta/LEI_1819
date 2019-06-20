@@ -469,6 +469,10 @@ def getPrescriptionBackToFrontJSON(serializer_data):
         temp['prescription']['pk'] = medication['pk']
         temp['prescription']['quantity'] = medication['quantity']
         temp['prescription']['state'] = medication['state']
+        takes = []
+        for take in medication['prescription']['take']:
+            takes.append(take['date'])
+        temp['prescription']['take'] = takes
 
         temp_event = {'event': {
             'data': {
