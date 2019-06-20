@@ -19,8 +19,6 @@
             class="nav-link"
             :to="{ name: 'calendar' }"
             @click.native="toggleoffcanvas() + currentUpdate('calendar')"
-            :disabled="!token"
-            :event="(!token ? '' : 'click')"
           >
             Calendário
             <span class="sr-only">(current)</span>
@@ -30,8 +28,6 @@
           <router-link
             class="nav-link"
             :to="{ name: 'medication' }"
-            :disabled="!token"
-            :event="(!token ? '' : 'click')"
             @click.native="toggleoffcanvas() + currentUpdate('medication')">
             Medicação
             <span class="sr-only">(current)</span>
@@ -40,8 +36,6 @@
         <li class="nav-item" v-bind:class="{ active: habitsCurrent }">
           <router-link class="nav-link"
             :to="{ name: 'habits' }"
-            :disabled="!token"
-            :event="(!token ? '' : 'click')"
             @click.native="toggleoffcanvas() + currentUpdate('habits')">
             Hábitos
             <span class="sr-only">(current)</span>
@@ -50,8 +44,6 @@
         <li class="nav-item" v-bind:class="{ active: chatCurrent }">
           <router-link class="nav-link"
             :to="{ name: 'chat' }"
-            :disabled="!token"
-            :event="(!token ? '' : 'click')"
             @click.native="toggleoffcanvas() + currentUpdate('chat')">
             Chat
             <span class="sr-only">(current)</span>
@@ -60,24 +52,27 @@
         <li class="nav-item" v-bind:class="{ active: jogosCurrent }">
           <router-link class="nav-link"
             :to="{ name: 'jogos' }"
-            :disabled="!token"
-            :event="(!token ? '' : 'click')"
             @click.native="toggleoffcanvas() + currentUpdate('jogos')">
             Jogos
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
-        <b-nav-item-dropdown id="info-dropdown" text="Páginas Informativas" v-bind:class="{ active: infoCurrent }">
-          <b-dropdown-item :to="{ name: 'info-iadem' }" @click.native="currentUpdate('info') + toggleoffcanvas()">
-            Projeto IADem
-          </b-dropdown-item>
-          <b-dropdown-item :to="{ name: 'info-demencia' }" @click.native="currentUpdate('info') + toggleoffcanvas()">
-            Literacia na demência
-          </b-dropdown-item>
-          <b-dropdown-item :to="{ name: 'info-apoio' }" @click.native="currentUpdate('info') + toggleoffcanvas()">
-            Redes e grupos de apoio
-          </b-dropdown-item>
-        </b-nav-item-dropdown>
+        <li class="nav-item" v-bind:class="{ active: infoCurrent }">
+          <router-link class="nav-link"
+            :to="{ name: 'info' }"
+            @click.native="toggleoffcanvas() + currentUpdate('info')">
+            Páginas Informativas
+            <span class="sr-only">(current)</span>
+          </router-link>
+        </li>
+        <li class="nav-item" v-bind:class="{ active: addUsersCurrent }">
+          <router-link class="nav-link"
+            :to="{ name: 'addUsers' }"
+            @click.native="toggleoffcanvas() + currentUpdate('addUsers')">
+            Adicionar utilizadores
+            <span class="sr-only">(current)</span>
+          </router-link>
+        </li>
       </ul>
       <router-link v-if="!token && $route.name != 'login'" class="btn btn-primary" :to="{ name: 'login' }">
         Login
@@ -128,6 +123,7 @@ export default {
       this.chatCurrent = false
       this.jogosCurrent = false
       this.infoCurrent = false
+      this.addUsersCurrent = false
       if (page === 'calendar') {
         this.calendarCurrent = true
       } else if (page === 'medication') {
@@ -140,6 +136,8 @@ export default {
         this.jogosCurrent = true
       } else if (page === 'info') {
         this.infoCurrent = true
+      } else if (page === 'addUsers') {
+        this.addUsersCurrent = true
       }
     },
     logout () {
