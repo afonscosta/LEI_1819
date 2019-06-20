@@ -53,6 +53,3 @@ class PatientViewSet(viewsets.ModelViewSet):
 class BackofficeUserViewSet(viewsets.ModelViewSet):
     queryset = BackofficeUser.objects.all()
     serializer_class = BackofficeUserSerializer
-
-
-
