@@ -26,6 +26,7 @@ router.register('sessions', SessionsViewSet)
 router.register('evaluation', EvaluationViewSet)
 router.register('medicine', MedicineViewSet)
 router.register('prescriptions', MedicationViewSet)
+router.register('take', TakeViewSet)
 # habits
 router.register('physicalActivity', PhysicalActivityViewSet)
 router.register('socialLeisure', SocialLeisureViewSet)

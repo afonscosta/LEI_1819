@@ -47,6 +47,11 @@ class EventViewSet(generics.ListAPIView):
         logger.info(sent_data)
         return Response(sent_data, status=status.HTTP_200_OK)
 
+
+'''
+Appointments Views
+'''
+
 class AppointmentViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
@@ -173,6 +178,10 @@ class AppointmentNoteViewSet(viewsets.ModelViewSet):
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+'''
+Session Views
+'''
 
 
 class SessionsViewSet(viewsets.ModelViewSet):
@@ -318,6 +327,10 @@ class EvaluationViewSet(viewsets.ModelViewSet):
         return Response(sent_data, status=status.HTTP_200_OK)
 
 
+'''
+Medication Views
+'''
+
 class MedicineViewSet(viewsets.ModelViewSet):
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
@@ -388,3 +401,7 @@ class MedicationViewSet(viewsets.ModelViewSet):
             return Response(sent_data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class TakeViewSet(viewsets.ModelViewSet):
+    queryset = Take.objects.all()
+    serializer_class = TakeSerializer
