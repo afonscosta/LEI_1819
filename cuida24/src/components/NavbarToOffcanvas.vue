@@ -65,6 +65,14 @@
             <span class="sr-only">(current)</span>
           </router-link>
         </li>
+        <li class="nav-item" v-bind:class="{ active: addUsersCurrent }">
+          <router-link class="nav-link"
+            :to="{ name: 'addUsers' }"
+            @click.native="toggleoffcanvas() + currentUpdate('addUsers')">
+            Adicionar utilizadores
+            <span class="sr-only">(current)</span>
+          </router-link>
+        </li>
       </ul>
       <router-link v-if="!token && $route.name != 'login'" class="btn btn-primary" :to="{ name: 'login' }">
         Login
@@ -115,6 +123,7 @@ export default {
       this.chatCurrent = false
       this.jogosCurrent = false
       this.infoCurrent = false
+      this.addUsersCurrent = false
       if (page === 'calendar') {
         this.calendarCurrent = true
       } else if (page === 'medication') {
@@ -127,6 +136,8 @@ export default {
         this.jogosCurrent = true
       } else if (page === 'info') {
         this.infoCurrent = true
+      } else if (page === 'addUsers') {
+        this.addUsersCurrent = true
       }
     },
     logout () {

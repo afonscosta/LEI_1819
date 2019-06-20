@@ -5,7 +5,7 @@ import store from '../store'
 // Miscellaneous
 import Home from '@/components/Home'
 import Login from '@/components/Login'
-import Registar from '@/components/Registar'
+import AddUsers from '@/components/AddUsers'
 
 // Calendar
 import Calendar from '@/components/Calendar/Calendar'
@@ -253,9 +253,9 @@ const router = new Router({
       component: Info
     },
     {
-      path: '/registar',
-      name: 'registar',
-      component: Registar,
+      path: '/addUsers',
+      name: 'addUsers',
+      component: AddUsers,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
           next()
