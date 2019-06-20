@@ -43,7 +43,7 @@ class StaticPagesSerializer(serializers.ModelSerializer):
 class GoalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goal
-        fields = ('goal', 'type', 'pk')
+        fields = ('goal', 'type', 'dateBegin', 'dateEnd', 'disable', 'pk')
 
 
 class PhysicalActivitySerializer(serializers.ModelSerializer):
@@ -111,6 +111,14 @@ class PatientSerializer(serializers.ModelSerializer):
         model = Patient
         fields = ('info', 'caregiver', 'pk')
 
+    def create(self, validated_data):
+        logger.info(validated_data)
+        user_data = validated_data.pop('info')
+        user_data['password'] = make_password(user_data['password'])
+        logger.info(user_data)
+        info = UserAuth.objects.create(**user_data)
+        patient = Patient.objects.create(info=info, **validated_data)
+        return patient
 
 class BackofficeUserSerializer(serializers.ModelSerializer):
     info = UserSerializer()
@@ -119,6 +127,14 @@ class BackofficeUserSerializer(serializers.ModelSerializer):
         model = BackofficeUser
         fields = ('type', 'info', 'pk')
 
+    def create(self, validated_data):
+        logger.info(validated_data)
+        user_data = validated_data.pop('info')
+        user_data['password'] = make_password(user_data['password'])
+        logger.info(user_data)
+        info = UserAuth.objects.create(**user_data)
+        backoffice_user = BackofficeUser.objects.create(info=info, **validated_data)
+        return backoffice_user
 
 # Historic
 

@@ -30,6 +30,9 @@ class Goal(models.Model):
             ('PC', 'Pré-cozinhados'), ('RF', 'Refrigerantes'), ('AL', 'Alcool'))
     type = models.CharField(max_length=2, choices=TYPE)
     goal = models.IntegerField()
+    dateBegin = models.DateTimeField()
+    dateEnd = models.DateTimeField()
+    disable = models.BooleanField()
 
 
 class PhysicalActivity(models.Model):
