@@ -25,6 +25,22 @@ class GoalViewSet(viewsets.ModelViewSet):
     queryset = Goal.objects.all()
     serializer_class = GoalSerializer
 
+    def destroy(self, request, *args, **kwargs):
+        logger.info("DELETE GOAL")
+        goal = get_object_or_404(Goal, pk=self.kwargs['pk'])
+        serializer_goal = GoalSerializer(goal)
+        req_data = copy.deepcopy(serializer_goal.data)
+        req_data['disable'] = True
+        logger.info(req_data)
+        serializer = GoalSerializer(instance=goal, data=req_data)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        logger.info(serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(detail=False, methods=['get'])
     def typeGoal(self, request):
         logger.info("GET TYPE GOAL")
@@ -34,6 +50,12 @@ class GoalViewSet(viewsets.ModelViewSet):
             dict = {'value': choice[0], 'title': choice[1]}
             enum_values.append(dict)
         return Response(enum_values)
+
+    def list(self, request, *args, **kwargs):
+        logger.info("Get BACKOFFICE GOALS")
+        goals = Goal.objects.filter(disable=False)
+        serializer_goal = GoalSerializer(goals, many=True)
+        return Response(serializer_goal.data, status=status.HTTP_200_OK)
 """
     def list(self, request, *args, **kwargs):
         logger.info("GET WATER")

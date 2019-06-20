@@ -45,7 +45,6 @@ class GoalSerializer(serializers.ModelSerializer):
         model = Goal
         fields = ('goal', 'type', 'dateBegin', 'dateEnd', 'disable', 'pk')
 
-
 class PhysicalActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = PhysicalActivity
@@ -119,6 +118,7 @@ class PatientSerializer(serializers.ModelSerializer):
         info = UserAuth.objects.create(**user_data)
         patient = Patient.objects.create(info=info, **validated_data)
         return patient
+
 
 class BackofficeUserSerializer(serializers.ModelSerializer):
     info = UserSerializer()

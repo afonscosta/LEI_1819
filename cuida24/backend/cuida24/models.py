@@ -32,7 +32,7 @@ class Goal(models.Model):
     goal = models.IntegerField()
     dateBegin = models.DateTimeField()
     dateEnd = models.DateTimeField()
-    disable = models.BooleanField()
+    disable = models.BooleanField(default=False)
 
 
 class PhysicalActivity(models.Model):
