@@ -68,6 +68,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar, eventID) => {
 		if (n > today) {
       if (rec === 'daily') {
         PushNotification.localNotificationSchedule({
+          id: String(1000000 + appt.appointmentPK),
           message: appt.event.data.title + '\n' + 
             appt.event.data.description + '\n' +
             appt.event.data.location,
@@ -76,6 +77,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar, eventID) => {
         });
       } else if (rec === 'weekly') {
         PushNotification.localNotificationSchedule({
+          id: String(1000000 + appt.appointmentPK),
           message: appt.event.data.title + '\n' + 
             appt.event.data.description + '\n' +
             appt.event.data.location,
@@ -84,6 +86,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar, eventID) => {
         });
       } else {
         PushNotification.localNotificationSchedule({
+          id: String(1000000 + appt.appointmentPK),
           message: appt.event.data.title + '\n' + 
             appt.event.data.description + '\n' +
             appt.event.data.location,
@@ -177,6 +180,7 @@ const handleAppointment = async (appt, hash, appointmentCalendar) => {
         if (oldEvDataParsed.hash !== hash) { // O evento mudou
           AsyncStorage.removeItem('@appointmentCalendar:' + appt.appointmentPK)
             .then(() => {
+              PushNotification.cancelLocalNotifications({id: String(1000000 + appt.appointmentPK)});
               // Adiciona o evento atualizado
               addNewAppointment(appt, hash, appointmentCalendar, oldEvDataParsed.id);
             })
@@ -194,18 +198,39 @@ const handleAppointment = async (appt, hash, appointmentCalendar) => {
 const addNewIndivSession = async (is, hash, indivSessionCalendar, eventID) => {
   console.log('Adicionando indivSession evento...', is);
 	var today = new Date();
+	var rec = parseSchedule(is);
   is.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
 		if (n > today) {
-			PushNotification.localNotificationSchedule({
-				message: is.event.data.title + '\n' + 
-					is.individualSession.theme + ' - ' + is.individualSession.description + '\n' +
-					is.event.data.location,
-				date: n
-			});
+      if (rec === 'daily') {
+        PushNotification.localNotificationSchedule({
+          id: String(3000000 + is.individualSession.pk),
+          message: is.event.data.title + '\n' + 
+            is.individualSession.theme + ' - ' + is.individualSession.description + '\n' +
+            is.event.data.location,
+          date: n,
+          repeatType: 'day'
+        });
+      } else if (rec === 'weekly') {
+        PushNotification.localNotificationSchedule({
+          id: String(3000000 + is.individualSession.pk),
+          message: is.event.data.title + '\n' + 
+            is.individualSession.theme + ' - ' + is.individualSession.description + '\n' +
+            is.event.data.location,
+          date: n,
+          repeatType: 'week'
+        });
+      } else {
+        PushNotification.localNotificationSchedule({
+          id: String(3000000 + is.individualSession.pk),
+          message: is.event.data.title + '\n' + 
+            is.individualSession.theme + ' - ' + is.individualSession.description + '\n' +
+            is.event.data.location,
+          date: n
+        });
+      }
 		}
   });
-	var rec = parseSchedule(is);
 	var allDay = true;
 	var startDate = new Date(
     is.event.occurrenceDate.year,
@@ -292,6 +317,7 @@ const handleIndivSession = async (is, hash, indivSessionCalendar) => {
         if (oldEvDataParsed.hash !== hash) { // O evento mudou
           AsyncStorage.removeItem('@indivSessionCalendar:' + is.individualSession.pk)
             .then(() => {
+              PushNotification.cancelLocalNotifications({id: String(3000000 + is.appointmentPK)});
               // Adiciona o evento atualizado
               addNewIndivSession(is, hash, indivSessionCalendar, oldEvDataParsed.id);
             })
@@ -309,18 +335,39 @@ const handleIndivSession = async (is, hash, indivSessionCalendar) => {
 const addNewGroupSession = async (gs, hash, groupSessionCalendar, eventID) => {
   console.log('Adicionando groupSession evento...', gs);
 	var today = new Date();
+	var rec = parseSchedule(gs);
   gs.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
 		if (n > today) {
-			PushNotification.localNotificationSchedule({
-				message: gs.event.data.title + '\n' + 
-					gs.groupSession.theme + ' - ' + gs.groupSession.description + '\n' +
-					gs.event.data.location,
-				date: n
-			});
+      if (rec === 'daily') {
+        PushNotification.localNotificationSchedule({
+          id: String(2000000 + gs.groupSession.pk),
+          message: gs.event.data.title + '\n' + 
+            gs.groupSession.theme + ' - ' + gs.groupSession.description + '\n' +
+            gs.event.data.location,
+          date: n,
+          repeatType: 'day'
+        });
+      } else if (rec === 'weekly') {
+        PushNotification.localNotificationSchedule({
+          id: String(2000000 + gs.groupSession.pk),
+          message: gs.event.data.title + '\n' + 
+            gs.groupSession.theme + ' - ' + gs.groupSession.description + '\n' +
+            gs.event.data.location,
+          date: n,
+          repeatType: 'week'
+        });
+      } else {
+        PushNotification.localNotificationSchedule({
+          id: String(2000000 + gs.groupSession.pk),
+          message: gs.event.data.title + '\n' + 
+            gs.groupSession.theme + ' - ' + gs.groupSession.description + '\n' +
+            gs.event.data.location,
+          date: n
+        });
+      }
 		}
   });
-	var rec = parseSchedule(gs);
 	var allDay = true;
 	var startDate = new Date(
     gs.event.occurrenceDate.year,
@@ -407,6 +454,7 @@ const handleGroupSession = async (gs, hash, groupSessionCalendar) => {
         if (oldEvDataParsed.hash !== hash) { // O evento mudou
           AsyncStorage.removeItem('@groupSessionCalendar:' + gs.groupSession.pk)
             .then(() => {
+              PushNotification.cancelLocalNotifications({id: String(2000000 + gs.groupSession.pk)});
               // Adiciona o evento atualizado
               addNewGroupSession(gs, hash, groupSessionCalendar, oldEvDataParsed.id);
             })
@@ -688,13 +736,13 @@ export default class CalendarPage extends React.Component {
           const oldEvData = await AsyncStorage.getItem('@appointmentCalendar:' + apptPK);
           RNCalendarEvents.removeEvent(JSON.parse(oldEvData).id)
             .then(() => {
-              (async () => { // Remove a key do asyncStorage
-                try {
-                  await AsyncStorage.removeItem('@appointmentCalendar:' + apptPK);
-                } catch (error) {
+               AsyncStorage.removeItem('@appointmentCalendar:' + apptPK)
+                .then(() => {
+                  PushNotification.cancelLocalNotifications({id: String(1000000 + apptPK)});
+                })
+                .catch((error) => {
                   console.warn('AsyncStorage - removeItem', error);
-                }
-              })();
+                });
             })
             .catch(error => {
               console.log('RNCalendarEvents - removeEvent', error);
@@ -775,13 +823,13 @@ export default class CalendarPage extends React.Component {
           const oldEvData = await AsyncStorage.getItem('@groupSessionCalendar:' + gsPK);
           RNCalendarEvents.removeEvent(JSON.parse(oldEvData).id)
             .then(() => {
-              (async () => { // Remove a key do asyncStorage
-                try {
-                  await AsyncStorage.removeItem('@groupSessionCalendar:' + gsPK);
-                } catch (error) {
+              AsyncStorage.removeItem('@groupSessionCalendar:' + gsPK)
+                .then(() => {
+                  PushNotification.cancelLocalNotifications({id: String(2000000 + gsPK)});
+                })
+                .catch(() => {
                   console.warn('AsyncStorage - removeItem groupSessionCalendar', error);
-                }
-              })();
+                });
             })
             .catch(error => {
               console.log('RNCalendarEvents - removeEvent groupSessionCalendar', error);
@@ -857,13 +905,13 @@ export default class CalendarPage extends React.Component {
           const oldEvData = await AsyncStorage.getItem('@indivSessionCalendar:' + isPK);
           RNCalendarEvents.removeEvent(JSON.parse(oldEvData).id)
             .then(() => {
-              (async () => { // Remove a key do asyncStorage
-                try {
-                  await AsyncStorage.removeItem('@indivSessionCalendar:' + isPK);
-                } catch (error) {
+              AsyncStorage.removeItem('@indivSessionCalendar:' + isPK)
+                .then(() => {
+                  PushNotification.cancelLocalNotifications({id: String(3000000 + isPK)});
+                })
+                .catch((error) => {
                   console.warn('AsyncStorage - removeItem indivSessionCalendar', error);
-                }
-              })();
+                });
             })
             .catch(error => {
               console.log('RNCalendarEvents - removeEvent indivSessionCalendar', error);

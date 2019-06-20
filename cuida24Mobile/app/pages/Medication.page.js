@@ -38,6 +38,42 @@ from 'react-native-simple-radio-button';
       //this.setState({ error, loading : false });
     //})
 //}
+
+const parseSchedule = (event) => {
+	var rec = null;
+	if (event.event.schedule.duration &&
+	event.event.schedule.durationInDays === 0 &&
+	event.event.schedule.durationUnit &&
+	!event.event.schedule.dayOfWeek &&
+	!event.event.schedule.dayOfMonth &&
+	!event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'daily';
+	}
+	else if (!event.event.schedule.durationInDays &&
+	event.event.schedule.dayOfWeek &&
+	!event.event.schedule.dayOfMonth &&
+	!event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'weekly';
+	}
+	else if (!event.event.schedule.durationInDays &&
+	!event.event.schedule.dayOfWeek &&
+	event.event.schedule.dayOfMonth &&
+	!event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'monthly';
+	}
+	else if (!event.event.schedule.durationInDays &&
+	!event.event.schedule.dayOfWeek &&
+	event.event.schedule.dayOfMonth &&
+	event.event.schedule.month &&
+	!event.event.schedule.year) {
+		rec = 'yearly';
+	}
+  return rec;
+}
+
 const fetchMedName = async (token, pk) => {
   console.log('token', token);
   console.log('pk', pk);
@@ -94,61 +130,55 @@ const fetchAuthorsNames = async (t, prescriptions) => {
   )
 }
 
-const addNewPrescription = async (token, presc, hash, medicationCalendar) => {
+const addNewPrescription = async (token, presc, hash, medicationCalendar, eventID, meds) => {
   console.log('Adicionando prescrição...', presc);
 	var today = new Date();
+	var rec = parseSchedule(presc);
+  console.log('medicamentos', meds);
+  console.log('medicine pk', presc.prescription.medicine);
+  var med = meds.find(m => m.pk == presc.prescription.medicine);
+  if (med != null) { med = med.name; }
+  else { med = 'desconhecido'; }
   presc.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
-		if (n > today) {
-			PushNotification.localNotificationSchedule({
-				message: presc.event.data.title + '\n' + 
-					presc.event.data.description + '\n' +
-					presc.event.data.location,
-				date: n
-			});
+		if (n > today || rec) {
+      var repeatType = null;
+      if (rec === 'daily') {
+        repeatType = 'minute';  //'day'
+      } else if (rec === 'weekly') {
+        repeatType = 'week';
+      }
+      if (repeatType) {
+        PushNotification.localNotificationSchedule({
+          id: String(presc.prescription.pk),
+          vibrate: true,
+          vibration: 1000,
+          visibility: "public",
+          playSound: true,
+          message: 'Medicamento: ' + med + '\n' +
+            'Quantidade: ' + presc.prescription.quantity + ' ml/mg' + '\n' +
+            'Via de administração: ' + presc.event.data.description + '\n' +
+            'Hora: ' + presc.event.schedule.times[0],
+          date: n,
+          repeatType: repeatType,
+          actions: '["Yes", "No", "Maybe"]',
+        });
+      } else {
+        PushNotification.localNotificationSchedule({
+          id: String(presc.prescription.pk),
+          vibrate: true,
+          vibration: 1000,
+          visibility: "public",
+          playSound: true,
+          message: 'Medicamento: ' + med + '\n' +
+            'Quantidade: ' + presc.prescription.quantity + ' ml/mg' + '\n' +
+            'Via de administração: ' + presc.event.data.description + '\n' +
+            'Hora: ' + presc.event.schedule.times[0],
+          date: n
+        });
+      }
 		}
   });
-	var rec = null;
-	if (presc.event.schedule.duration &&
-	presc.event.schedule.durationInDays &&
-	presc.event.schedule.durationUnit &&
-	!presc.event.schedule.times &&
-	!presc.event.schedule.dayOfWeek &&
-	!presc.event.schedule.dayOfMonth &&
-	!presc.event.schedule.month &&
-	!presc.event.schedule.year) {
-		rec = 'daily';
-	}
-	else if (!presc.event.schedule.duration &&
-	!presc.event.schedule.durationInDays &&
-	!presc.event.schedule.durationUnit &&
-	!presc.event.schedule.times &&
-	presc.event.schedule.dayOfWeek &&
-	!presc.event.schedule.dayOfMonth &&
-	!presc.event.schedule.month &&
-	!presc.event.schedule.year) {
-		rec = 'weekly';
-	}
-	else if (!presc.event.schedule.duration &&
-	!presc.event.schedule.durationInDays &&
-	!presc.event.schedule.durationUnit &&
-	!presc.event.schedule.times &&
-	!presc.event.schedule.dayOfWeek &&
-	presc.event.schedule.dayOfMonth &&
-	!presc.event.schedule.month &&
-	!presc.event.schedule.year) {
-		rec = 'monthly';
-	}
-	else if (!presc.event.schedule.duration &&
-	!presc.event.schedule.durationInDays &&
-	!presc.event.schedule.durationUnit &&
-	!presc.event.schedule.times &&
-	!presc.event.schedule.dayOfWeek &&
-	presc.event.schedule.dayOfMonth &&
-	presc.event.schedule.month &&
-	!presc.event.schedule.year) {
-		rec = 'yearly';
-	}
 	var allDay = true;
 	var startDate = new Date(
     presc.occurrenceDate.year,
@@ -168,7 +198,7 @@ const addNewPrescription = async (token, presc, hash, medicationCalendar) => {
 			presc.occurrenceDate.year,
 			presc.occurrenceDate.month-1, // Porque os meses são de 0 a 11
 			presc.occurrenceDate.dayOfMonth,
-			parseInt(timeSplit[0])+1, // Porquê que preciso de somar 1???
+			parseInt(timeSplit[0]),
 			parseInt(timeSplit[1]),
 			parseInt(timeSplit[2])
 		);
@@ -194,9 +224,16 @@ const addNewPrescription = async (token, presc, hash, medicationCalendar) => {
 		endDate: endDate.toISOString(),
 		allDay: presc.event.schedule.times ? false : true,
 		location: presc.event.data.location,
-		description: presc.event.data.description,
+		description: 'Medicamento: ' + med + '\n' +
+      'Quantidade: ' + presc.prescription.quantity + 'ml/mg' + '\n' +
+      'Via de administração: ' + presc.event.data.description + '\n' +
+      'Hora: ' + presc.event.schedule.times[0],
 		recurrence: rec
 	};
+
+  if (eventID) { // Para fazer update do event
+    eventData.id = eventID;
+  }
 
 	if (eventData.recurrence == null) {
 		delete eventData.recurrence;
@@ -219,36 +256,31 @@ const addNewPrescription = async (token, presc, hash, medicationCalendar) => {
   }).catch(error => console.warn('RNCalendarEvents - saveEvent', error));
 }
 
-const handlePrescription = async (token, presc, hash, medicationCalendar) => {
-  try {
-    //await AsyncStorage.clear();
-    const oldEvData = await AsyncStorage.getItem('@medicationCalendar:' + presc.prescription.pk);
-    if (oldEvData == null) { // O evento ainda não existe
-      addNewPrescription(token, presc, hash, medicationCalendar);
-    }
-    else { // Já tem o evento. Está atualizado?
-      var oldEvDataParsed = JSON.parse(oldEvData);
-      if (oldEvDataParsed.hash !== hash) { // O evento mudou
-        RNCalendarEvents.removeEvent(oldEvDataParsed.id)
-          .then(() => {
-            (async () => { // Remove a key do asyncStorage
-              try {
-                await AsyncStorage.removeItem('@medicationCalendar:' + presc.prescription.pk);
-              } catch (error) {
-                console.warn('AsyncStorage - removeItem', error);
-              }
-            })();
-            // Adiciona o evento atualizado
-            addNewPrescription(token, presc, hash, medicationCalendar);
-          })
-          .catch(error => {
-            console.log('RNCalendarEvents - removeEvent', error);
-          });
+const handlePrescription = async (token, presc, hash, medicationCalendar, meds) => {
+  AsyncStorage.getItem('@medicationCalendar:' + presc.prescription.pk)
+    .then((oldEvData) => {
+      if (oldEvData == null) { // O evento ainda não existe
+        addNewPrescription(token, presc, hash, medicationCalendar, null, meds);
       }
-    }
-  } catch (error) {
-    console.warn('AsyncStorage - handlePrescription', error);
-  }
+      else { // Já tem o evento. Está atualizado?
+        var oldEvDataParsed = JSON.parse(oldEvData);
+        if (oldEvDataParsed.hash !== hash) { // O evento mudou
+          // Remove a key do asyncStorage
+          AsyncStorage.removeItem('@medicationCalendar:' + presc.prescription.pk)
+            .then(() => {
+              PushNotification.cancelLocalNotifications({id: String(presc.prescription.pk)});
+              // Adiciona o evento atualizado
+              addNewPrescription(token, presc, hash, medicationCalendar, oldEvDataParsed.id, meds);
+            })
+            .catch((error) => {
+              console.warn('AsyncStorage - removeItem', error);
+            });
+        }
+      }
+    })
+    .catch((error) => {
+      console.warn('AsyncStorage - handlePrescription', error);
+    });
 }
 
 export default class MedicationPage extends React.Component {
@@ -346,10 +378,11 @@ export default class MedicationPage extends React.Component {
         }
       })
       .catch(error => console.warn('Auth Error: ', error));
+
   }
 
   componentDidMount() {
-    //PushNotification.cancelAllLocalNotifications();
+    // PushNotification.cancelAllLocalNotifications();
     const fetchData = async () => {
       try {
         const token_res = await AsyncStorage.getItem('@login:');
@@ -445,7 +478,6 @@ export default class MedicationPage extends React.Component {
   }
 
   fetchPrescriptionsFromApi = (token)  => {
-
     const url = this.state.base_url + "prescriptions/";
 
     this.setState({ loading: true });
@@ -472,7 +504,7 @@ export default class MedicationPage extends React.Component {
         }, () => {
           this.fetchMedsNames();
           this.fetchAuthorsNames();
-          this.handlePrescriptions();
+          // this.handlePrescriptions();
         });
       })
       .catch(error => {
@@ -482,12 +514,15 @@ export default class MedicationPage extends React.Component {
 
 
   fetchMedsNames() {
-    fetchMedsNames(this.state.token, this.state.prescriptions).then(meds => {
-      console.log('Meds loaded', meds);
-      this.setState({
-        meds: meds,
+    fetchMedsNames(this.state.token, this.state.prescriptions)
+      .then(meds => {
+        console.log('Meds loaded', meds);
+        this.setState({
+          meds: meds,
+        }, () => {
+          this.handlePrescriptions();
+        })
       })
-    })
   }
 
   fetchAuthorsNames() {
@@ -527,6 +562,7 @@ export default class MedicationPage extends React.Component {
 
   iterateThroughPrescriptions(eventsToRemove, medicationCalendar) {
     const t = this.state.token;
+    const meds = this.state.meds;
     this.state.prescriptions.forEach( function(presc) {
       if (eventsToRemove.includes(presc.prescription.pk)) {
         eventsToRemove = eventsToRemove.filter(e => e !== presc.prescription.pk);
@@ -534,7 +570,7 @@ export default class MedicationPage extends React.Component {
       sha256(JSON.stringify(presc)).then( hash => {
         (async () => {
           try {
-            handlePrescription(t, presc, hash, medicationCalendar);
+            handlePrescription(t, presc, hash, medicationCalendar, meds);
           } catch (error) {
             console.warn('handleAppointment - outside', error);
           }
@@ -548,13 +584,14 @@ export default class MedicationPage extends React.Component {
           const oldEvData = await AsyncStorage.getItem('@medicationCalendar:' + prescPK);
           RNCalendarEvents.removeEvent(JSON.parse(oldEvData).id)
             .then(() => {
-              (async () => { // Remove a key do asyncStorage
-                try {
-                  await AsyncStorage.removeItem('@medicationCalendar:' + prescPK);
-                } catch (error) {
+              // Remove a key do asyncStorage
+              AsyncStorage.removeItem('@medicationCalendar:' + prescPK)
+                .then(() => {
+                  PushNotification.cancelLocalNotifications({id: String(prescPK)});
+                })
+                .catch((error) => {
                   console.warn('AsyncStorage - removeItem', error);
-                }
-              })();
+                });
             })
             .catch(error => {
               console.log('RNCalendarEvents - removeEvent', error);
@@ -608,49 +645,42 @@ export default class MedicationPage extends React.Component {
 		)
 	}
 
-  _parseScheduleRepetition = presc => {
-    var rec = null
-    if (presc.event.schedule.duration &&
-    presc.event.schedule.durationInDays &&
-    presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    !presc.event.schedule.dayOfWeek &&
-    !presc.event.schedule.dayOfMonth &&
-    !presc.event.schedule.month &&
-    !presc.event.schedule.year) {
+  _parseScheduleRepetition = event => {
+    var rec = null;
+    if (event.event.schedule.duration &&
+    event.event.schedule.durationInDays === 0 &&
+    event.event.schedule.durationUnit &&
+    !event.event.schedule.dayOfWeek &&
+    !event.event.schedule.dayOfMonth &&
+    !event.event.schedule.month &&
+    !event.event.schedule.year) {
       return (
         <Text>diariamente</Text>
       )
-    } else if (!presc.event.schedule.duration &&
-    !presc.event.schedule.durationInDays &&
-    !presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    presc.event.schedule.dayOfWeek &&
-    !presc.event.schedule.dayOfMonth &&
-    !presc.event.schedule.month &&
-    !presc.event.schedule.year) {
+    }
+    else if (!event.event.schedule.durationInDays &&
+    event.event.schedule.dayOfWeek &&
+    !event.event.schedule.dayOfMonth &&
+    !event.event.schedule.month &&
+    !event.event.schedule.year) {
       return (
         <Text>semanalmente</Text>
       )
-    } else if (!presc.event.schedule.duration &&
-    !presc.event.schedule.durationInDays &&
-    !presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    !presc.event.schedule.dayOfWeek &&
-    presc.event.schedule.dayOfMonth &&
-    !presc.event.schedule.month &&
-    !presc.event.schedule.year) {
+    }
+    else if (!event.event.schedule.durationInDays &&
+    !event.event.schedule.dayOfWeek &&
+    event.event.schedule.dayOfMonth &&
+    !event.event.schedule.month &&
+    !event.event.schedule.year) {
       return (
         <Text>mensalmente</Text>
       )
-    } else if (!presc.event.schedule.duration &&
-    !presc.event.schedule.durationInDays &&
-    !presc.event.schedule.durationUnit &&
-    !presc.event.schedule.times &&
-    !presc.event.schedule.dayOfWeek &&
-    presc.event.schedule.dayOfMonth &&
-    presc.event.schedule.month &&
-    !presc.event.schedule.year) {
+    }
+    else if (!event.event.schedule.durationInDays &&
+    !event.event.schedule.dayOfWeek &&
+    event.event.schedule.dayOfMonth &&
+    event.event.schedule.month &&
+    !event.event.schedule.year) {
       return (
         <Text>anualmente</Text>
       )
@@ -739,7 +769,7 @@ export default class MedicationPage extends React.Component {
                 </Text>
                 <Text>
                   <Text style={{fontWeight: 'bold'}}>Data de prescrição:{' '}</Text>
-                  { item.prescription.date }
+                  { (new Date(item.prescription.date)).toLocaleDateString('en-GB') }
                 </Text>
               </View>
             </Card>

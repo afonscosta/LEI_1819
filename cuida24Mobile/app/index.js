@@ -13,6 +13,7 @@ import store from './redux/index'
 const persistor = persistStore(store)
 
 class Cuida24App extends Component {
+
   render () {
     return (
 			<Provider store={store}>
