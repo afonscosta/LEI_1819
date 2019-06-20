@@ -43,7 +43,7 @@ class StaticPagesSerializer(serializers.ModelSerializer):
 class GoalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Goal
-        fields = ('goal', 'type', 'pk')
+        fields = ('goal', 'type', 'dateBegin', 'dateEnd', 'disable', 'pk')
 
 
 class PhysicalActivitySerializer(serializers.ModelSerializer):

@@ -349,7 +349,10 @@
     "pk": 1,
     "fields": {
         "goal": "2",
-        "type": "AF"
+        "type": "AF",
+        "disable": "False",
+        "dateBegin": "2019-06-11T23:00:00.000Z",
+        "dateEnd": "2019-08-11T23:00:00.000Z"
     }
   },
   {
@@ -357,7 +360,10 @@
     "pk": 2,
     "fields": {
         "goal": "3",
-        "type": "LS"
+        "type": "LS",
+        "disable": "False",
+        "dateBegin": "2019-06-11T23:00:00.000Z",
+        "dateEnd": "2019-08-11T23:00:00.000Z"
     }
   },
   {

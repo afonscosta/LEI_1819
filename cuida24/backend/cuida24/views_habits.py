@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from rest_framework import status, generics, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from datetime import datetime
 
 from backend.cuida24.permissions import *
 from .services import *
@@ -11,6 +12,7 @@ from .services_habits import *
 # Serve Vue Application
 index_view = never_cache(TemplateView.as_view(template_name='index.html'))
 logger = logging.getLogger("mylogger")
+
 
 class GoalViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
@@ -32,7 +34,25 @@ class GoalViewSet(viewsets.ModelViewSet):
             dict = {'value': choice[0], 'title': choice[1]}
             enum_values.append(dict)
         return Response(enum_values)
+"""
+    def list(self, request, *args, **kwargs):
+        logger.info("GET WATER")
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        date_now = datetime.now()
+        goals = Goal.objects.filter(disble=False)
+        #serializer_goal = GoalSerializer(goals,many=True)
+        for goal in goals:
+            if goal.dateBegin <= date_now <= goal.dateEnd:
+                (('AF', 'Atividade Fisica'), ('LS', 'Lazer Social'), ('LI', 'Lazer Individual'), ('GM', 'Jogo'),
+                 ('WT', 'Agua'), ('NP', 'Sesta'), ('SP', 'Dormir'), ('SS', 'SOS'), ('PA', 'Pequeno Almoço'),
+                 ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'Lanche Tarde'), ('JT', 'Jantar'),
+                 ('CB', 'Carnes Brancas'), ('FT', 'Fruta'), ('VG', 'Vegetais'), ('FB', 'Fibras'),
+                 ('PC', 'Pré-cozinhados'), ('RF', 'Refrigerantes'), ('AL', 'Alcool'))
 
+        query_set = Water.objects.filter(caregiver_id=caregiver)
+        serializer = WaterSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+"""
 
 class PhysicalActivityViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
