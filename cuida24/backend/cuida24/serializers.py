@@ -117,8 +117,7 @@ class PatientSerializer(serializers.ModelSerializer):
         user_data['password'] = make_password(user_data['password'])
         logger.info(user_data)
         info = UserAuth.objects.create(**user_data)
-        caregiver = Caregiver.objects.get(pk=validated_data['caregiver'])
-        patient = Patient.objects.create(info=info,caregiver=caregiver);
+        patient = Patient.objects.create(info=info, **validated_data)
         return patient
 
 class BackofficeUserSerializer(serializers.ModelSerializer):
