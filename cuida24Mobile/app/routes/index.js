@@ -21,6 +21,7 @@ import HistoricIndivLeisurePage from '../pages/Habits/Historic/IndivLeisure.page
 import PhysicalActivityPage from '../pages/Habits/PhysicalActivity.page'
 import HistoricPhysicalActivityPage from '../pages/Habits/Historic/PhysicalActivity.page'
 import SleepPage from '../pages/Habits/Sleep.page'
+import TakePage from '../pages/Habits/Take.page'
 import NapPage from '../pages/Habits/Nap.page'
 import HistoricNapPage from '../pages/Habits/Historic/Nap.page'
 import SOSPage from '../pages/Habits/SOS.page'
@@ -65,12 +66,11 @@ class AuthLoadingScreen extends React.Component {
     this._bootstrapAsync();
   }
 
-
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
     AsyncStorage.getItem('@login:')
       .then((userToken) => {
-        this.props.navigation.navigate(userToken ? 'SleepLoading' : 'Auth');
+        this.props.navigation.navigate(userToken ? 'SleepLoading': 'Auth');
       })
       .catch((error) => {
         console.log(error);
@@ -709,6 +709,7 @@ export default createAppContainer(createSwitchNavigator(
     App: DrawerNavigator,
     SleepLoading: SleepLoadingScreen,
     Sleep: SleepPage,
+    Take: TakePage,
     MealLoading: MealLoadingScreen,
     Meal: MealPage,
     Auth: DrawerNavigatorNoLogin

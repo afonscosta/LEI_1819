@@ -23,6 +23,7 @@ import {
   RadioButtonInput,
   RadioButtonLabel
 } from 'react-native-simple-radio-button';
+import { setupPushNotification } from '../utils/configNotifications';
 
 const parseSchedule = (event) => {
 	var rec = null;
@@ -65,7 +66,7 @@ const addNewAppointment = async (appt, hash, appointmentCalendar, eventID) => {
 	var rec = parseSchedule(appt);
   appt.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
-		if (n > today) {
+		if (n > today || rec) {
       if (rec === 'daily') {
         PushNotification.localNotificationSchedule({
           id: String(1000000 + appt.appointmentPK),
@@ -201,7 +202,7 @@ const addNewIndivSession = async (is, hash, indivSessionCalendar, eventID) => {
 	var rec = parseSchedule(is);
   is.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
-		if (n > today) {
+		if (n > today || rec) {
       if (rec === 'daily') {
         PushNotification.localNotificationSchedule({
           id: String(3000000 + is.individualSession.pk),
@@ -338,7 +339,7 @@ const addNewGroupSession = async (gs, hash, groupSessionCalendar, eventID) => {
 	var rec = parseSchedule(gs);
   gs.event.data.notify.forEach((notif) => {
 		var n = new Date(notif);
-		if (n > today) {
+		if (n > today || rec) {
       if (rec === 'daily') {
         PushNotification.localNotificationSchedule({
           id: String(2000000 + gs.groupSession.pk),
@@ -592,6 +593,19 @@ export default class CalendarPage extends React.Component {
       }
     }
     fetchData();
+    this.pushNotification = setupPushNotification(this._handleNotificationOpen);
+  }
+
+  _handleNotificationOpen = (notification) => {
+    console.log('NOTIFICATION', notification);
+    AsyncStorage.setItem('@take', JSON.stringify(notification.notificationId))
+      .then(() => {
+        const {navigate} = this.props.navigation;
+        navigate("Take");
+      })
+      .catch((error) => {
+        console.warn('Error: getItem take');
+      });
   }
 
   fetchCalendarsFromApi = (token)  => {

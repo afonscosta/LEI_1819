@@ -151,25 +151,16 @@ const addNewPrescription = async (token, presc, hash, medicationCalendar, eventI
       if (repeatType) {
         PushNotification.localNotificationSchedule({
           id: String(presc.prescription.pk),
-          vibrate: true,
-          vibration: 1000,
-          visibility: "public",
-          playSound: true,
           message: 'Medicamento: ' + med + '\n' +
             'Quantidade: ' + presc.prescription.quantity + ' ml/mg' + '\n' +
             'Via de administração: ' + presc.event.data.description + '\n' +
             'Hora: ' + presc.event.schedule.times[0],
           date: n,
-          repeatType: repeatType,
-          actions: '["Yes", "No", "Maybe"]',
+          repeatType: repeatType
         });
       } else {
         PushNotification.localNotificationSchedule({
           id: String(presc.prescription.pk),
-          vibrate: true,
-          vibration: 1000,
-          visibility: "public",
-          playSound: true,
           message: 'Medicamento: ' + med + '\n' +
             'Quantidade: ' + presc.prescription.quantity + ' ml/mg' + '\n' +
             'Via de administração: ' + presc.event.data.description + '\n' +
