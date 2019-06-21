@@ -77,7 +77,7 @@
               @click="goToEvaluation(gs)"
               >Avaliar participantes</b-button>
             <b-button block 
-              v-if="gs.groupSession.state === 'E'"
+              v-if="gs.groupSession.state === 'E' && userAuth === 'COR'"
               class="mt-2" 
               size="sm" 
               variant="primary" 
@@ -107,7 +107,8 @@ export default {
       indivSessions: state => state.sessions.indivSessions,
       usersActive: state => state.users.usersActive,
       caregivers: state => state.users.users.caregivers,
-      patients: state => state.users.users.patients
+      patients: state => state.users.users.patients,
+      userAuth: state => state.users.userAuth
     }),
     durationUnitTranslated () {
       return (durationUnit) => {

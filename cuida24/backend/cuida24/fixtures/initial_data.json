@@ -132,15 +132,71 @@
         "username": "l@gmail.com",
         "email": "l@gmail.com"
     }
-  },{
+  },
+  {
     "model": "auth.user",
     "pk": 8,
     "fields": {
-        "first_name": "manuel",
-        "last_name": "crespo",
+        "first_name": "prf",
+        "last_name": "prf",
         "password": "123",
-        "username": "mc@gmail.com",
-        "email": "mc@gmail.com"
+        "username": "prf@gmail.com",
+        "email": "prf@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 9,
+    "fields": {
+        "first_name": "admin",
+        "last_name": "admin",
+        "password": "123",
+        "username": "admin@gmail.com",
+        "email": "admin@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 10,
+    "fields": {
+        "first_name": "med",
+        "last_name": "med",
+        "password": "123",
+        "username": "med@gmail.com",
+        "email": "med@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 11,
+    "fields": {
+        "first_name": "rem",
+        "last_name": "rem",
+        "password": "123",
+        "username": "rem@gmail.com",
+        "email": "rem@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 12,
+    "fields": {
+        "first_name": "enf",
+        "last_name": "enf",
+        "password": "123",
+        "username": "enf@gmail.com",
+        "email": "enf@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 13,
+    "fields": {
+        "first_name": "psi",
+        "last_name": "psi",
+        "password": "123",
+        "username": "psi@gmail.com",
+        "email": "psi@gmail.com"
     }
   },
   {
@@ -265,6 +321,86 @@
     "pk": 8,
     "fields": {
         "user": "8",
+        "group": "1"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 3,
+    "fields": {
+       "info": "9",
+       "type": "ADM"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 9,
+    "fields": {
+        "user": "9",
+        "group": "1"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 4,
+    "fields": {
+       "info": "10",
+       "type": "MED"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 10,
+    "fields": {
+        "user": "10",
+        "group": "1"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 5,
+    "fields": {
+       "info": "11",
+       "type": "REM"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 11,
+    "fields": {
+        "user": "11",
+        "group": "1"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 6,
+    "fields": {
+       "info": "12",
+       "type": "ENF"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 12,
+    "fields": {
+        "user": "12",
+        "group": "1"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 7,
+    "fields": {
+       "info": "13",
+       "type": "PSI"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 13,
+    "fields": {
+        "user": "13",
         "group": "1"
     }
   },

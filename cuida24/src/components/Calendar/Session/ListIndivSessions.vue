@@ -74,7 +74,7 @@
               @click="goToEvaluation(is)"
               >Avaliar participante</b-button>
             <b-button block 
-              v-if="is.individualSession.state === 'E'"
+              v-if="is.individualSession.state === 'E' && userAuth === 'COR'"
               class="mt-2" 
               size="sm" 
               variant="primary" 
@@ -102,7 +102,8 @@ export default {
     ...mapState({
       groupSessions: state => state.sessions.groupSessions,
       indivSessions: state => state.sessions.indivSessions,
-      usersActive: state => state.users.usersActive
+      usersActive: state => state.users.usersActive,
+      userAuth: state => state.users.userAuth
     }),
     ...mapGetters('users', [
       'getCaregiverById',

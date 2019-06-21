@@ -64,7 +64,11 @@ const router = new Router({
       component: Calendar,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -76,7 +80,11 @@ const router = new Router({
       component: Appointments,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -88,7 +96,12 @@ const router = new Router({
       component: FormAppoint,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          const type = store.getters['users/userAuth'].type
+          if (!['ADM', 'REM'].includes(type) && ['COR', 'PRF', 'MED'].includes(type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -100,7 +113,11 @@ const router = new Router({
       component: Notes,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -112,7 +129,11 @@ const router = new Router({
       component: Session,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -124,7 +145,11 @@ const router = new Router({
       component: FormSession,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -136,7 +161,11 @@ const router = new Router({
       component: UserEvaluation,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -150,7 +179,12 @@ const router = new Router({
       component: Medication,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          const type = store.getters['users/userAuth'].type
+          if (!['ADM', 'REM'].includes(type) && ['COR', 'PRF', 'MED'].includes(type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -162,7 +196,12 @@ const router = new Router({
       component: Prescriptions,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          const type = store.getters['users/userAuth'].type
+          if (!['ADM', 'REM'].includes(type) && ['COR', 'PRF', 'MED'].includes(type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -174,7 +213,12 @@ const router = new Router({
       component: FormPrescription,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          const type = store.getters['users/userAuth'].type
+          if (!['ADM', 'REM'].includes(type) && ['COR', 'PRF', 'MED'].includes(type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -188,7 +232,11 @@ const router = new Router({
       component: Habits,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -200,7 +248,11 @@ const router = new Router({
       component: Goals,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -212,7 +264,11 @@ const router = new Router({
       component: Activities,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (!['ADM', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -259,7 +315,11 @@ const router = new Router({
       component: AddUsers,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (store.getters['users/userAuth'].type === 'ADM') {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
@@ -271,7 +331,11 @@ const router = new Router({
       component: Medicine,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
-          next()
+          if (['COR', 'REM'].includes(store.getters['users/userAuth'].type)) {
+            next()
+          } else {
+            next(false)
+          }
         } else {
           next({ name: 'login' })
         }
