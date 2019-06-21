@@ -15,10 +15,12 @@ const mutations = {
     console.log(response.token)
     state.accesstoken = response.token
     localStorage.setItem('token', response.token)
+    this.dispatch('users/getUserAuth')
   },
   setPlainToken (state, token) {
     state.accesstoken = token
     localStorage.setItem('token', token)
+    this.dispatch('users/getUserAuth')
   },
   deleteToken (state) {
     state.accesstoken = null

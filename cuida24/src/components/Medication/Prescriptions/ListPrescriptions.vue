@@ -34,9 +34,9 @@
       ref="modal-takes"
       hide-footer title="Histórico de tomas"
     >
-      <b-card>
-        <p>ITEM</p>
-      </b-card>
+      <label v-for="take in takes" :key="take">
+        {{ (new Date(take)).toLocaleDateString('en-GB') }}
+      </label>
     </b-modal>
 
     <b-container>
@@ -91,7 +91,7 @@
 
             <b-button variant="danger" @click="remove(presc)">Eliminar</b-button>
             <b-button @click="$emit('editPrescription', presc)">Editar</b-button>
-            <b-button @click="$refs['modal-takes'].show()">Histórico de tomas</b-button>
+            <b-button @click="showTakes(presc)">Histórico de tomas</b-button>
           </b-card>
         </b-col>
       </b-row>
@@ -109,7 +109,8 @@ export default {
   props: {
   },
   data: () => ({
-    prescToRemove: null
+    prescToRemove: null,
+    takes: []
   }),
   created () {
     if (this.usersActive.caregivers.length !== 0 || this.usersActive.patients.length !== 0) {
@@ -149,6 +150,10 @@ export default {
     },
     showModal () {
       this.$refs['my-modal'].show()
+    },
+    showTakes (presc) {
+      this.takes = presc.prescription.take
+      this.$refs['modal-takes'].show()
     },
     confirme (bool) {
       if (bool === true) {
