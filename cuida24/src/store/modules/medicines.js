@@ -50,7 +50,7 @@ const actions = {
         })
     })
   },
-  updateMedicine ({ commit }, medicine) {
+  updateMedicineBO ({ commit }, medicine) {
     return new Promise((resolve, reject) => {
       medicinesService.putMedicine(medicine)
         .then(() => {

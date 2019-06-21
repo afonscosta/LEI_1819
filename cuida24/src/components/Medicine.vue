@@ -69,16 +69,11 @@
                   v-model="medicine.holder"></b-form-input>
               </b-form-group>
 
-              <b-form-group
-                label-cols-sm="3"
-                label="Genérico:"
-                label-align-sm="right"
-                label-for="nested-generic"
-              >
-                <b-form-input id="nested-generic" 
-                  required
-                  v-model="medicine.generic"></b-form-input>
-              </b-form-group>
+              <b-form-checkbox
+                id="nested-generic"
+                v-model="medicine.generic"
+                name="nested-generic"
+              >Genérico</b-form-checkbox>
 
               <div v-if="selectedMedicine.length === 1" class="buttons float-right">
                 <b-button type="submit" variant="primary">Atualizar</b-button>
@@ -94,7 +89,7 @@
         </b-card>
       </b-col>
     </b-row>
-    <b-row>
+    <b-row class="mt-3">
       <b-col>
         <ListMedicines 
           :meds="medicines"
@@ -123,7 +118,7 @@ export default {
       pharmaceuticalForm: '',
       dosage: 0,
       holder: '',
-      generic: '',
+      generic: false,
       pk: null
     },
     selectedMedicine: [],
@@ -139,15 +134,16 @@ export default {
   },
   methods: {
     ...mapActions('medicines', [
-      'addMedicine', 'updateMedicine', 'deleteMedicine',
+      'addMedicine',
+      'updateMedicineBO',
+      'deleteMedicine',
       'getMedicines'
     ]),
     onSubmit (evt) {
       // cancela o comportamento default do evento
       evt.preventDefault()
       if (this.medicine.pk) {
-        console.log('update', this.medicine)
-        this.updateMedicine(this.medicine)
+        this.updateMedicineBO(this.medicine)
       } else {
         this.addMedicine(this.medicine)
       }
@@ -157,7 +153,7 @@ export default {
         pharmaceuticalForm: '',
         dosage: '',
         holder: '',
-        generic: '',
+        generic: false,
         pk: null
       }
     },
@@ -170,7 +166,7 @@ export default {
         pharmaceuticalForm: '',
         dosage: '',
         holder: '',
-        generic: '',
+        generic: false,
         pk: null
       }
       this.selectedMedicine = []
@@ -182,6 +178,15 @@ export default {
     },
     removeMedicine () {
       this.selectedMedicine = []
+      this.medicine = {
+        activeSubs: '',
+        name: '',
+        pharmaceuticalForm: '',
+        dosage: '',
+        holder: '',
+        generic: false,
+        pk: null
+      }
     },
     updateMedicine (med) {
       this.selectedMedicine = [med]
