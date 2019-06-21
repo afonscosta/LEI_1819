@@ -96,5 +96,47 @@ export default {
         Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
+  },
+  fetchUserActivities  (pk) {
+    return cuida24.get(`activity/${pk}`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
+  },
+  fetchUserMeal  (pk) {
+    return cuida24.get(`meal/${pk}`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
+  },
+  fetchUserWater  (pk) {
+    return cuida24.get(`water/${pk}`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
+  },
+  fetchUserSleep  (pk) {
+    return cuida24.get(`sleep/${pk}`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
+  },
+  fetchUserNap  (pk) {
+    return cuida24.get(`nap/${pk}`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
+  },
+  fetchUserSOS  (pk) {
+    return cuida24.get(`sos/${pk}`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
   }
 }

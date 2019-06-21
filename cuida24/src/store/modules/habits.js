@@ -5,7 +5,13 @@ const state = {
   goals: [],
   physicalActivities: [],
   socialLeisures: [],
-  indivLeisures: []
+  indivLeisures: [],
+  userActivities: [],
+  userWater: [],
+  userSOS: [],
+  userSleep: [],
+  userNap: [],
+  userMeal: []
 }
 
 const getters = {
@@ -23,6 +29,24 @@ const getters = {
   },
   indivLeisures: state => {
     return state.indivLeisures
+  },
+  userActivities: state => {
+    return state.userActivities
+  },
+  userWater: state => {
+    return state.userWater
+  },
+  userSOS: state => {
+    return state.userSOS
+  },
+  userSleep: state => {
+    return state.userSleep
+  },
+  userNap: state => {
+    return state.userNap
+  },
+  userMeal: state => {
+    return state.userMeal
   }
 }
 
@@ -73,6 +97,25 @@ const mutations = {
   },
   deleteIndivLeisure (state, ilPK) {
     state.indivLeisures = state.indivLeisures.filter(il => il.pk !== ilPK)
+  },
+  // Habits fetch
+  setUserActivities (state, items) {
+    state.userActivities = items
+  },
+  setUserMeal (state, items) {
+    state.userMeal = items
+  },
+  setUserWater (state, items) {
+    state.userWater = items
+  },
+  setUserSOS (state, items) {
+    state.userSOS = items
+  },
+  setUserSleep (state, items) {
+    state.userSleep = items
+  },
+  setUserNap (state, items) {
+    state.userNap = items
   }
 }
 
@@ -227,6 +270,38 @@ const actions = {
           reject(error)
         })
     })
+  },
+  getHabits ({ commit }, payload) {
+    habitsService.fetchUserActivities(payload)
+      .then(items => {
+        console.log('fetch activities', items)
+        commit('setUserActivities', items)
+      })
+    habitsService.fetchUserMeal(payload)
+      .then(items => {
+        console.log('fetch meals', items)
+        commit('setUserMeal', items)
+      })
+    habitsService.fetchUserSOS(payload)
+      .then(items => {
+        console.log('fetch sos', items)
+        commit('setUserSOS', items)
+      })
+    habitsService.fetchUserWater(payload)
+      .then(items => {
+        console.log('fetch water', items)
+        commit('setUserWater', items)
+      })
+    habitsService.fetchUserSleep(payload)
+      .then(items => {
+        console.log('fetch sleep', items)
+        commit('setUserSleep', items)
+      })
+    habitsService.fetchUserNap(payload)
+      .then(items => {
+        console.log('fetch nap', items)
+        commit('setUserNap', items)
+      })
   }
 }
 

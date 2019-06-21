@@ -41,6 +41,109 @@
           </b-row>
         </b-form>
       </b-card>
+
+      <div class="mt-3" role="tablist">
+        <b-card v-if="activities.length > 0" no-body class="mb-1">
+          <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-button block href="#" v-b-toggle.accordion-1>Atividades</b-button>
+          </b-card-header>
+          <b-collapse id="accordion-1" role="tabpanel">
+            <b-card-body>
+              <b-card
+                v-for="act in activities"
+                :key="'act' + act.pk"
+                border-variant="dark"
+                :header="act.act"
+              >
+                <p>Data: {{ (new Date(act.date)).toLocaleDateString('en-GB') }}</p>
+                <p>Duração: {{ act.duration }}</p>
+              </b-card>
+            </b-card-body>
+          </b-collapse>
+        </b-card>
+
+        <b-card v-if="meal.length > 0" no-body class="mb-1">
+          <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-button block href="#" v-b-toggle.accordion-2>Refeições</b-button>
+          </b-card-header>
+          <b-collapse id="accordion-2" role="tabpanel">
+            <b-card-body>
+              <b-card
+                v-for="m in meal"
+                :key="'meal' + m.pk"
+                border-variant="dark"
+                :header="m.type"
+              >
+                <p>Data: {{ (new Date(m.date)).toLocaleDateString('en-GB') }}</p>
+                <p>Realizado: {{ m.done ? 'Sim' : 'Não' }}</p>
+                <p v-if="m.food.length > 0">Comida: {{ m.food }}</p>
+              </b-card>
+            </b-card-body>
+          </b-collapse>
+        </b-card>
+
+        <b-card v-if="water.length > 0" no-body class="mb-1">
+          <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-button block href="#" v-b-toggle.accordion-3>Água</b-button>
+          </b-card-header>
+          <b-collapse id="accordion-3" role="tabpanel">
+            <b-card-body>
+              <b-card
+                v-for="w in water"
+                :key="'water' + w.pk"
+                border-variant="dark"
+                :header="(new Date(w.date)).toLocaleDateString('en-GB')"
+              >
+                <p>Quantidade: {{ w.water }} copos</p>
+              </b-card>
+            </b-card-body>
+          </b-collapse>
+        </b-card>
+
+        <b-card v-if="sos.length > 0" no-body class="mb-1">
+          <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-button block href="#" v-b-toggle.accordion-4>Medicamento SOS</b-button>
+          </b-card-header>
+          <b-collapse id="accordion-4" role="tabpanel">
+            <b-card-body>
+              <b-card
+                v-for="s in sos"
+                :key="'sos' + s.pk"
+                border-variant="dark"
+                :header="(new Date(s.date)).toLocaleDateString('en-GB')"
+              >
+                <p>Quantidade: {{ s.sos }}</p>
+              </b-card>
+            </b-card-body>
+          </b-collapse>
+        </b-card>
+
+        <b-card v-if="sleep.length > 0 || nap.length > 0" no-body class="mb-1">
+          <b-card-header header-tag="header" class="p-1" role="tab">
+            <b-button block href="#" v-b-toggle.accordion-5>Sono</b-button>
+          </b-card-header>
+          <b-collapse id="accordion-5" role="tabpanel">
+            <b-card-body>
+              <b-card
+                v-for="s in sleep"
+                :key="'sleep' + s.pk"
+                border-variant="dark"
+                :header="(new Date(s.date)).toLocaleDateString('en-GB')"
+              >
+                <p>Dormiu mais de 7 horas? {{ s.quantity ? 'Sim' : 'Não' }}</p>
+              </b-card>
+              <b-card
+                v-for="n in nap"
+                :key="'nap' + n.pk"
+                border-variant="dark"
+                :header="(new Date(n.date)).toLocaleDateString('en-GB')"
+              >
+                <p>Sestas: {{ n.naps }}</p>
+              </b-card>
+            </b-card-body>
+          </b-collapse>
+        </b-card>
+      </div>
     </b-container>
   </div>
 </template>
@@ -63,7 +166,13 @@ export default {
   },
   computed: {
     ...mapState({
-      caregivers: state => state.users.users.caregivers
+      caregivers: state => state.users.users.caregivers,
+      activities: state => state.habits.userActivities,
+      meal: state => state.habits.userMeal,
+      water: state => state.habits.userWater,
+      sos: state => state.habits.userSOS,
+      sleep: state => state.habits.userSleep,
+      nap: state => state.habits.userNap
     }),
     caregiversParsed () {
       // TODO: Será que é esta pk?
@@ -73,7 +182,9 @@ export default {
     }
   },
   methods: {
-    onSubmitSearch () {
+    onSubmitSearch (evt) {
+      evt.preventDefault()
+      this.$store.dispatch('habits/getHabits', this.selectedCaregiver)
       console.log('search habits for ', this.selectedCaregiver)
     },
     formatDates (dateOne, dateTwo) {
