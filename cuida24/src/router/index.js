@@ -6,6 +6,7 @@ import store from '../store'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 import AddUsers from '@/components/AddUsers'
+import Medicine from '@/components/Medicine'
 
 // Calendar
 import Calendar from '@/components/Calendar/Calendar'
@@ -256,6 +257,18 @@ const router = new Router({
       path: '/addUsers',
       name: 'addUsers',
       component: AddUsers,
+      beforeEnter: (to, from, next) => {
+        if (store.getters['login/accesstoken']) {
+          next()
+        } else {
+          next({ name: 'login' })
+        }
+      }
+    },
+    {
+      path: '/medicine',
+      name: 'medicine',
+      component: Medicine,
       beforeEnter: (to, from, next) => {
         if (store.getters['login/accesstoken']) {
           next()
