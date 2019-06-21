@@ -34,9 +34,9 @@
       ref="modal-takes"
       hide-footer title="Histórico de tomas"
     >
-      <label v-for="take in takes" :key="take">
+      <p v-for="take in takes" :key="take">
         {{ (new Date(take)).toLocaleDateString('en-GB') }}
-      </label>
+      </p>
     </b-modal>
 
     <b-container>
