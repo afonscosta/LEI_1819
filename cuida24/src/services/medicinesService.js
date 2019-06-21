@@ -16,14 +16,14 @@ export default {
       }
     }).then(response => response.data)
   },
-  putNote (payload) {
+  putMedicine (payload) {
     return cuida24.put(`medicine/`, payload, {
       headers: {
         Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
   },
-  deleteNote (medicineId) {
+  deleteMedicine (medicineId) {
     return cuida24.delete(`medicine/${medicineId}`, {
       headers: {
         Authorization: 'Token ' + store.state.accesstoken
