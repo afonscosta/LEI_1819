@@ -56,26 +56,47 @@ class GoalViewSet(viewsets.ModelViewSet):
         goals = Goal.objects.filter(disable=False)
         serializer_goal = GoalSerializer(goals, many=True)
         return Response(serializer_goal.data, status=status.HTTP_200_OK)
-"""
-    def list(self, request, *args, **kwargs):
-        logger.info("GET WATER")
+
+'''
+    @action(detail=False, methods=['get'])
+    def list_goals_caregiver(self,request):
+        logger.info("GET GOALS CAREGIVER")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
         date_now = datetime.now()
         goals = Goal.objects.filter(disble=False)
         #serializer_goal = GoalSerializer(goals,many=True)
         for goal in goals:
+            logger.info(goal.dateBegin)
+            logger.info(goal.date_now)
+            logger.info(goal.dateEnd)
             if goal.dateBegin <= date_now <= goal.dateEnd:
-                (('AF', 'Atividade Fisica'), ('LS', 'Lazer Social'), ('LI', 'Lazer Individual'), ('GM', 'Jogo'),
-                 ('WT', 'Agua'), ('NP', 'Sesta'), ('SP', 'Dormir'), ('SS', 'SOS'), ('PA', 'Pequeno Almoço'),
-                 ('LM', 'Lanche Manhã'), ('AL', 'Almoço'), ('LT', 'Lanche Tarde'), ('JT', 'Jantar'),
-                 ('CB', 'Carnes Brancas'), ('FT', 'Fruta'), ('VG', 'Vegetais'), ('FB', 'Fibras'),
-                 ('PC', 'Pré-cozinhados'), ('RF', 'Refrigerantes'), ('AL', 'Alcool'))
+                if goal.type == 'AF':
+
+                if goal.type == 'LS':
+                if goal.type == 'LI':
+                if goal.type == 'WT':
+                if goal.type == 'NP':
+                if goal.type == 'SP':
+                if goal.type == 'SS':
+                if goal.type == 'PA':
+                if goal.type == 'LM':
+                if goal.type == 'AL':
+                if goal.type == 'LT':
+                if goal.type == 'JT':
+                if goal.type == 'CB':
+                if goal.type == 'FT':
+                if goal.type == 'VG':
+                if goal.type == 'FB':
+                if goal.type == 'PC':
+                if goal.type == 'RF':
+                if goal.type == 'AL':
+                else:
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
 
         query_set = Water.objects.filter(caregiver_id=caregiver)
         serializer = WaterSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-"""
-
+'''
 class PhysicalActivityViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {

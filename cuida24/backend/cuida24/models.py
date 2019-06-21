@@ -205,7 +205,7 @@ class Medicine(models.Model):
     pharmaceuticalForm = models.TextField()
     dosage = models.IntegerField()
     holder = models.TextField()
-    generic = models.TextField()
+    generic = models.BooleanField()
 
 
 class Prescription(models.Model):
