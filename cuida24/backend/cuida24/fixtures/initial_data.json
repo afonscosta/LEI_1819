@@ -277,7 +277,7 @@
         "pharmaceuticalForm": "Comprimido",
         "dosage": 1000, 
         "holder": "Accel Farma, Unipessoal Lda.",
-        "generic": "Sim"
+        "generic": "True"
     }
   },
   {
