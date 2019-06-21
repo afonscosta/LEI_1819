@@ -393,8 +393,8 @@ class MedicationViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         logger.info("GET PRESCRIPTION")
         logger.info(request.GET)
-        try:
-            data = json.loads(str(request.GET))['users'][0]
+        if request.GET:
+            data = json.loads(dict(request.GET)['users'][0])
             if data['patients'][0]:
                 logger.info("GET PRESCRIPTION BY ARGUMENTS")
                 serializer_data = getPrescriptions(data['patients'][0])
@@ -410,7 +410,7 @@ class MedicationViewSet(viewsets.ModelViewSet):
                 return Response(sent_data, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-        except JSONDecodeError:
+        else:
             logger.info("GET PRESCRIPTION BY TOKEN")
             caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
             patients = Patient.objects.filter(caregiver=caregiver)
