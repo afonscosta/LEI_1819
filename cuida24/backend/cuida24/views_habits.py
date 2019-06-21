@@ -186,8 +186,15 @@ class WaterViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request, *args, **kwargs):
-        logger.info("GET WATER")
+        logger.info("GET WATER BY TOKEN")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = Water.objects.filter(caregiver_id=caregiver)
+        serializer = WaterSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.info("GET WATER BY PK")
+        caregiver = get_object_or_404(Caregiver, pk=self.kwargs['pk']).pk
         query_set = Water.objects.filter(caregiver_id=caregiver)
         serializer = WaterSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -243,9 +250,15 @@ class SleepViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request, *args, **kwargs):
-        logger.info("GET SLEEP")
-        logger.info(request.GET)
+        logger.info("GET SLEEP BY TOKEN")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = Sleep.objects.filter(caregiver_id=caregiver)
+        serializer = SleepSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.info("GET SLEEP BY PK")
+        caregiver = get_object_or_404(Caregiver, pk=self.kwargs['pk']).pk
         query_set = Sleep.objects.filter(caregiver_id=caregiver)
         serializer = SleepSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -304,8 +317,15 @@ class NapViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request, *args, **kwargs):
-        logger.info("GET WATER")
+        logger.info("GET NAP BY TOKEN")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = Nap.objects.filter(caregiver_id=caregiver)
+        serializer = NapSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.info("GET NAP BY PK")
+        caregiver = get_object_or_404(Caregiver, pk=self.kwargs['pk']).pk
         query_set = Nap.objects.filter(caregiver_id=caregiver)
         serializer = NapSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -366,11 +386,19 @@ class SOSViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request, *args, **kwargs):
-        logger.info("GET SOS")
+        logger.info("GET SOS BY TOKEN")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
         query_set = SOS.objects.filter(caregiver_id=caregiver)
         serializer = SOSSerializer(query_set, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.info("GET SOS BY PK")
+        caregiver = get_object_or_404(Caregiver, pk=self.kwargs['pk']).pk
+        query_set = SOS.objects.filter(caregiver_id=caregiver)
+        serializer = SOSSerializer(query_set, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class ActivityViewSet(viewsets.ModelViewSet):
     queryset = Activity.objects.all()
@@ -405,8 +433,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
        Get method by user id
      """
     def list(self, request, *args, **kwargs):
-        logger.info("GET ACTIVITY")
-        logger.info(request.GET)
+        logger.info("GET ACTIVITY BY TOKEN")
         request_type = dict(request.GET)['type'][0]
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
         query_set = Activity.objects.filter(caregiver_id=caregiver, type=request_type)
@@ -425,6 +452,27 @@ class ActivityViewSet(viewsets.ModelViewSet):
             else:
                 Response(status=status.HTTP_404_NOT_FOUND)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.info('GET ACTIVITY BY PK')
+        caregiver = get_object_or_404(Caregiver, pk=self.kwargs['pk']).pk
+        query_set = Activity.objects.filter(caregiver_id=caregiver)
+        serializer = ActivitySerializer(query_set, many=True)
+        for activity in serializer.data:
+            type = activity['type']
+            if type == 'LI':
+                act = IndividualLeisure.objects.get(pk=activity['act']).description
+                activity['act'] = act
+            elif type == 'LS':
+                act = SocialLeisure.objects.get(pk=activity['act']).description
+                activity['act'] = act
+            elif type == 'AF':
+                act = PhysicalActivity.objects.get(pk=activity['act']).description
+                activity['act'] = act
+            else:
+                Response(status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()
@@ -449,8 +497,25 @@ class MealViewSet(viewsets.ModelViewSet):
        Get method by user id
      """
     def list(self, request, *args, **kwargs):
-        logger.info("GET MEAL")
+        logger.info("GET MEAL BY TOKEN")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        query_set = Meal.objects.filter(caregiver_id=caregiver)
+        serializer = MealSerializer(query_set, many=True)
+        food = []
+        for meal in serializer.data:
+            logger.info(meal)
+            query_set2 = Constitution.objects.filter(meal=meal['pk']).values('food')
+            for const in query_set2:
+                food.append(const['food'])
+            meal['food'] = food
+            logger.info(food)
+            food = []
+        logger.info(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        logger.info("GET MEAL BY PK")
+        caregiver = get_object_or_404(Caregiver, pk=self.kwargs['pk']).pk
         query_set = Meal.objects.filter(caregiver_id=caregiver)
         serializer = MealSerializer(query_set, many=True)
         food = []
