@@ -33,7 +33,7 @@
     <h3 v-if="notes.length === 0">Esta consulta não tem notas associadas.</h3>
 
     <div role="tablist" v-if="notes.length !== 0">
-      <b-card no-body class="mb-1">
+      <b-card v-if="['COR', 'MED', 'ENF'].includes(userAuth.type)" no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
           <b-button block href="#" v-b-toggle.accordion-1>Notas de Enfermagem</b-button>
         </b-card-header>
@@ -48,15 +48,15 @@
               <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
               <div v-if="editingNote != note.pk">
                 <b-card-text align="left">{{ note.note }}</b-card-text>
-                <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
-                <b-button @click="edit(note.pk)">Editar</b-button>
+                <b-button v-if="['COR', 'ENF'].includes(userAuth.type)" variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+                <b-button v-if="['COR', 'ENF'].includes(userAuth.type)" @click="edit(note.pk)">Editar</b-button>
               </div>
             </b-card>
           </b-card-body>
         </b-collapse>
       </b-card>
 
-      <b-card no-body class="mb-1">
+      <b-card v-if="['COR', 'MED'].includes(userAuth.type)" no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
           <b-button block href="#" v-b-toggle.accordion-2>Notas Clínicas</b-button>
         </b-card-header>
@@ -79,7 +79,7 @@
         </b-collapse>
       </b-card>
 
-      <b-card no-body class="mb-1">
+      <b-card v-if="['COR', 'PSI'].includes(userAuth.type)" no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
           <b-button block href="#" v-b-toggle.accordion-3>Notas Psicólogo</b-button>
         </b-card-header>
@@ -102,7 +102,7 @@
         </b-collapse>
       </b-card>
 
-      <b-card no-body class="mb-1">
+      <b-card v-if="['COR', 'MED', 'PRF'].includes(userAuth.type)" no-body class="mb-1">
         <b-card-header header-tag="header" class="p-1" role="tab">
           <b-button block href="#" v-b-toggle.accordion-4>Outras Apreciações</b-button>
         </b-card-header>
@@ -117,8 +117,8 @@
               <FormNote v-if="editingNote == note.pk" :noteData="note" @disableEditingNote="editingNote = null"></FormNote>
               <div v-if="editingNote != note.pk">
                 <b-card-text align="left">{{ note.note }}</b-card-text>
-                <b-button variant="danger" @click="remove(note.pk)">Eliminar</b-button>
-                <b-button @click="edit(note.pk)">Editar</b-button>
+                <b-button v-if="['COR', 'PRF'].includes(userAuth.type)" variant="danger" @click="remove(note.pk)">Eliminar</b-button>
+                <b-button v-if="['COR', 'PRF'].includes(userAuth.type)" @click="edit(note.pk)">Editar</b-button>
               </div>
             </b-card>
           </b-card-body>
@@ -150,7 +150,8 @@ export default {
   computed: {
     ...mapState({
       notes: state => state.notes.notes,
-      apptPK: state => state.notes.apptPK
+      apptPK: state => state.notes.apptPK,
+      userAuth: state => state.users.userAuth
     }),
     ...mapGetters('notes', [
       'notesEnf',

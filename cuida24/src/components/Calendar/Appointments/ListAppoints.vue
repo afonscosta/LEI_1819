@@ -61,8 +61,8 @@
             <b-card-text align="left">
               <b>Localização:</b> {{ appt.event.data.location }}
             </b-card-text>
-            <b-button variant="danger" @click="remove(appt)">Eliminar</b-button>
-            <b-button @click="edit(appt.appointmentPK)">Editar</b-button>
+            <b-button v-if="['COR', 'PRF', 'MED'].includes(userAuth)" variant="danger" @click="remove(appt)">Eliminar</b-button>
+            <b-button v-if="['COR', 'PRF', 'MED'].includes(userAuth)" @click="edit(appt.appointmentPK)">Editar</b-button>
             <b-button @click="viewNotes(appt.appointmentPK)">Notas de consulta</b-button>
           </b-card>
         </b-col>
@@ -92,7 +92,8 @@ export default {
     ...mapState({
       appointments: state => state.appointments.appointments,
       usersActive: state => state.users.usersActive,
-      apptPK: state => state.notes.apptPK
+      apptPK: state => state.notes.apptPK,
+      userAuth: state => state.users.userAuth
     }),
     ...mapGetters('appointments', [
       'getAppointmentsById'
