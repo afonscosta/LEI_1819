@@ -338,6 +338,18 @@ class MedicineViewSet(viewsets.ModelViewSet):
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
 
+    def put(self, request):
+        logger.info("PUT MEDICINE")
+        logger.info(request.data)
+        request_data = request.data
+        medice = get_object_or_404(Medicine, pk=request_data['pk'])
+        serializer = MedicineSerializer(data=request_data, instance=medice)
+        if serializer.is_valid(raise_exception=False):
+            serializer.save()
+            logger.info("SERIALIZER RETURN DATA")
+            logger.info(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MedicationViewSet(viewsets.ModelViewSet):
     queryset = Medication.objects.all()
