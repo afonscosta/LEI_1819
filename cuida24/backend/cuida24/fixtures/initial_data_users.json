@@ -75,6 +75,146 @@
         "name": "backofficeUserWithoutRespMedication"
     }
   },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 1,
+   "fields": {
+        "type": "ADM",
+        "group": "4"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 2,
+   "fields": {
+        "type": "ADM",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 3,
+   "fields": {
+        "type": "ADM",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 4,
+   "fields": {
+        "type": "COR",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 5,
+   "fields": {
+        "type": "COR",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 6,
+   "fields": {
+        "type": "COR",
+        "group": "5"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 7,
+   "fields": {
+        "type": "REM",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 8,
+   "fields": {
+        "type": "REM",
+        "group": "6"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 9,
+   "fields": {
+        "type": "PRF",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 10,
+   "fields": {
+        "type": "PRF",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 11,
+   "fields": {
+        "type": "PRF",
+        "group": "7"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 12,
+   "fields": {
+        "type": "MED",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 13,
+   "fields": {
+        "type": "MED",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 14,
+   "fields": {
+        "type": "MED",
+        "group": "8"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 15,
+   "fields": {
+        "type": "ENF",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 16,
+   "fields": {
+        "type": "ENF",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 17,
+   "fields": {
+        "type": "ENF",
+        "group": "9"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 18,
+   "fields": {
+        "type": "PSI",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 19,
+   "fields": {
+        "type": "PSI",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 20,
+   "fields": {
+        "type": "PSI",
+        "group": "10"
+   }
+  },
   {
     "model": "auth.user",
     "pk": 1,
