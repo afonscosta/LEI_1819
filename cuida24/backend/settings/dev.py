@@ -86,6 +86,9 @@ REST_FRAMEWORK = {
   #)
 }
 
+FIXTURE_DIRS = (
+   'backend/cuida24/fixtures',
+)
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 

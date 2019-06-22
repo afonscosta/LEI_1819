@@ -1,5 +1,4 @@
 import itertools
-from json import JSONDecodeError
 
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
@@ -19,18 +18,21 @@ class CalendarViewSet(viewsets.ModelViewSet):
     serializer_class = CalendarSerializer
 
 class EventViewSet(generics.ListAPIView):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'backofficeUserWithoutRespMedication']
+    }
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
     """
-       Get method by user id 
+       Get method by user id pass on JSON
+       Return all the events associated to user
     """
     def list(self, request, *args, **kwargs):
         logger.info("GET EVENT")
         logger.info(request.GET)
         data = json.loads(dict(request.GET)['users'][0])
-        # logger.info(request.data)
-        # data = request.data['users']
         is_patient = False
         sent_data = {'appointments': [], 'sessions': []}
         participants = []
@@ -58,10 +60,10 @@ Appointments Views
 class AppointmentViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['backofficeUser'],
-        'PUT': ['backofficeUser'],
-        'DELETE': ['backofficeUser']
+        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
+        'POST': ['admin', 'coordinator', 'healthcare.prof', 'doctor'],
+        'PUT': ['admin', 'coordinator', 'healthcare.prof', 'doctor'],
+        'DELETE': ['admin', 'coordinator', 'healthcare.prof', 'doctor']
     }
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
@@ -134,6 +136,13 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
 
 class AppointmentNoteViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
+        'POST': ['admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
+        'PUT': ['admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
+        'DELETE': ['admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist']
+    }
     queryset = AppointmentNote.objects.all()
     serializer_class = AppointmentNoteSerializer
 
@@ -188,6 +197,13 @@ Session Views
 
 
 class SessionsViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'backofficeUserWithoutRespMedication'],
+        'POST': ['backofficeUserWithoutRespMedication'],
+        'PUT': ['backofficeUserWithoutRespMedication'],
+        'DELETE': ['backofficeUserWithoutRespMedication']
+    }
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
 
@@ -273,6 +289,13 @@ class SessionsViewSet(viewsets.ModelViewSet):
 
 
 class EvaluationViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['backofficeUserWithoutRespMedication'],
+        'POST': ['backofficeUserWithoutRespMedication'],
+        'PUT': ['backofficeUserWithoutRespMedication'],
+        'DELETE': ['backofficeUserWithoutRespMedication']
+    }
     queryset = Evaluation.objects.all()
     serializer_class = EvaluationSerializer
 
@@ -335,6 +358,13 @@ Medication Views
 '''
 
 class MedicineViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'backofficeUser'],
+        'POST': ['admin', 'coordinator', 'resp.medication'],
+        'PUT': ['admin', 'coordinator', 'resp.medication'],
+        'DELETE': ['admin', 'coordinator', 'resp.medication']
+    }
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
 
@@ -342,8 +372,8 @@ class MedicineViewSet(viewsets.ModelViewSet):
         logger.info("PUT MEDICINE")
         logger.info(request.data)
         request_data = request.data
-        medice = get_object_or_404(Medicine, pk=request_data['pk'])
-        serializer = MedicineSerializer(data=request_data, instance=medice)
+        medicine = get_object_or_404(Medicine, pk=request_data['pk'])
+        serializer = MedicineSerializer(data=request_data, instance=medicine)
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
@@ -352,6 +382,13 @@ class MedicineViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MedicationViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
+        'POST': ['admin', 'coordinator', 'healthcare.prof', 'doctor'],
+        'PUT': ['admin'],
+        'DELETE': ['admin']
+    }
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
 
@@ -443,6 +480,13 @@ class MedicationViewSet(viewsets.ModelViewSet):
 
 
 class TakeViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
+        'POST': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
+        'DELETE': ['admin'],
+        'PUT': ['admin']
+    }
     queryset = Take.objects.all()
     serializer_class = TakeSerializer
 

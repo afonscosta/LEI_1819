@@ -100,6 +100,7 @@ class CaregiverSerializer(serializers.ModelSerializer):
         logger.info(user_data)
         info = UserAuth.objects.create(**user_data)
         caregiver = Caregiver.objects.create(info=info)
+        info.groups.add("caregiver")
         return caregiver
 
 
