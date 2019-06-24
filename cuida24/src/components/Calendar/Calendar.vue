@@ -3,6 +3,7 @@
     <b-container>
       <b-row sm="auto">
         <b-col md="6" cols="6">
+          <h4 class="mb-3">Cuidadores</h4>
           <ListUsers 
             :listName="'Cuidadores'"
             :users="caregivers"
@@ -13,6 +14,7 @@
           ></ListUsers>
         </b-col>
         <b-col md="6" cols="6">
+          <h4 class="mb-3">Utentes</h4>
           <ListUsers 
             :listName="'Utentes'"
             :users="patients"

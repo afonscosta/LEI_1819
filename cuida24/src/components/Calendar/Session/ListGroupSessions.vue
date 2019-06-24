@@ -77,7 +77,7 @@
               @click="goToEvaluation(gs)"
               >Avaliar participantes</b-button>
             <b-button block 
-              v-if="gs.groupSession.state === 'E' && userAuth === 'COR'"
+              v-if="gs.groupSession.state === 'E' && userAuth.type === 'COR'"
               class="mt-2" 
               size="sm" 
               variant="primary" 
