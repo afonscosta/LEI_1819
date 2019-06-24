@@ -1,9 +1,9 @@
 from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
-from rest_framework import status, generics, viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from datetime import datetime
+from django.utils import timezone
 
 from backend.cuida24.permissions import *
 from .services import *
@@ -17,10 +17,10 @@ logger = logging.getLogger("mylogger")
 class GoalViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['backofficeUser'],
-        'DELETE': ['backofficeUser'],
-        'PUT': ['backofficeUser']
+        'GET': ['caregiver', 'backofficeUserWithoutRespMedication'],
+        'POST': ['backofficeUserWithoutRespMedication'],
+        'DELETE': ['backofficeUserWithoutRespMedication'],
+        'PUT': ['backofficeUserWithoutRespMedication']
     }
     queryset = Goal.objects.all()
     serializer_class = GoalSerializer
@@ -57,53 +57,56 @@ class GoalViewSet(viewsets.ModelViewSet):
         serializer_goal = GoalSerializer(goals, many=True)
         return Response(serializer_goal.data, status=status.HTTP_200_OK)
 
-'''
     @action(detail=False, methods=['get'])
-    def list_goals_caregiver(self,request):
+    def list_goals_caregiver(self, request):
         logger.info("GET GOALS CAREGIVER")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
-        date_now = datetime.now()
-        goals = Goal.objects.filter(disble=False)
-        #serializer_goal = GoalSerializer(goals,many=True)
+        date_now = timezone.now()
+        goals = Goal.objects.filter(disable=False)
+        choices_value = dict(Goal.TYPE)
+        return_data = {}
         for goal in goals:
+            dateB = goal.dateBegin
+            dateE = goal.dateEnd
             logger.info(goal.dateBegin)
-            logger.info(goal.date_now)
+            logger.info(date_now)
             logger.info(goal.dateEnd)
-            if goal.dateBegin <= date_now <= goal.dateEnd:
-                if goal.type == 'AF':
+            if dateB <= date_now <= dateE:
+                realized = 0
+                if goal.type == 'AF' or goal.type == 'LS' or goal.type == 'LI':
+                    realized = Activity.objects.filter(type=goal.type, caregiver=caregiver,
+                                                       date__range=(dateB, dateE)).count()
 
-                if goal.type == 'LS':
-                if goal.type == 'LI':
                 if goal.type == 'WT':
+                    realized = Water.objects.filter(caregiver=caregiver,
+                                                    date__range=(dateB, dateE)).count()
                 if goal.type == 'NP':
+                    realized = Nap.objects.filter(caregiver=caregiver,
+                                                  date__range=(dateB, dateE)).count()
                 if goal.type == 'SP':
+                    realized = Sleep.objects.filter(caregiver=caregiver,
+                                                    date__range=(dateB, dateE)).count()
                 if goal.type == 'SS':
-                if goal.type == 'PA':
-                if goal.type == 'LM':
-                if goal.type == 'AL':
-                if goal.type == 'LT':
-                if goal.type == 'JT':
-                if goal.type == 'CB':
-                if goal.type == 'FT':
-                if goal.type == 'VG':
-                if goal.type == 'FB':
-                if goal.type == 'PC':
-                if goal.type == 'RF':
-                if goal.type == 'AL':
-                else:
-                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                    realized = SOS.objects.filter(caregiver=caregiver,
+                                                  date__range=(dateB, dateE)).count()
+                if goal.type == 'PA' or goal.type == 'LM' or goal.type == 'AL' or goal.type == 'LT' or goal.type == 'JT':
+                    realized = Meal.objects.filter(type=goal.type, caregiver=caregiver,
+                                                   date__range=(dateB, dateE)).count()
+                if goal.type == 'CB' or goal.type == 'FT' or goal.type == 'VG' or goal.type == 'FB' or goal.type == 'PC' or goal.type == 'RF' or goal.type == 'AL':
+                    realized = Meal.objects.filter(food=goal.type, caregiver=caregiver,
+                                                   date__range=(dateB, dateE)).count()
+                return_data[str(goal.type)] = {'type': choices_value[goal.type], 'realized': realized, 'goal': goal.goal}
+                logger.info(return_data)
+        return Response(return_data, status=status.HTTP_200_OK)
 
-        query_set = Water.objects.filter(caregiver_id=caregiver)
-        serializer = WaterSerializer(query_set, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-'''
+
 class PhysicalActivityViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['backofficeUser'],
-        'DELETE': ['backofficeUser'],
-        'PUT': ['backofficeUser']
+        'GET': ['caregiver', 'backofficeUserWithoutRespMedication'],
+        'POST': ['backofficeUserWithoutRespMedication'],
+        'DELETE': ['backofficeUserWithoutRespMedication'],
+        'PUT': ['backofficeUserWithoutRespMedication']
     }
     queryset = PhysicalActivity.objects.all()
     serializer_class = PhysicalActivitySerializer
@@ -112,10 +115,10 @@ class PhysicalActivityViewSet(viewsets.ModelViewSet):
 class SocialLeisureViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['backofficeUser'],
-        'DELETE': ['backofficeUser'],
-        'PUT': ['backofficeUser']
+        'GET': ['caregiver', 'backofficeUserWithoutRespMedication'],
+        'POST': ['backofficeUserWithoutRespMedication'],
+        'DELETE': ['backofficeUserWithoutRespMedication'],
+        'PUT': ['backofficeUserWithoutRespMedication']
     }
     queryset = SocialLeisure.objects.all()
     serializer_class = SocialLeisureSerializer
@@ -124,10 +127,10 @@ class SocialLeisureViewSet(viewsets.ModelViewSet):
 class IndividualLeisureViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['backofficeUser'],
-        'DELETE': ['backofficeUser'],
-        'PUT': ['backofficeUser']
+        'GET': ['caregiver', 'backofficeUserWithoutRespMedication'],
+        'POST': ['backofficeUserWithoutRespMedication'],
+        'DELETE': ['backofficeUserWithoutRespMedication'],
+        'PUT': ['backofficeUserWithoutRespMedication']
     }
     queryset = IndividualLeisure.objects.all()
     serializer_class = IndividualLeisureSerializer
@@ -136,10 +139,10 @@ class IndividualLeisureViewSet(viewsets.ModelViewSet):
 class WaterViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['caregiver', 'backofficeUser'],
-        'DELETE': ['caregiver', 'backofficeUser'],
-        'PUT': ['caregiver', 'backofficeUser']
+        'GET': ['caregiver', 'admin', 'coordinator'],
+        'POST': ['caregiver', 'admin'],
+        'DELETE': ['admin'],
+        'PUT': ['caregiver', 'admin']
     }
     queryset = Water.objects.all()
     serializer_class = WaterSerializer
@@ -203,10 +206,10 @@ class WaterViewSet(viewsets.ModelViewSet):
 class SleepViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['caregiver', 'backofficeUser'],
-        'DELETE': ['caregiver', 'backofficeUser'],
-        'PUT': ['caregiver', 'backofficeUser']
+        'GET': ['caregiver', 'admin', 'coordinator'],
+        'POST': ['caregiver', 'admin'],
+        'DELETE': ['admin'],
+        'PUT': ['caregiver', 'admin']
     }
     queryset = Sleep.objects.all()
     serializer_class = SleepSerializer
@@ -267,10 +270,10 @@ class SleepViewSet(viewsets.ModelViewSet):
 class NapViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['caregiver', 'backofficeUser'],
-        'DELETE': ['caregiver', 'backofficeUser'],
-        'PUT': ['caregiver', 'backofficeUser']
+        'GET': ['caregiver', 'admin', 'coordinator'],
+        'POST': ['caregiver', 'admin'],
+        'DELETE': ['admin'],
+        'PUT': ['caregiver', 'admin']
     }
     queryset = Nap.objects.all()
     serializer_class = NapSerializer
@@ -334,10 +337,10 @@ class NapViewSet(viewsets.ModelViewSet):
 class SOSViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
-        'POST': ['caregiver', 'backofficeUser'],
-        'DELETE': ['caregiver', 'backofficeUser'],
-        'PUT': ['caregiver', 'backofficeUser']
+        'GET': ['caregiver', 'admin', 'coordinator'],
+        'POST': ['caregiver', 'admin'],
+        'DELETE': ['admin'],
+        'PUT': ['caregiver', 'admin']
     }
     queryset = SOS.objects.all()
     serializer_class = SOSSerializer
@@ -401,6 +404,13 @@ class SOSViewSet(viewsets.ModelViewSet):
 
 
 class ActivityViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'admin', 'coordinator'],
+        'POST': ['caregiver', 'admin'],
+        'DELETE': ['admin'],
+        'PUT': ['caregiver', 'admin']
+    }
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
 
@@ -432,6 +442,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
     """
        Get method by user id
      """
+
     def list(self, request, *args, **kwargs):
         logger.info("GET ACTIVITY BY TOKEN")
         request_type = dict(request.GET)['type'][0]
@@ -475,6 +486,13 @@ class ActivityViewSet(viewsets.ModelViewSet):
 
 
 class MealViewSet(viewsets.ModelViewSet):
+    permission_classes = (HasGroupPermission,)
+    required_groups = {
+        'GET': ['caregiver', 'admin', 'coordinator'],
+        'POST': ['caregiver', 'admin'],
+        'DELETE': ['admin'],
+        'PUT': ['caregiver', 'admin']
+    }
     queryset = Meal.objects.all()
     serializer_class = MealSerializer
 
@@ -484,7 +502,7 @@ class MealViewSet(viewsets.ModelViewSet):
         logger.info(request_data)
         req_data = habitsFrontToBackJSON(request_data, request.user)
         logger.info(req_data)
-        serializer = MealSerializer(data=req_data,  context={'request': req_data})
+        serializer = MealSerializer(data=req_data, context={'request': req_data})
         if serializer.is_valid(raise_exception=False):
             serializer.save()
             logger.info("SERIALIZER RETURN DATA")
@@ -496,6 +514,7 @@ class MealViewSet(viewsets.ModelViewSet):
     """
        Get method by user id
      """
+
     def list(self, request, *args, **kwargs):
         logger.info("GET MEAL BY TOKEN")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk

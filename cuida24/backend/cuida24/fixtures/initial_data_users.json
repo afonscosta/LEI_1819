@@ -1,0 +1,669 @@
+[ {
+    "model": "auth.group",
+    "pk":1,
+    "fields": {
+        "name": "backofficeUser"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":2,
+    "fields": {
+        "name": "caregiver"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":3,
+    "fields": {
+        "name": "patient"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":4,
+    "fields": {
+        "name": "admin"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":5,
+    "fields": {
+        "name": "coordinator"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":6,
+    "fields": {
+        "name": "resp.medication"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":7,
+    "fields": {
+        "name": "healthcare.prof"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":8,
+    "fields": {
+        "name": "doctor"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":9,
+    "fields": {
+        "name": "nurse"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":10,
+    "fields": {
+        "name": "psychologist"
+    }
+  },
+  {
+    "model": "auth.group",
+    "pk":11,
+    "fields": {
+        "name": "backofficeUserWithoutRespMedication"
+    }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 1,
+   "fields": {
+        "type": "ADM",
+        "group": "4"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 2,
+   "fields": {
+        "type": "ADM",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 3,
+   "fields": {
+        "type": "ADM",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 4,
+   "fields": {
+        "type": "COR",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 5,
+   "fields": {
+        "type": "COR",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 6,
+   "fields": {
+        "type": "COR",
+        "group": "5"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 7,
+   "fields": {
+        "type": "REM",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 8,
+   "fields": {
+        "type": "REM",
+        "group": "6"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 9,
+   "fields": {
+        "type": "PRF",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 10,
+   "fields": {
+        "type": "PRF",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 11,
+   "fields": {
+        "type": "PRF",
+        "group": "7"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 12,
+   "fields": {
+        "type": "MED",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 13,
+   "fields": {
+        "type": "MED",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 14,
+   "fields": {
+        "type": "MED",
+        "group": "8"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 15,
+   "fields": {
+        "type": "ENF",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 16,
+   "fields": {
+        "type": "ENF",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 17,
+   "fields": {
+        "type": "ENF",
+        "group": "9"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 18,
+   "fields": {
+        "type": "PSI",
+        "group": "11"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 19,
+   "fields": {
+        "type": "PSI",
+        "group": "1"
+   }
+  },
+  {"model": "cuida24.BackofficeUserTypeGroup",
+   "pk": 20,
+   "fields": {
+        "type": "PSI",
+        "group": "10"
+   }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+        "first_name": "Patricia",
+        "last_name": "Barreira",
+        "password": "123",
+        "username": "p@gmail.com",
+        "email": "p@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+        "first_name": "Marco",
+        "last_name": "Silva",
+        "password": "123",
+        "username": "m@gmail.com",
+        "email": "m@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+        "first_name": "Afonso",
+        "last_name": "Costa",
+        "password": "123",
+        "username": "a@gmail.com",
+        "email": "a@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+        "first_name": "Joaquina",
+        "last_name": "Maria",
+        "password": "123",
+        "username": "j@gmail.com",
+        "email": "j@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 6,
+    "fields": {
+        "first_name": "Diana",
+        "last_name": "Siva",
+        "password": "123",
+        "username": "d@gmail.com",
+        "email": "d@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 7,
+    "fields": {
+        "first_name": "Joana",
+        "last_name": "Alexandra",
+        "password": "123",
+        "username": "ja@gmail.com",
+        "email": "ja@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+        "first_name": "laura",
+        "last_name": "crespo",
+        "password": "123",
+        "username": "l@gmail.com",
+        "email": "l@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 8,
+    "fields": {
+        "first_name": "prf",
+        "last_name": "prf",
+        "password": "123",
+        "username": "prf@gmail.com",
+        "email": "prf@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 9,
+    "fields": {
+        "first_name": "admin",
+        "last_name": "admin",
+        "password": "123",
+        "username": "admin@gmail.com",
+        "email": "admin@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 10,
+    "fields": {
+        "first_name": "med",
+        "last_name": "med",
+        "password": "123",
+        "username": "med@gmail.com",
+        "email": "med@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 11,
+    "fields": {
+        "first_name": "rem",
+        "last_name": "rem",
+        "password": "123",
+        "username": "rem@gmail.com",
+        "email": "rem@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 12,
+    "fields": {
+        "first_name": "enf",
+        "last_name": "enf",
+        "password": "123",
+        "username": "enf@gmail.com",
+        "email": "enf@gmail.com"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 13,
+    "fields": {
+        "first_name": "psi",
+        "last_name": "psi",
+        "password": "123",
+        "username": "psi@gmail.com",
+        "email": "psi@gmail.com"
+    }
+  },
+  {
+    "model": "cuida24.Caregiver",
+    "pk": 1,
+    "fields": {
+       "info": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 1,
+    "fields": {
+        "user": "1",
+        "group": "2"
+    }
+  },
+  {
+    "model": "cuida24.Caregiver",
+    "pk": 2,
+    "fields": {
+       "info": "4"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 2,
+    "fields": {
+        "user": "4",
+        "group": "2"
+    }
+  },
+  {
+    "model": "cuida24.Caregiver",
+    "pk": 3,
+    "fields": {
+       "info": "5"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 3,
+    "fields": {
+        "user": "5",
+        "group": "2"
+    }
+  },
+  {
+    "model": "cuida24.Patient",
+    "pk": 1,
+    "fields": {
+       "info": "2",
+       "caregiver": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 4,
+    "fields": {
+        "user": "2",
+        "group": "3"
+    }
+  },
+  {
+    "model": "cuida24.Patient",
+    "pk": 2,
+    "fields": {
+       "info": "6",
+       "caregiver": "2"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 5,
+    "fields": {
+        "user": "6",
+        "group": "3"
+    }
+  },
+  {
+    "model": "cuida24.Patient",
+    "pk": 3,
+    "fields": {
+       "info": "7",
+       "caregiver": "3"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 6,
+    "fields": {
+        "user": "7",
+        "group": "3"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 1,
+    "fields": {
+       "info": "3",
+       "type": "COR"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 7,
+    "fields": {
+        "user": "3",
+        "group": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 8,
+    "fields": {
+        "user": "3",
+        "group": "5"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 9,
+    "fields": {
+        "user": "3",
+        "group": "11"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 2,
+    "fields": {
+       "info": "8",
+       "type": "PRF"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 10,
+    "fields": {
+        "user": "8",
+        "group": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 11,
+    "fields": {
+        "user": "8",
+        "group": "7"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 12,
+    "fields": {
+        "user": "8",
+        "group": "11"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 3,
+    "fields": {
+       "info": "9",
+       "type": "ADM"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 13,
+    "fields": {
+        "user": "9",
+        "group": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 14,
+    "fields": {
+        "user": "9",
+        "group": "4"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 15,
+    "fields": {
+        "user": "9",
+        "group": "11"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 4,
+    "fields": {
+       "info": "10",
+       "type": "MED"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 16,
+    "fields": {
+        "user": "10",
+        "group": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 17,
+    "fields": {
+        "user": "10",
+        "group": "8"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 18,
+    "fields": {
+        "user": "10",
+        "group": "11"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 5,
+    "fields": {
+       "info": "11",
+       "type": "REM"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 19,
+    "fields": {
+        "user": "11",
+        "group": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 20,
+    "fields": {
+        "user": "11",
+        "group": "6"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 6,
+    "fields": {
+       "info": "12",
+       "type": "ENF"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 21,
+    "fields": {
+        "user": "12",
+        "group": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 22,
+    "fields": {
+        "user": "12",
+        "group": "9"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 23,
+    "fields": {
+        "user": "12",
+        "group": "11"
+    }
+  },
+  {
+    "model": "cuida24.BackofficeUser",
+    "pk": 7,
+    "fields": {
+       "info": "13",
+       "type": "PSI"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 24,
+    "fields": {
+        "user": "13",
+        "group": "1"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 25,
+    "fields": {
+        "user": "13",
+        "group": "10"
+    }
+  },
+  {
+    "model": "auth.user_groups",
+    "pk": 26,
+    "fields": {
+        "user": "13",
+        "group": "11"
+    }
+  }]

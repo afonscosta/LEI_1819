@@ -1,6 +1,7 @@
 
 from django.db import models
 from django.contrib.auth.models import User as UserAuth
+from django.contrib.auth.models import Group
 import logging
 
 from rest_framework.generics import get_object_or_404
@@ -63,6 +64,14 @@ class BackofficeUser(models.Model):
       ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
     type = models.CharField(max_length=3, choices=TYPE)
     info = models.OneToOneField(UserAuth, on_delete=models.CASCADE)
+
+class BackofficeUserTypeGroup(models.Model):
+    TYPE = (
+        ('ADM', 'Administrador'), ('COR', 'Coordenador'), ('REM', 'Responsável Medicação'),
+        ('PRF', 'Profissional Saúde'),
+        ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
+    type = models.CharField(max_length=3, choices=TYPE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
 # Historic
 

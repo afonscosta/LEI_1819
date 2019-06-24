@@ -156,6 +156,7 @@ export default {
         generic: false,
         pk: null
       }
+      this.selectedMedicine = []
     },
     onReset (evt) {
       evt.preventDefault()

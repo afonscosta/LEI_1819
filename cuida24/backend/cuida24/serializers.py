@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User as UserAuth
+from django.contrib.auth.models import User as UserAuth, Group
 from django.contrib.auth.hashers import make_password
 from rest_framework.generics import get_object_or_404
 
@@ -100,6 +100,8 @@ class CaregiverSerializer(serializers.ModelSerializer):
         logger.info(user_data)
         info = UserAuth.objects.create(**user_data)
         caregiver = Caregiver.objects.create(info=info)
+        group = Group.objects.get(name='caregiver')
+        info.groups.add(group)
         return caregiver
 
 
@@ -117,6 +119,8 @@ class PatientSerializer(serializers.ModelSerializer):
         logger.info(user_data)
         info = UserAuth.objects.create(**user_data)
         patient = Patient.objects.create(info=info, **validated_data)
+        group = Group.objects.get(name='patient')
+        info.groups.add(group)
         return patient
 
 
@@ -134,6 +138,10 @@ class BackofficeUserSerializer(serializers.ModelSerializer):
         logger.info(user_data)
         info = UserAuth.objects.create(**user_data)
         backoffice_user = BackofficeUser.objects.create(info=info, **validated_data)
+        groups = BackofficeUserTypeGroup.objects.filter(type=validated_data['type']).values('group')
+        logger.info(groups)
+        for group in groups:
+            info.groups.add(group['group'])
         return backoffice_user
 
 # Historic

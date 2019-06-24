@@ -7,6 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         call_command('loaddata', 'initial_data')
+        call_command('loaddata', 'initial_data_users')
         # Fix the passwords of fixtures
         for user in User.objects.all():
             user.set_password(user.password)
