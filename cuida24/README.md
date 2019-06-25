@@ -19,6 +19,7 @@ Change `postgres`'s password to 'postgres'.
 
 Setup
 ```
+$ cd cuida24
 $ npm install
 $ pipenv install --dev && pipenv shell
 $ ./init.sh
