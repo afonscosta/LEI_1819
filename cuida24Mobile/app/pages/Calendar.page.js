@@ -658,9 +658,6 @@ export default class CalendarPage extends React.Component {
         const groupSessionCalendar = this.getGroupSessionCalendar(result);
         const indivSessionCalendar = this.getIndivSessionCalendar(result);
 
-        console.log('appptUtente', appointmentPatientCalendar);
-        console.log('result', result);
-
         // Calendário consultas já existe
         if (appointmentCalendar && cal.calendar === 'Consultas') { 
           return; 
@@ -739,7 +736,7 @@ export default class CalendarPage extends React.Component {
       })
   };
 
-  iterateThroughAppointments(eventsToRemove, appointmentCalendar) {
+  iterateThroughAppointments(eventsToRemove, appointmentCalendar, appointmentPatientCalendar) {
     this.state.appointments.forEach( function(appt) {
       if (eventsToRemove.includes(appt.appointmentPK)) {
         eventsToRemove = eventsToRemove.filter(e => e !== appt.appointmentPK);
@@ -747,7 +744,11 @@ export default class CalendarPage extends React.Component {
       sha256(JSON.stringify(appt)).then( hash => {
         (async () => {
           try {
-            handleAppointment(appt, hash, appointmentCalendar);
+            if (appt.patientPK) {
+              handleAppointment(appt, hash, appointmentPatientCalendar);
+            } else if (appt.caregiverPK) {
+              handleAppointment(appt, hash, appointmentCalendar);
+            }
           } catch (error) {
             console.warn('handleAppointment - outside', error);
           }
@@ -798,11 +799,13 @@ export default class CalendarPage extends React.Component {
     RNCalendarEvents.findCalendars()
     .then((result) => {
       const appointmentCalendar = this.getAppointmentCalendar(result);
+      const appointmentPatientCalendar = this.getAppointmentPatientCalendar(result);
       const medicationCalendar = this.getMedicationCalendar(result);
       const groupSessionCalendar = this.getGroupSessionCalendar(result);
       const indivSessionCalendar = this.getIndivSessionCalendar(result);
 
       if (!appointmentCalendar) { return; }
+      if (!appointmentPatientCalendar) { return; }
       if (!medicationCalendar) { return; }
       if (!groupSessionCalendar) { return; }
       if (!indivSessionCalendar) { return; }
@@ -813,10 +816,10 @@ export default class CalendarPage extends React.Component {
           const eventsToRemoveStr = await AsyncStorage.getItem('@appointmentCalendar:etr');
           if (eventsToRemoveStr == null) {
             eventsToRemove = [];
-            this.iterateThroughAppointments(eventsToRemove, appointmentCalendar);
+            this.iterateThroughAppointments(eventsToRemove, appointmentCalendar, appointmentPatientCalendar);
           } else {
             eventsToRemove = JSON.parse(eventsToRemoveStr);
-            this.iterateThroughAppointments(eventsToRemove, appointmentCalendar);
+            this.iterateThroughAppointments(eventsToRemove, appointmentCalendar, appointmentPatientCalendar);
           }
         } catch (error) {
           console.warn('AsyncStorage - getItem: eventsToRemove', error);
