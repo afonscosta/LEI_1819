@@ -44,13 +44,17 @@ class EventViewSet(generics.ListAPIView):
                 user = get_object_or_404(Caregiver, pk=user)
                 participants.append(user.info)
                 serializer_data = getAppointments(user, is_patient)
-                sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+                appointments = getAppointmentBackToFrontJSON(serializer_data)
+                if appointments:
+                    sent_data['appointments'].append(appointments)
             for user in data['patients']:
                 user = get_object_or_404(Patient, pk=user)
                 participants.append(user.info)
                 is_patient = True
                 serializer_data = getAppointments(user, is_patient)
-                sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+                appointments = getAppointmentBackToFrontJSON(serializer_data)
+                if appointments:
+                    sent_data['appointments'].append(appointments)
             # get session
             serializer_data = getSessions(participants, only_validated)
             sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
@@ -63,11 +67,16 @@ class EventViewSet(generics.ListAPIView):
             logger.info(patients)
             logger.info(patients)
             serializer_data = getAppointments(caregiver, is_patient)
-            sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+            appointments = getAppointmentBackToFrontJSON(serializer_data)
+            if appointments:
+                sent_data['appointments'] = sent_data['appointments'] + appointments
             for patient in patients:
                 is_patient = True
                 serializer_data = getAppointments(patient, is_patient)
-                sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+                appointments = getAppointmentBackToFrontJSON(serializer_data)
+                if appointments:
+                    sent_data['appointments'] = sent_data['appointments'] + appointments
+            sent_data['appointments'] = [sent_data['appointments']]
             # get session
             participants.append(caregiver.info)
             only_validated = True
