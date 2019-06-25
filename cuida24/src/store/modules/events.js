@@ -96,6 +96,7 @@ const actions = {
     commit('deleteEvent', eventID)
   },
   getEvents ({ rootGetters, commit }, payload) {
+    console.log(payload)
     eventsService.fetchEvents(payload)
       .then(events => {
         console.log('sessions/appointments recebidas do django', events)
@@ -104,6 +105,9 @@ const actions = {
         events.appointments.forEach(appts => {
           this.dispatch('appointments/setAppointments', appts)
         })
+        if (events.appointments.length === 0) {
+          this.dispatch('appointments/setAppointments', [])
+        }
         this.dispatch('sessions/setSessions', events.sessions[0])
       })
   }
