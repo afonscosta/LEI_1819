@@ -57,13 +57,13 @@ class Patient(models.Model):
     info = models.OneToOneField(UserAuth, on_delete=models.CASCADE)
     caregiver = models.ForeignKey(Caregiver, on_delete=models.CASCADE)
 
-
 class BackofficeUser(models.Model):
     TYPE = (
       ('ADM', 'Administrador'), ('COR', 'Coordenador'), ('REM', 'Responsável Medicação'), ('PRF', 'Profissional Saúde'),
       ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
     type = models.CharField(max_length=3, choices=TYPE)
     info = models.OneToOneField(UserAuth, on_delete=models.CASCADE)
+
 
 class BackofficeUserTypeGroup(models.Model):
     TYPE = (
@@ -72,6 +72,7 @@ class BackofficeUserTypeGroup(models.Model):
         ('MED', 'Médico'), ('ENF', 'Enfermeiro'), ('PSI', 'Psicólogo'))
     type = models.CharField(max_length=3, choices=TYPE)
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
+
 
 # Historic
 

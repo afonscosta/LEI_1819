@@ -1,5 +1,4 @@
 import copy
-import logging
 import json
 
 from django.shortcuts import get_object_or_404
@@ -12,7 +11,6 @@ logger = logging.getLogger("mylogger")
 '''
 Não está a a ser utilizado
 '''
-
 
 def eventFrontToBackJSON(request_param):
     request = copy.deepcopy(request_param)
