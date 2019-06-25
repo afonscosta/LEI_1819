@@ -3,7 +3,6 @@ from django.views.generic import TemplateView
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.utils import timezone
 
 from backend.cuida24.permissions import *
 from .services import *
@@ -41,6 +40,13 @@ class GoalViewSet(viewsets.ModelViewSet):
         logger.info(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def retrieve(self, request, *args, **kwargs):
+        logger.info("GET GOALS CAREGIVER BY PK")
+        logger.info(self.kwargs['pk'])
+        return_data = getGoals(self.kwargs['pk'])
+        return Response(return_data, status=status.HTTP_200_OK)
+
+
     @action(detail=False, methods=['get'])
     def typeGoal(self, request):
         logger.info("GET TYPE GOAL")
@@ -59,44 +65,11 @@ class GoalViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def list_goals_caregiver(self, request):
-        logger.info("GET GOALS CAREGIVER")
+        logger.info("GET GOALS CAREGIVER BY TOKEN")
         caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
-        date_now = timezone.now()
-        goals = Goal.objects.filter(disable=False)
-        choices_value = dict(Goal.TYPE)
-        return_data = {}
-        for goal in goals:
-            dateB = goal.dateBegin
-            dateE = goal.dateEnd
-            logger.info(goal.dateBegin)
-            logger.info(date_now)
-            logger.info(goal.dateEnd)
-            if dateB <= date_now <= dateE:
-                realized = 0
-                if goal.type == 'AF' or goal.type == 'LS' or goal.type == 'LI':
-                    realized = Activity.objects.filter(type=goal.type, caregiver=caregiver,
-                                                       date__range=(dateB, dateE)).count()
+        logger.info(caregiver)
+        return_data = getGoals(caregiver)
 
-                if goal.type == 'WT':
-                    realized = Water.objects.filter(caregiver=caregiver,
-                                                    date__range=(dateB, dateE)).count()
-                if goal.type == 'NP':
-                    realized = Nap.objects.filter(caregiver=caregiver,
-                                                  date__range=(dateB, dateE)).count()
-                if goal.type == 'SP':
-                    realized = Sleep.objects.filter(caregiver=caregiver,
-                                                    date__range=(dateB, dateE)).count()
-                if goal.type == 'SS':
-                    realized = SOS.objects.filter(caregiver=caregiver,
-                                                  date__range=(dateB, dateE)).count()
-                if goal.type == 'PA' or goal.type == 'LM' or goal.type == 'AL' or goal.type == 'LT' or goal.type == 'JT':
-                    realized = Meal.objects.filter(type=goal.type, caregiver=caregiver,
-                                                   date__range=(dateB, dateE)).count()
-                if goal.type == 'CB' or goal.type == 'FT' or goal.type == 'VG' or goal.type == 'FB' or goal.type == 'PC' or goal.type == 'RF' or goal.type == 'AL':
-                    realized = Meal.objects.filter(food=goal.type, caregiver=caregiver,
-                                                   date__range=(dateB, dateE)).count()
-                return_data[str(goal.type)] = {'type': choices_value[goal.type], 'realized': realized, 'goal': goal.goal}
-                logger.info(return_data)
         return Response(return_data, status=status.HTTP_200_OK)
 
 
