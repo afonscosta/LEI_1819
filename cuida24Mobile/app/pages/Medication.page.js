@@ -22,23 +22,6 @@ import
   {RadioButton, RadioButtonInput, RadioButtonLabel} 
 from 'react-native-simple-radio-button';
 
-//const fetchMedName = async (token, pk) => {
-  //return await fetch("http://10.0.2.2:8000/cuida24/medicine/" + pk, {
-    //headers: new Headers({
-      //'Authorization': 'Token ' + token,
-      //'Content-Type': 'application/json'
-    //})
-  //})
-    //.then(res => res.json())
-    //.then(res => {
-      //console.log('med before return', res.activeSubs);
-      //return res.activeSubs;
-    //})
-    //.catch(error => {
-      //this.setState({ error, loading : false });
-    //})
-//}
-
 const parseSchedule = (event) => {
 	var rec = null;
 	if (event.event.schedule.duration &&
@@ -144,7 +127,7 @@ const addNewPrescription = async (token, presc, hash, medicationCalendar, eventI
 		if (n > today || rec) {
       var repeatType = null;
       if (rec === 'daily') {
-        repeatType = 'minute';  //'day'
+        repeatType = 'day';
       } else if (rec === 'weekly') {
         repeatType = 'week';
       }

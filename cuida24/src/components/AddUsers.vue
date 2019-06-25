@@ -109,10 +109,10 @@
               <label>{{ c.info.name }}</label>
             </b-col>
             <b-col>
-              <b-button @click="deleteCaregiver(c.pk)">Eliminar</b-button>
+              <b-button disabled @click="deleteCaregiver(c.pk)">Eliminar</b-button>
             </b-col>
             <b-col>
-              <b-button>Editar</b-button>
+              <b-button disabled>Editar</b-button>
             </b-col>
           </b-row>
         </b-card>
@@ -126,10 +126,10 @@
               <label>{{ p.info.name }} (Cuidador: {{ p.caregiver }})</label>
             </b-col>
             <b-col>
-              <b-button @click="deletePatient(p.pk)">Eliminar</b-button>
+              <b-button disabled @click="deletePatient(p.pk)">Eliminar</b-button>
             </b-col>
             <b-col>
-              <b-button>Editar</b-button>
+              <b-button disabled>Editar</b-button>
             </b-col>
           </b-row>
         </b-card>
@@ -143,10 +143,10 @@
               <label>{{ b.info.name }} ({{ b.type }})</label>
             </b-col>
             <b-col>
-              <b-button @click="deleteBackoffice(b.pk)">Eliminar</b-button>
+              <b-button disabled @click="deleteBackoffice(b.pk)">Eliminar</b-button>
             </b-col>
             <b-col>
-              <b-button>Editar</b-button>
+              <b-button disabled>Editar</b-button>
             </b-col>
           </b-row>
         </b-card>
