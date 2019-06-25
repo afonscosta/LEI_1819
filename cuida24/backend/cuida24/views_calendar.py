@@ -32,24 +32,57 @@ class EventViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         logger.info("GET EVENT")
         logger.info(request.GET)
-        data = json.loads(dict(request.GET)['users'][0])
         is_patient = False
         sent_data = {'appointments': [], 'sessions': []}
         participants = []
-        for user in data['caregivers']:
-            user = get_object_or_404(Caregiver, pk=user)
-            participants.append(user.info)
-            serializer_data = getAppointments(user, is_patient)
-            sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
-        for user in data['patients']:
-            user = get_object_or_404(Patient, pk=user)
-            participants.append(user.info)
-            serializer_data = getAppointments(user, is_patient)
-            sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
-        # get session
-        serializer_data = getSessions(participants)
-        sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
-        logger.info(sent_data)
+        only_validated = False
+        if request.GET:
+            logger.info("GET EVENT BY ID")
+            data = json.loads(dict(request.GET)['users'][0])
+            logger.info(data)
+            for user in data['caregivers']:
+                user = get_object_or_404(Caregiver, pk=user)
+                participants.append(user.info)
+                serializer_data = getAppointments(user, is_patient)
+                appointments = getAppointmentBackToFrontJSON(serializer_data)
+                if appointments:
+                    sent_data['appointments'].append(appointments)
+            for user in data['patients']:
+                user = get_object_or_404(Patient, pk=user)
+                participants.append(user.info)
+                is_patient = True
+                serializer_data = getAppointments(user, is_patient)
+                appointments = getAppointmentBackToFrontJSON(serializer_data)
+                if appointments:
+                    sent_data['appointments'].append(appointments)
+            # get session
+            serializer_data = getSessions(participants, only_validated)
+            sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
+            logger.info(sent_data)
+        else:
+            logger.info("GET EVENT BY TOKEN")
+            caregiver = get_object_or_404(Caregiver, info=request.user.pk)
+            patients = Patient.objects.filter(caregiver=caregiver.pk)
+            logger.info("My patients")
+            logger.info(patients)
+            logger.info(patients)
+            serializer_data = getAppointments(caregiver, is_patient)
+            appointments = getAppointmentBackToFrontJSON(serializer_data)
+            if appointments:
+                sent_data['appointments'] = sent_data['appointments'] + appointments
+            for patient in patients:
+                is_patient = True
+                serializer_data = getAppointments(patient, is_patient)
+                appointments = getAppointmentBackToFrontJSON(serializer_data)
+                if appointments:
+                    sent_data['appointments'] = sent_data['appointments'] + appointments
+            sent_data['appointments'] = [sent_data['appointments']]
+            # get session
+            participants.append(caregiver.info)
+            only_validated = True
+            serializer_data = getSessions(participants, only_validated)
+            sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
+            logger.info(sent_data)
         return Response(sent_data, status=status.HTTP_200_OK)
 
 
@@ -477,7 +510,23 @@ class MedicationViewSet(viewsets.ModelViewSet):
                 data.append(serializer_data)
             sent_data = getPrescriptionBackToFrontJSON(list(itertools.chain(*data)))
             return Response(sent_data, status=status.HTTP_200_OK)
-
+    '''
+    @action(detail=False, methods=['get'])
+    def patient_medication(self, request):
+        logger.info(request.user.pk)
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        patients = Patient.objects.filter(caregiver=caregiver)
+        return_data = []
+        for patient in patients:
+            query_set = Prescription.objects.filter(patient=patient.pk)
+            for prescription in query_set:
+                logger.info(prescription)
+                query_set2 = Medication.objects.filter(prescription=prescription.pk).values('medication')
+                logger.info(query_set2)
+                serializer = MedicineSerializer(query_set2, many=True)
+                return_data.append(serializer.data)
+        return Response(return_data, status=status.HTTP_200_OK)
+    '''
 
 class TakeViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
