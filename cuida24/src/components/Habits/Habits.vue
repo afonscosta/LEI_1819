@@ -42,7 +42,20 @@
         </b-form>
       </b-card>
 
-      {{ goalsCaregiver }}
+      <b-row class="mt-3">
+        <b-col>
+          <b-card v-if="Object.keys(goalsCaregiver).length > 0" class="mb-1"
+            header="Objetivos semanais"
+            header-tag="header"
+          >
+            <b-card class="mb-3" no-body v-for="key in Object.keys(goalsCaregiver)" :key="key">
+              <p class="mt-2"><strong>Tipo:</strong> {{ goalsCaregiver[key].type }}</p>
+              <p><strong>Objetivo:</strong> {{ goalsCaregiver[key].goal }}</p>
+              <p><strong>Realizadas:</strong> {{ goalsCaregiver[key].realized }}</p>
+            </b-card>
+          </b-card>
+        </b-col>
+      </b-row>
 
       <div class="mt-3" role="tablist">
         <b-card v-if="activities.length > 0" no-body class="mb-1">
