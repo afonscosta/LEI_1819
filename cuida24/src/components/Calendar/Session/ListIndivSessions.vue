@@ -74,7 +74,7 @@
               @click="goToEvaluation(is)"
               >Avaliar participante</b-button>
             <b-button block 
-              v-if="is.individualSession.state === 'E' && userAuth === 'COR'"
+              v-if="is.individualSession.state === 'E' && userAuth.type === 'COR'"
               class="mt-2" 
               size="sm" 
               variant="primary" 

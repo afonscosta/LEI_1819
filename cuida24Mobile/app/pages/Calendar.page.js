@@ -658,9 +658,6 @@ export default class CalendarPage extends React.Component {
         const groupSessionCalendar = this.getGroupSessionCalendar(result);
         const indivSessionCalendar = this.getIndivSessionCalendar(result);
 
-        console.log('appptUtente', appointmentPatientCalendar);
-        console.log('result', result);
-
         // Calendário consultas já existe
         if (appointmentCalendar && cal.calendar === 'Consultas') { 
           return; 
@@ -798,11 +795,13 @@ export default class CalendarPage extends React.Component {
     RNCalendarEvents.findCalendars()
     .then((result) => {
       const appointmentCalendar = this.getAppointmentCalendar(result);
+      const appointmentPatientCalendar = this.getAppointmentPatientCalendar(result);
       const medicationCalendar = this.getMedicationCalendar(result);
       const groupSessionCalendar = this.getGroupSessionCalendar(result);
       const indivSessionCalendar = this.getIndivSessionCalendar(result);
 
       if (!appointmentCalendar) { return; }
+      if (!appointmentPatientCalendar) { return; }
       if (!medicationCalendar) { return; }
       if (!groupSessionCalendar) { return; }
       if (!indivSessionCalendar) { return; }
