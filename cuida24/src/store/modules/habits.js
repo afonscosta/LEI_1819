@@ -11,7 +11,8 @@ const state = {
   userSOS: [],
   userSleep: [],
   userNap: [],
-  userMeal: []
+  userMeal: [],
+  goalsCaregiver: []
 }
 
 const getters = {
@@ -47,6 +48,9 @@ const getters = {
   },
   userMeal: state => {
     return state.userMeal
+  },
+  goalsCaregiver: state => {
+    return state.goalsCaregiver
   }
 }
 
@@ -116,6 +120,9 @@ const mutations = {
   },
   setUserNap (state, items) {
     state.userNap = items
+  },
+  setGoalsCaregiver (state, gs) {
+    state.goalsCaregiver = gs
   }
 }
 
@@ -301,6 +308,13 @@ const actions = {
       .then(items => {
         console.log('fetch nap', items)
         commit('setUserNap', items)
+      })
+  },
+  getGoalsCaregiver ({ commit }, payload) {
+    habitsService.fetchGoalsCaregiver(payload)
+      .then(gs => {
+        console.log('fetch goalsCaregiver', gs)
+        commit('setGoalsCaregiver', gs)
       })
   }
 }

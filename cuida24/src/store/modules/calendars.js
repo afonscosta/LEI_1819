@@ -19,6 +19,9 @@ const getters = {
   },
   calendarIndivSession: state => {
     return state.calendars.find(calendar => calendar.pk === 4)
+  },
+  calendarAppointPatient: state => {
+    return state.calendars.find(calendar => calendar.pk === 5)
   }
 }
 

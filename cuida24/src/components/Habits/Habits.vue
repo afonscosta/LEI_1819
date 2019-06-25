@@ -42,6 +42,8 @@
         </b-form>
       </b-card>
 
+      {{ goalsCaregiver }}
+
       <div class="mt-3" role="tablist">
         <b-card v-if="activities.length > 0" no-body class="mb-1">
           <b-card-header header-tag="header" class="p-1" role="tab">
@@ -172,7 +174,8 @@ export default {
       water: state => state.habits.userWater,
       sos: state => state.habits.userSOS,
       sleep: state => state.habits.userSleep,
-      nap: state => state.habits.userNap
+      nap: state => state.habits.userNap,
+      goalsCaregiver: state => state.habits.goalsCaregiver
     }),
     caregiversParsed () {
       // TODO: Será que é esta pk?
@@ -185,6 +188,7 @@ export default {
     onSubmitSearch (evt) {
       evt.preventDefault()
       this.$store.dispatch('habits/getHabits', this.selectedCaregiver)
+      this.$store.dispatch('habits/getGoalsCaregiver', this.selectedCaregiver)
       console.log('search habits for ', this.selectedCaregiver)
     },
     formatDates (dateOne, dateTwo) {

@@ -264,7 +264,8 @@ export default {
       usersActive: state => state.users.usersActive
     }),
     ...mapGetters('calendars', [
-      'calendarAppoint'
+      'calendarAppoint',
+      'calendarAppointPatient'
     ]),
     scheduleChosen () {
       return this.parseScheduleOption(this.selectedSchedule)
@@ -316,14 +317,27 @@ export default {
         'caregivers': this.usersActive.caregivers,
         'patients': this.usersActive.patients
       }
-      let data = {
-        'calendar': this.calendarAppoint.pk,
-        'color': this.calendarAppoint.color,
-        'description': this.formData.specialty,
-        'forecolor': this.calendarAppoint.forecolor,
-        'location': this.formData.local,
-        'notify': this.formData.notify,
-        'title': 'Consulta'
+      let data = {}
+      if (users.caregivers.length > 0) {
+        data = {
+          'calendar': this.calendarAppoint.pk,
+          'color': this.calendarAppoint.color,
+          'description': this.formData.specialty,
+          'forecolor': this.calendarAppoint.forecolor,
+          'location': this.formData.local,
+          'notify': this.formData.notify,
+          'title': 'Consulta'
+        }
+      } else if (users.patients.length > 0) {
+        data = {
+          'calendar': this.calendarAppointPatient.pk,
+          'color': this.calendarAppoint.color,
+          'description': this.formData.specialty,
+          'forecolor': this.calendarAppoint.forecolor,
+          'location': this.formData.local,
+          'notify': this.formData.notify,
+          'title': 'Consulta'
+        }
       }
       this.formData.sched = this.scheduleChosen
       if (!this.formData.sched) {

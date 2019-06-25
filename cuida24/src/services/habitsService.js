@@ -138,5 +138,12 @@ export default {
         Authorization: 'Token ' + store.state.accesstoken
       }
     }).then(response => response.data)
+  },
+  fetchGoalsCaregiver  (pk) {
+    return cuida24.get(`goal/list_goals_caregiver/${pk}`, {
+      headers: {
+        Authorization: 'Token ' + store.state.accesstoken
+      }
+    }).then(response => response.data)
   }
 }
