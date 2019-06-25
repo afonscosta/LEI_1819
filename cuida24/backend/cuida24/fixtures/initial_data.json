@@ -36,6 +36,15 @@
     }
   },
   {
+    "model": "cuida24.Calendar",
+    "pk": 5,
+    "fields": {
+       "calendar": "Consultas utente",
+       "color": "#00BCD4",
+       "forecolor": "#ffffff"
+    }
+  },
+  {
     "model": "cuida24.Medicine",
     "pk": 1,
     "fields": {

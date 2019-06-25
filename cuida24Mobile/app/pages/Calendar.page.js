@@ -519,6 +519,15 @@ export default class CalendarPage extends React.Component {
     );
   }
 
+  getAppointmentPatientCalendar(result) {
+    return result.find(c =>
+      c.title === 'Consultas utente' &&
+      c.type === 'LOCAL' && 
+      c.isPrimary &&
+      !c.allowsModifications
+    );
+  }
+
   getMedicationCalendar(result) {
     return result.find(c =>
       c.title === 'Medicação' &&
@@ -627,9 +636,7 @@ export default class CalendarPage extends React.Component {
           loading: false,
           refreshing: false
         }, () => {
-          if (res.detail && res.detail !== 'Invalid token.') {
-            this.addCalendars()
-          }
+          this.addCalendars()
         });
       })
       .catch(error => {
@@ -646,12 +653,20 @@ export default class CalendarPage extends React.Component {
         }
 
         const appointmentCalendar = this.getAppointmentCalendar(result);
+        const appointmentPatientCalendar = this.getAppointmentPatientCalendar(result);
         const medicationCalendar = this.getMedicationCalendar(result);
         const groupSessionCalendar = this.getGroupSessionCalendar(result);
         const indivSessionCalendar = this.getIndivSessionCalendar(result);
 
+        console.log('appptUtente', appointmentPatientCalendar);
+        console.log('result', result);
+
         // Calendário consultas já existe
         if (appointmentCalendar && cal.calendar === 'Consultas') { 
+          return; 
+        }
+        // Calendário consultas já existe
+        if (appointmentPatientCalendar && cal.calendar === 'Consultas utente') { 
           return; 
         }
         // Calendário medicação já existe
@@ -690,15 +705,11 @@ export default class CalendarPage extends React.Component {
   }
 
   fetchEventsFromApi = (token)  => {
-    const url = this.state.base_url + "events";
+    const url = this.state.base_url + "events/";
 
     this.setState({ loading: true });
 
-		const encodedValue = encodeURIComponent(
-			JSON.stringify({caregivers: [1], patients: []})
-		);
-
-    fetch(url + `?users=${encodedValue}`, {
+    fetch(url, {
       headers: new Headers({
         'Authorization': 'Token ' + token,
         'Content-Type': 'application/json'
