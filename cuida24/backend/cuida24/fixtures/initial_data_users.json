@@ -76,24 +76,10 @@
     }
   },
   {"model": "cuida24.BackofficeUserTypeGroup",
-   "pk": 1,
-   "fields": {
-        "type": "ADM",
-        "group": "4"
-   }
-  },
-  {"model": "cuida24.BackofficeUserTypeGroup",
    "pk": 2,
    "fields": {
         "type": "ADM",
         "group": "1"
-   }
-  },
-  {"model": "cuida24.BackofficeUserTypeGroup",
-   "pk": 3,
-   "fields": {
-        "type": "ADM",
-        "group": "11"
    }
   },
   {"model": "cuida24.BackofficeUserTypeGroup",
@@ -311,7 +297,9 @@
         "last_name": "admin",
         "password": "123",
         "username": "admin@gmail.com",
-        "email": "admin@gmail.com"
+        "email": "admin@gmail.com",
+        "is_superuser": "t",
+        "is_staff": "t"
     }
   },
   {
@@ -525,26 +513,10 @@
   },
   {
     "model": "auth.user_groups",
-    "pk": 13,
-    "fields": {
-        "user": "9",
-        "group": "1"
-    }
-  },
-  {
-    "model": "auth.user_groups",
     "pk": 14,
     "fields": {
         "user": "9",
         "group": "4"
-    }
-  },
-  {
-    "model": "auth.user_groups",
-    "pk": 15,
-    "fields": {
-        "user": "9",
-        "group": "11"
     }
   },
   {

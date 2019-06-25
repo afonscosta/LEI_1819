@@ -93,10 +93,10 @@ Appointments Views
 class AppointmentViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
-        'POST': ['admin', 'coordinator', 'healthcare.prof', 'doctor'],
-        'PUT': ['admin', 'coordinator', 'healthcare.prof', 'doctor'],
-        'DELETE': ['admin', 'coordinator', 'healthcare.prof', 'doctor']
+        'GET': ['caregiver', 'coordinator', 'healthcare.prof', 'doctor'],
+        'POST': ['coordinator', 'healthcare.prof', 'doctor'],
+        'PUT': ['coordinator', 'healthcare.prof', 'doctor'],
+        'DELETE': ['coordinator', 'healthcare.prof', 'doctor']
     }
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
@@ -171,10 +171,10 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 class AppointmentNoteViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
-        'POST': ['admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
-        'PUT': ['admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
-        'DELETE': ['admin', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist']
+        'GET': ['caregiver', 'coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
+        'POST': ['coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
+        'PUT': ['coordinator', 'healthcare.prof', 'doctor', 'psychologist'],
+        'DELETE': ['coordinator', 'healthcare.prof', 'doctor', 'psychologist']
     }
     queryset = AppointmentNote.objects.all()
     serializer_class = AppointmentNoteSerializer
@@ -394,9 +394,9 @@ class MedicineViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
         'GET': ['caregiver', 'backofficeUser'],
-        'POST': ['admin', 'coordinator', 'resp.medication'],
-        'PUT': ['admin', 'coordinator', 'resp.medication'],
-        'DELETE': ['admin', 'coordinator', 'resp.medication']
+        'POST': ['coordinator', 'resp.medication'],
+        'PUT': ['coordinator', 'resp.medication'],
+        'DELETE': ['coordinator', 'resp.medication']
     }
     queryset = Medicine.objects.all()
     serializer_class = MedicineSerializer
@@ -417,10 +417,10 @@ class MedicineViewSet(viewsets.ModelViewSet):
 class MedicationViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
-        'POST': ['admin', 'coordinator', 'healthcare.prof', 'doctor'],
-        'PUT': ['admin'],
-        'DELETE': ['admin']
+        'GET': ['caregiver', 'coordinator', 'healthcare.prof', 'doctor'],
+        'POST': ['coordinator', 'healthcare.prof', 'doctor'],
+        'PUT': ['coordinator', 'healthcare.prof', 'doctor', 'caregiver'],
+        'DELETE': ['coordinator', 'healthcare.prof', 'doctor']
     }
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
@@ -531,10 +531,10 @@ class MedicationViewSet(viewsets.ModelViewSet):
 class TakeViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
-        'POST': ['caregiver', 'admin', 'coordinator', 'healthcare.prof', 'doctor'],
-        'DELETE': ['admin'],
-        'PUT': ['admin']
+        'GET': ['caregiver', 'coordinator', 'healthcare.prof', 'doctor'],
+        'POST': ['caregiver', 'coordinator', 'healthcare.prof', 'doctor'],
+        'DELETE': [],
+        'PUT': []
     }
     queryset = Take.objects.all()
     serializer_class = TakeSerializer

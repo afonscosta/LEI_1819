@@ -112,10 +112,10 @@ class IndividualLeisureViewSet(viewsets.ModelViewSet):
 class WaterViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator'],
-        'POST': ['caregiver', 'admin'],
-        'DELETE': ['admin'],
-        'PUT': ['caregiver', 'admin']
+        'GET': ['caregiver', 'coordinator'],
+        'POST': ['caregiver'],
+        'DELETE': [],
+        'PUT': ['caregiver']
     }
     queryset = Water.objects.all()
     serializer_class = WaterSerializer
@@ -179,10 +179,10 @@ class WaterViewSet(viewsets.ModelViewSet):
 class SleepViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator'],
-        'POST': ['caregiver', 'admin'],
-        'DELETE': ['admin'],
-        'PUT': ['caregiver', 'admin']
+        'GET': ['caregiver', 'coordinator'],
+        'POST': ['caregiver'],
+        'DELETE': [],
+        'PUT': ['caregiver']
     }
     queryset = Sleep.objects.all()
     serializer_class = SleepSerializer
@@ -243,10 +243,10 @@ class SleepViewSet(viewsets.ModelViewSet):
 class NapViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator'],
-        'POST': ['caregiver', 'admin'],
-        'DELETE': ['admin'],
-        'PUT': ['caregiver', 'admin']
+        'GET': ['caregiver', 'coordinator'],
+        'POST': ['caregiver'],
+        'DELETE': [],
+        'PUT': ['caregiver']
     }
     queryset = Nap.objects.all()
     serializer_class = NapSerializer
@@ -310,10 +310,10 @@ class NapViewSet(viewsets.ModelViewSet):
 class SOSViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator'],
-        'POST': ['caregiver', 'admin'],
-        'DELETE': ['admin'],
-        'PUT': ['caregiver', 'admin']
+        'GET': ['caregiver', 'coordinator'],
+        'POST': ['caregiver'],
+        'DELETE': [],
+        'PUT': ['caregiver']
     }
     queryset = SOS.objects.all()
     serializer_class = SOSSerializer
@@ -379,10 +379,10 @@ class SOSViewSet(viewsets.ModelViewSet):
 class ActivityViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator'],
-        'POST': ['caregiver', 'admin'],
-        'DELETE': ['admin'],
-        'PUT': ['caregiver', 'admin']
+        'GET': ['caregiver', 'coordinator'],
+        'POST': ['caregiver'],
+        'DELETE': [],
+        'PUT': ['caregiver']
     }
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
@@ -461,10 +461,10 @@ class ActivityViewSet(viewsets.ModelViewSet):
 class MealViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'admin', 'coordinator'],
-        'POST': ['caregiver', 'admin'],
-        'DELETE': ['admin'],
-        'PUT': ['caregiver', 'admin']
+        'GET': ['caregiver', 'coordinator'],
+        'POST': ['caregiver'],
+        'DELETE': [],
+        'PUT': ['caregiver']
     }
     queryset = Meal.objects.all()
     serializer_class = MealSerializer
