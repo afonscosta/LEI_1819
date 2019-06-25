@@ -43,7 +43,7 @@ class AuthenticateUserView(generics.ListAPIView):
 class CaregiverViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'GET': ['caregiver','admin', 'patient', 'backofficeUser'],
         'POST': ['admin'],
         'DELETE': ['admin'],
         'PUT': ['admin']
@@ -52,10 +52,11 @@ class CaregiverViewSet(viewsets.ModelViewSet):
     serializer_class = CaregiverSerializer
 
 
+
 class PatientViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'GET': ['caregiver', 'admin', 'patient', 'backofficeUser'],
         'POST': ['admin'],
         'DELETE': ['admin'],
         'PUT': ['admin']
@@ -67,7 +68,7 @@ class PatientViewSet(viewsets.ModelViewSet):
 class BackofficeUserViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
     required_groups = {
-        'GET': ['caregiver', 'patient', 'backofficeUser'],
+        'GET': ['caregiver', 'admin', 'patient', 'backofficeUser'],
         'POST': ['admin'],
         'DELETE': ['admin'],
         'PUT': ['admin']

@@ -29,8 +29,6 @@ class HasGroupPermission(permissions.BasePermission):
     """
     Ensure user is in required groups.
     """
-    logger.info("check permission...")
-
     def has_permission(self, request, view):
         # Get a mapping of methods -> required group.
         required_groups_mapping = getattr(view, "required_groups", {})
@@ -38,6 +36,6 @@ class HasGroupPermission(permissions.BasePermission):
         # Determine the required groups for this particular request method.
         required_groups = required_groups_mapping.get(request.method, [])
 
-        # Return True if the user has all the required groups
+        # Return True if the user has one of the required groups
         return any([is_in_group(request.user, group_name) if group_name != "__all__" else True for group_name in
                     required_groups])

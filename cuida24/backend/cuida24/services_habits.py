@@ -1,11 +1,7 @@
-import copy
-import logging
-import json
 from django.utils import timezone
 
 from django.shortcuts import get_object_or_404
 
-from backend.cuida24.models import *
 from backend.cuida24.serializers import *
 
 logger = logging.getLogger("mylogger")
