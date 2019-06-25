@@ -510,7 +510,23 @@ class MedicationViewSet(viewsets.ModelViewSet):
                 data.append(serializer_data)
             sent_data = getPrescriptionBackToFrontJSON(list(itertools.chain(*data)))
             return Response(sent_data, status=status.HTTP_200_OK)
-
+    '''
+    @action(detail=False, methods=['get'])
+    def patient_medication(self, request):
+        logger.info(request.user.pk)
+        caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+        patients = Patient.objects.filter(caregiver=caregiver)
+        return_data = []
+        for patient in patients:
+            query_set = Prescription.objects.filter(patient=patient.pk)
+            for prescription in query_set:
+                logger.info(prescription)
+                query_set2 = Medication.objects.filter(prescription=prescription.pk).values('medication')
+                logger.info(query_set2)
+                serializer = MedicineSerializer(query_set2, many=True)
+                return_data.append(serializer.data)
+        return Response(return_data, status=status.HTTP_200_OK)
+    '''
 
 class TakeViewSet(viewsets.ModelViewSet):
     permission_classes = (HasGroupPermission,)
