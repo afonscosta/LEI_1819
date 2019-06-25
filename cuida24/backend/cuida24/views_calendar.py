@@ -32,24 +32,43 @@ class EventViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         logger.info("GET EVENT")
         logger.info(request.GET)
-        data = json.loads(dict(request.GET)['users'][0])
         is_patient = False
         sent_data = {'appointments': [], 'sessions': []}
         participants = []
-        for user in data['caregivers']:
-            user = get_object_or_404(Caregiver, pk=user)
-            participants.append(user.info)
-            serializer_data = getAppointments(user, is_patient)
+        if request.GET:
+            logger.info("GET EVENT BY ID")
+            data = json.loads(dict(request.GET)['users'][0])
+            logger.info(data)
+            for user in data['caregivers']:
+                user = get_object_or_404(Caregiver, pk=user)
+                participants.append(user.info)
+                serializer_data = getAppointments(user, is_patient)
+                sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+            for user in data['patients']:
+                user = get_object_or_404(Patient, pk=user)
+                participants.append(user.info)
+                is_patient = True
+                serializer_data = getAppointments(user, is_patient)
+                sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+            # get session
+            serializer_data = getSessions(participants)
+            sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
+            logger.info(sent_data)
+        else:
+            logger.info("GET EVENT BY TOKEN")
+            caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
+            patients = Patient.objects.filter(caregiver=caregiver)
+            serializer_data = getAppointments(caregiver, is_patient)
             sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
-        for user in data['patients']:
-            user = get_object_or_404(Patient, pk=user)
-            participants.append(user.info)
-            serializer_data = getAppointments(user, is_patient)
-            sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
-        # get session
-        serializer_data = getSessions(participants)
-        sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
-        logger.info(sent_data)
+            for patient in patients:
+                is_patient = True
+                serializer_data = getAppointments(patient, is_patient)
+                sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
+            # get session
+            participants.append(caregiver.info)
+            serializer_data = getSessions(participants)
+            sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
+            logger.info(sent_data)
         return Response(sent_data, status=status.HTTP_200_OK)
 
 
