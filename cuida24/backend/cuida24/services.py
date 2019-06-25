@@ -313,8 +313,11 @@ def getAppointments(user, is_patient):
 '''
 
 
-def getSessions(participants):
-    queryset = Session.objects.filter(participants__in=participants).distinct()
+def getSessions(participants, only_validated):
+    if only_validated:
+        queryset = Session.objects.filter(participants__in=participants, state='A').distinct()
+    else:
+        queryset = Session.objects.filter(participants__in=participants).distinct()
     serializer_session = SessionSerializer(queryset, many=True)
     for session in serializer_session.data:
         logger.info(session)

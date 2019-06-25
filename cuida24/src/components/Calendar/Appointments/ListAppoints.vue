@@ -61,8 +61,8 @@
             <b-card-text align="left">
               <b>Localização:</b> {{ appt.event.data.location }}
             </b-card-text>
-            <b-button v-if="['COR', 'PRF', 'MED'].includes(userAuth)" variant="danger" @click="remove(appt)">Eliminar</b-button>
-            <b-button v-if="['COR', 'PRF', 'MED'].includes(userAuth)" @click="edit(appt.appointmentPK)">Editar</b-button>
+            <b-button v-if="['COR', 'PRF', 'MED'].includes(userAuth.type)" variant="danger" @click="remove(appt)">Eliminar</b-button>
+            <b-button v-if="['COR', 'PRF', 'MED'].includes(userAuth.type)" @click="edit(appt.appointmentPK)">Editar</b-button>
             <b-button @click="viewNotes(appt.appointmentPK)">Notas de consulta</b-button>
           </b-card>
         </b-col>

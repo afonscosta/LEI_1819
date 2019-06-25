@@ -35,6 +35,7 @@ class EventViewSet(generics.ListAPIView):
         is_patient = False
         sent_data = {'appointments': [], 'sessions': []}
         participants = []
+        only_validated = False
         if request.GET:
             logger.info("GET EVENT BY ID")
             data = json.loads(dict(request.GET)['users'][0])
@@ -51,13 +52,16 @@ class EventViewSet(generics.ListAPIView):
                 serializer_data = getAppointments(user, is_patient)
                 sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
             # get session
-            serializer_data = getSessions(participants)
+            serializer_data = getSessions(participants, only_validated)
             sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
             logger.info(sent_data)
         else:
             logger.info("GET EVENT BY TOKEN")
-            caregiver = get_object_or_404(Caregiver, info=request.user.pk).pk
-            patients = Patient.objects.filter(caregiver=caregiver)
+            caregiver = get_object_or_404(Caregiver, info=request.user.pk)
+            patients = Patient.objects.filter(caregiver=caregiver.pk)
+            logger.info("My patients")
+            logger.info(patients)
+            logger.info(patients)
             serializer_data = getAppointments(caregiver, is_patient)
             sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
             for patient in patients:
@@ -66,7 +70,8 @@ class EventViewSet(generics.ListAPIView):
                 sent_data['appointments'].append(getAppointmentBackToFrontJSON(serializer_data))
             # get session
             participants.append(caregiver.info)
-            serializer_data = getSessions(participants)
+            only_validated = True
+            serializer_data = getSessions(participants, only_validated)
             sent_data['sessions'].append(getSessionBackToFrontJSON(serializer_data))
             logger.info(sent_data)
         return Response(sent_data, status=status.HTTP_200_OK)
