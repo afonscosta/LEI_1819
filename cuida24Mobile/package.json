@@ -14,7 +14,7 @@
     "@redux-offline/redux-offline": "^2.5.1",
     "date-fns": "^1.30.1",
     "react": "16.8.3",
-    "react-native": "0.59.5",
+    "react-native": "0.62.3",
     "react-native-calendar-events": "^1.7.1",
     "react-native-calendars": "^1.66.0",
     "react-native-elements": "^1.1.0",
